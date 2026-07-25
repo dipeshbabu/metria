@@ -3,7 +3,9 @@ mlx KV translation + import-gate, vllm + sglang surface checks."""
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -14,6 +16,7 @@ from refract.backends.base import (
     CompletionResult,
     KLDResult,
     TrajectoryResult,
+    _aggregate_topk_kld,
     _full_token_chunks,
     approximate_topk_kl,
 )
@@ -49,6 +52,15 @@ def test_full_token_chunks(
 def test_full_token_chunks_rejects_non_positive_chunk_length():
     with pytest.raises(ValueError, match="chunk_len must be positive"):
         _full_token_chunks([0], chunk_len=0, max_chunks=1)
+
+
+def test_aggregate_topk_kld_rejects_misaligned_chunk_counts():
+    with pytest.raises(BackendCapabilityError, match="chunk count mismatch"):
+        _aggregate_topk_kld(
+            [[{1: -0.1}]],
+            [],
+            backend_name="test backend",
+        )
 
 
 # --- registry -------------------------------------------------------------
@@ -186,6 +198,200 @@ def test_vllm_methods_present():
         "model_metadata",
     ):
         assert callable(getattr(bk, meth)), f"VLLMBackend missing {meth}"
+
+
+def _run_fake_topk_kld(
+    backend_name: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    reference_positions: list[dict[int, float]],
+    candidate_positions: list[dict[int, float]],
+) -> KLDResult:
+    corpus = tmp_path / "corpus.txt"
+    corpus.write_text("test corpus", encoding="utf-8")
+
+    if backend_name == "vllm":
+        from refract.backends import vllm as module
+
+        class FakeSamplingParams:
+            def __init__(self, **kwargs):
+                self.kwargs = kwargs
+
+        class FakeTokenizer:
+            def encode(self, text, *, add_special_tokens):
+                return list(range(len(reference_positions)))
+
+        class FakeLLM:
+            def __init__(self, positions):
+                self.positions = positions
+
+            def get_tokenizer(self):
+                return FakeTokenizer()
+
+            def generate(self, prompt, sampling_params, *, use_tqdm):
+                prompt_logprobs = [
+                    (
+                        {
+                            token_id: SimpleNamespace(logprob=logprob)
+                            for token_id, logprob in position.items()
+                        }
+                        if position
+                        else None
+                    )
+                    for position in self.positions
+                ]
+                return [SimpleNamespace(prompt_logprobs=prompt_logprobs)]
+
+        reference_llm = FakeLLM(reference_positions)
+        candidate_llm = FakeLLM(candidate_positions)
+        monkeypatch.setitem(
+            sys.modules,
+            "vllm",
+            SimpleNamespace(SamplingParams=FakeSamplingParams),
+        )
+        monkeypatch.setattr(
+            module,
+            "_get_llm",
+            lambda model, kv_dtype, max_model_len: (
+                reference_llm if kv_dtype == "auto" else candidate_llm
+            ),
+        )
+        return VLLMBackend().run_kld(
+            model="org/model",
+            corpus=corpus,
+            ref_kv_str="ctk=f16,ctv=f16",
+            cand_kv_str="ctk=q8_0,ctv=q8_0",
+            chunks=1,
+            ctx=len(reference_positions) + 1,
+        )
+
+    from refract.backends import sglang as module
+
+    reference_url = "http://reference.test"
+    candidate_url = "http://candidate.test"
+    monkeypatch.setenv("REFRACT_SGLANG_REF_URL", reference_url)
+    monkeypatch.setenv("REFRACT_SGLANG_CAND_URL", candidate_url)
+    monkeypatch.setattr(module, "_model_id", lambda url: "org/model")
+
+    def encode_positions(positions):
+        return [
+            (
+                [[logprob, token_id, None] for token_id, logprob in position.items()]
+                if position
+                else None
+            )
+            for position in positions
+        ]
+
+    def fake_post(url, path, body, *, timeout_s):
+        if path == "/tokenize":
+            return {"tokens": list(range(len(reference_positions)))}
+        positions = reference_positions if url == reference_url else candidate_positions
+        return {
+            "meta_info": {
+                "input_token_top_logprobs": encode_positions(positions),
+            }
+        }
+
+    monkeypatch.setattr(module, "_post", fake_post)
+    return SGLangBackend().run_kld(
+        model="org/model",
+        corpus=corpus,
+        ref_kv_str="ctk=f16,ctv=f16",
+        cand_kv_str="ctk=q8_0,ctv=q8_0",
+        chunks=1,
+        ctx=len(reference_positions) + 8,
+    )
+
+
+@pytest.mark.parametrize("backend_name", ["vllm", "sglang"])
+def test_topk_backends_reject_zero_scored_positions(
+    backend_name, tmp_path, monkeypatch
+):
+    positions = [{}, {}, {}]
+    with pytest.raises(BackendCapabilityError, match="zero usable positions"):
+        _run_fake_topk_kld(
+            backend_name,
+            tmp_path,
+            monkeypatch,
+            positions,
+            positions,
+        )
+
+
+@pytest.mark.parametrize("backend_name", ["vllm", "sglang"])
+def test_topk_backends_reject_non_finite_logprobs(backend_name, tmp_path, monkeypatch):
+    reference = [{}, {1: float("nan")}, {2: -0.4}]
+    candidate = [{}, {1: -0.2}, {2: -0.5}]
+    with pytest.raises(BackendCapabilityError, match="must be finite"):
+        _run_fake_topk_kld(
+            backend_name,
+            tmp_path,
+            monkeypatch,
+            reference,
+            candidate,
+        )
+
+
+@pytest.mark.parametrize("backend_name", ["vllm", "sglang"])
+def test_topk_backends_reject_misaligned_position_counts(
+    backend_name, tmp_path, monkeypatch
+):
+    reference = [{}, {1: -0.2}, {2: -0.4}]
+    candidate = [{}, {1: -0.2}]
+    with pytest.raises(BackendCapabilityError, match="position count mismatch"):
+        _run_fake_topk_kld(
+            backend_name,
+            tmp_path,
+            monkeypatch,
+            reference,
+            candidate,
+        )
+
+
+@pytest.mark.parametrize("backend_name", ["vllm", "sglang"])
+def test_topk_backends_reject_one_sided_missing_positions(
+    backend_name, tmp_path, monkeypatch
+):
+    reference = [{}, {1: -0.2}, {2: -0.4}]
+    candidate = [{}, {}, {2: -0.4}]
+    with pytest.raises(BackendCapabilityError, match="availability mismatch"):
+        _run_fake_topk_kld(
+            backend_name,
+            tmp_path,
+            monkeypatch,
+            reference,
+            candidate,
+        )
+
+
+@pytest.mark.parametrize("backend_name", ["vllm", "sglang"])
+def test_topk_backends_report_partial_position_coverage(
+    backend_name, tmp_path, monkeypatch
+):
+    reference = [{}, {1: -0.2, 2: -2.0}, {3: -0.4, 4: -1.5}]
+    candidate = [{}, {1: -0.3, 2: -1.8}, {3: -0.6, 4: -1.2}]
+    result = _run_fake_topk_kld(
+        backend_name,
+        tmp_path,
+        monkeypatch,
+        reference,
+        candidate,
+    )
+    expected_kld = (
+        sum(
+            approximate_topk_kl(ref, cand)
+            for ref, cand in zip(reference[1:], candidate[1:], strict=True)
+        )
+        / 2
+    )
+    assert result.mean_kld == pytest.approx(expected_kld)
+    assert result.metadata["n_positions_total"] == 3
+    assert result.metadata["n_positions_scored"] == 2
+    assert result.metadata["n_positions_skipped"] == 1
+    assert result.metadata["position_coverage"] == pytest.approx(2 / 3)
+    assert result.metadata["partial_positions"] is True
+    assert result.metadata["position_alignment"] == "exact"
 
 
 # --- sglang backend (production v0.3.2.1) ---------------------------------
