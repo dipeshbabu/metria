@@ -22,7 +22,6 @@ Env knobs
 
 from __future__ import annotations
 
-import math
 import os
 from pathlib import Path
 from typing import Any, Optional
@@ -34,8 +33,8 @@ from .base import (
     KLDResult,
     ModelSpec,
     TrajectoryResult,
+    _aggregate_topk_kld,
     _full_token_chunks,
-    approximate_topk_kl,
 )
 
 # llama.cpp KV cache string → vLLM kv_cache_dtype.
@@ -267,48 +266,29 @@ class VLLMBackend(Backend):
         cand_llm = _get_llm(model, cand_dtype, max_len)
         cand_logp = _run(cand_llm)
 
-        # Aligned, normalized top-k estimate. It includes a residual bucket
-        # for omitted vocabulary mass but is not a full-vocabulary KL.
-        LOG_FLOOR = -30.0
-        total_kl = 0.0
-        n_pos = 0
-        sq_dp_sum = 0.0
-        n_dp = 0
-        same_topp_hits = 0
-        same_topp_n = 0
-        for ref_chunk, cand_chunk in zip(ref_logp, cand_logp, strict=False):
-            for ref_pos, cand_pos in zip(ref_chunk, cand_chunk, strict=False):
-                if not ref_pos or not cand_pos:
-                    continue
-                n_pos += 1
-                for tid, ref_lp in ref_pos.items():
-                    p = math.exp(ref_lp)
-                    cand_lp = cand_pos.get(tid, LOG_FLOOR)
-                    if p > 1e-9:
-                        sq_dp_sum += ((math.exp(cand_lp) - p) / p) ** 2
-                        n_dp += 1
-                total_kl += approximate_topk_kl(ref_pos, cand_pos, log_floor=LOG_FLOOR)
-                ref_top = max(ref_pos.items(), key=lambda kv: kv[1])[0]
-                cand_top = max(cand_pos.items(), key=lambda kv: kv[1])[0]
-                same_topp_hits += int(ref_top == cand_top)
-                same_topp_n += 1
-
-        mean_kl = total_kl / max(n_pos, 1)
-        rms_dp_pct = 100.0 * math.sqrt(sq_dp_sum / max(n_dp, 1)) if n_dp else None
-        same_topp_pct = (
-            100.0 * same_topp_hits / max(same_topp_n, 1) if same_topp_n else None
+        metrics = _aggregate_topk_kld(
+            ref_logp,
+            cand_logp,
+            backend_name="vLLM",
         )
         return KLDResult(
-            mean_kld=mean_kl,
-            rms_dp_pct=rms_dp_pct,
-            same_topp_pct=same_topp_pct,
+            mean_kld=metrics.mean_kld,
+            rms_dp_pct=metrics.rms_dp_pct,
+            same_topp_pct=metrics.same_topp_pct,
             chunks=len(slices),
             ctx=ctx,
             metadata={
                 "ref_kv_cache_dtype": ref_dtype,
                 "cand_kv_cache_dtype": cand_dtype,
                 "topk": topk,
-                "n_positions_scored": n_pos,
+                "n_positions_total": metrics.n_positions_total,
+                "n_positions_scored": metrics.n_positions_scored,
+                "n_positions_skipped": metrics.n_positions_skipped,
+                "position_coverage": (
+                    metrics.n_positions_scored / metrics.n_positions_total
+                ),
+                "partial_positions": metrics.n_positions_skipped > 0,
+                "position_alignment": "exact",
                 "kld_estimator": "normalized_top_k_with_other_bucket",
                 "full_vocabulary": False,
             },

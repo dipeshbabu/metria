@@ -7,6 +7,11 @@ matrix result that motivated or validated the change.
 
 ## Unreleased
 
+- vLLM and SGLang KLD evaluation now rejects empty, non-finite, and
+  positionally misaligned prompt-log-probability responses instead of allowing
+  missing evidence to produce a perfect score. Symmetrically unavailable
+  positions are reported through total/scored/skipped counts and a coverage
+  ratio; zero usable positions fail with `BackendCapabilityError`.
 - Raised the repository-wide PyTorch floor to 2.13.0, the first release that
   fixes GHSA-rrmf-rvhw-rf47. The managed vLLM extra is temporarily withdrawn
   because vLLM 0.25.1 still pins vulnerable PyTorch 2.11.0; the adapter code
