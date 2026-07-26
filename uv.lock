@@ -9,7 +9,7 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "refract-llm",
+    "kv-fidelity",
     "turboquant-reference",
 ]
 constraints = [
@@ -26,6 +26,7 @@ dev = [
     { name = "pytest", specifier = ">=9.0.3" },
     { name = "pytest-cov", specifier = ">=4.0" },
     { name = "ruff", specifier = ">=0.15.22" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0" },
     { name = "twine", specifier = ">=5.0" },
     { name = "types-requests", specifier = ">=2.28" },
 ]
@@ -796,6 +797,85 @@ sdist = { url = "https://files.pythonhosted.org/packages/43/4b/674af6ef2f97d56f0
 wheels = [
     { url = "https://files.pythonhosted.org/packages/81/db/e655086b7f3a705df045bf0933bdd9c2f79bb3c97bfef1384598bb79a217/keyring-25.7.0-py3-none-any.whl", hash = "sha256:be4a0b195f149690c166e850609a477c532ddbfbaed96a404d4e43f8d5e2689f", size = 39160, upload-time = "2025-11-16T16:26:08.402Z" },
 ]
+
+[[package]]
+name = "kv-fidelity"
+version = "0.3.5.dev0"
+source = { editable = "components/kv-fidelity" }
+
+[package.optional-dependencies]
+benchmarks = [
+    { name = "accelerate" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "torch" },
+    { name = "transformers" },
+]
+dev = [
+    { name = "build" },
+    { name = "coverage" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+    { name = "twine" },
+]
+full = [
+    { name = "mlx", marker = "sys_platform == 'darwin'" },
+    { name = "mlx-lm", marker = "sys_platform == 'darwin'" },
+    { name = "requests" },
+    { name = "transformers" },
+]
+mlx = [
+    { name = "mlx", marker = "sys_platform == 'darwin'" },
+    { name = "mlx-lm", marker = "sys_platform == 'darwin'" },
+]
+research = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sglang = [
+    { name = "requests" },
+    { name = "transformers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "accelerate", marker = "extra == 'benchmarks'", specifier = ">=0.28" },
+    { name = "build", marker = "extra == 'dev'", specifier = ">=1.0" },
+    { name = "coverage", marker = "extra == 'dev'", specifier = ">=7.15.2" },
+    { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'full'", specifier = ">=0.29.4" },
+    { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.29.4" },
+    { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'full'", specifier = ">=0.31" },
+    { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.31" },
+    { name = "numpy", marker = "extra == 'benchmarks'", specifier = ">=1.23" },
+    { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.23" },
+    { name = "numpy", marker = "extra == 'research'", specifier = ">=1.23" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.3" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0" },
+    { name = "requests", marker = "extra == 'full'", specifier = ">=2.33" },
+    { name = "requests", marker = "extra == 'sglang'", specifier = ">=2.33" },
+    { name = "scipy", marker = "extra == 'benchmarks'", specifier = ">=1.10" },
+    { name = "scipy", marker = "extra == 'dev'", specifier = ">=1.10" },
+    { name = "scipy", marker = "extra == 'research'", specifier = ">=1.10" },
+    { name = "tomli", marker = "python_full_version < '3.11' and extra == 'dev'", specifier = ">=2.0" },
+    { name = "torch", marker = "extra == 'benchmarks'", specifier = ">=2.13" },
+    { name = "transformers", marker = "extra == 'benchmarks'", specifier = ">=5.3" },
+    { name = "transformers", marker = "extra == 'full'", specifier = ">=5.3" },
+    { name = "transformers", marker = "extra == 'sglang'", specifier = ">=5.3" },
+    { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0" },
+]
+provides-extras = ["mlx", "sglang", "full", "research", "benchmarks", "dev"]
 
 [[package]]
 name = "librt"
@@ -1747,83 +1827,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/02/51/d3a6ea424652c60f0
 wheels = [
     { url = "https://files.pythonhosted.org/packages/97/1b/295bf2fa3e740131778065e5ffa2c481f0e7210182d408e9a2c244ff5b0c/readme_renderer-45.0-py3-none-any.whl", hash = "sha256:3385ed220117104a2bceb4a9dac8c5fdf6d1f96890d7ea2a9c7174fd5c84091f", size = 14134, upload-time = "2026-06-09T21:05:15.85Z" },
 ]
-
-[[package]]
-name = "refract-llm"
-version = "0.3.4"
-source = { editable = "components/refract" }
-
-[package.optional-dependencies]
-benchmarks = [
-    { name = "accelerate" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
-    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "torch" },
-    { name = "transformers" },
-]
-dev = [
-    { name = "build" },
-    { name = "coverage" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
-    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "twine" },
-]
-full = [
-    { name = "mlx", marker = "sys_platform == 'darwin'" },
-    { name = "mlx-lm", marker = "sys_platform == 'darwin'" },
-    { name = "requests" },
-    { name = "transformers" },
-]
-refract-mlx = [
-    { name = "mlx", marker = "sys_platform == 'darwin'" },
-    { name = "mlx-lm", marker = "sys_platform == 'darwin'" },
-]
-refract-sglang = [
-    { name = "requests" },
-    { name = "transformers" },
-]
-research = [
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
-    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "accelerate", marker = "extra == 'benchmarks'", specifier = ">=0.28" },
-    { name = "build", marker = "extra == 'dev'", specifier = ">=1.0" },
-    { name = "coverage", marker = "extra == 'dev'", specifier = ">=7.15.2" },
-    { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'full'", specifier = ">=0.29.4" },
-    { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'refract-mlx'", specifier = ">=0.29.4" },
-    { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'full'", specifier = ">=0.31" },
-    { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'refract-mlx'", specifier = ">=0.31" },
-    { name = "numpy", marker = "extra == 'benchmarks'", specifier = ">=1.23" },
-    { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.23" },
-    { name = "numpy", marker = "extra == 'research'", specifier = ">=1.23" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.3" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0" },
-    { name = "requests", marker = "extra == 'full'", specifier = ">=2.33" },
-    { name = "requests", marker = "extra == 'refract-sglang'", specifier = ">=2.33" },
-    { name = "scipy", marker = "extra == 'benchmarks'", specifier = ">=1.10" },
-    { name = "scipy", marker = "extra == 'dev'", specifier = ">=1.10" },
-    { name = "scipy", marker = "extra == 'research'", specifier = ">=1.10" },
-    { name = "torch", marker = "extra == 'benchmarks'", specifier = ">=2.13" },
-    { name = "transformers", marker = "extra == 'benchmarks'", specifier = ">=5.3" },
-    { name = "transformers", marker = "extra == 'full'", specifier = ">=5.3" },
-    { name = "transformers", marker = "extra == 'refract-sglang'", specifier = ">=5.3" },
-    { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0" },
-]
-provides-extras = ["refract-mlx", "refract-sglang", "full", "research", "benchmarks", "dev"]
 
 [[package]]
 name = "regex"

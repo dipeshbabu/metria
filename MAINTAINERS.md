@@ -12,13 +12,13 @@ Use [SUPPORT.md](SUPPORT.md) for public support routes,
 
 | Maintainer | Role | Scope |
 |---|---|---|
-| [@dipeshbabu](https://github.com/dipeshbabu) | Lead maintainer and release manager | Repository administration, REFRACT, TurboQuant reference, tools, research and artifacts, documentation, security coordination, and releases |
+| [@dipeshbabu](https://github.com/dipeshbabu) | Lead maintainer and release manager | Repository administration, KV Fidelity, TurboQuant reference, tools, research and artifacts, documentation, security coordination, and releases |
 
 ## Component ownership
 
 | Area | Paths | Responsible maintainer | Stability |
 |---|---|---|---|
-| REFRACT | `components/refract/` | `@dipeshbabu` | Published beta package |
+| KV Fidelity | `components/kv-fidelity/` | `@dipeshbabu` | Unpublished beta package |
 | TurboQuant reference | `components/turboquant-reference/` | `@dipeshbabu` | Research alpha package |
 | Repository tools | `tools/` | `@dipeshbabu` | Mixed experimental and operational tooling |
 | Maintained documentation | `docs/`, root community files | `@dipeshbabu` | Current guidance and policy |

@@ -8,13 +8,13 @@ GitHub: [@dipeshbabu](https://github.com/dipeshbabu)
 
 ## Abstract
 
-We benchmark three production inference engines (vLLM, SGLang, llama.cpp) on a single AMD MI300X GPU running the same hybrid GDN + attention MoE model (Qwen3.6-35B-A3B). Two rounds: (1) BF16 baseline with no KV compression, measuring load time, perplexity, prefill, and decode; (2) REFRACT 4-axis fidelity scoring with each engine's native 8-bit KV cache against its own fp/bf16 reference. No advanced compression schemes (TurboQuant or otherwise) are tested. Baseline-only.
+We benchmark three production inference engines (vLLM, SGLang, llama.cpp) on a single AMD MI300X GPU running the same hybrid GDN + attention MoE model (Qwen3.6-35B-A3B). Two rounds: (1) BF16 baseline with no KV compression, measuring load time, perplexity, prefill, and decode; (2) KV Fidelity 4-axis fidelity scoring with each engine's native 8-bit KV cache against its own fp/bf16 reference. No advanced compression schemes (TurboQuant or otherwise) are tested. Baseline-only.
 
 The BF16 round shows no single engine wins all axes. Model load: llama.cpp 31.8 s vs vLLM 188.9 s and SGLang ~210 s (first launch, includes AITER kernel JIT compile). PPL at 32K: 5.49 / 5.74 / 6.01 (vLLM / SGLang / llama.cpp), measured at non-uniform chunk sizes (vLLM 3 × 32K, SGLang 9 × 8K due to logprob OOM at 32K, llama.cpp 9 × 32K sliding) — comparison is loose. Prefill at 32K: SGLang 32,428 tok/s, vLLM 11,690 tok/s, llama.cpp 1,298 tok/s. Decode at 256 output tokens: llama.cpp 133.2 tok/s (clean isolated `tg256` measurement), SGLang 90.2 tok/s, vLLM 25.6 tok/s (last two derived as `total - prefill` after a 32K prefill — methodology differs from llama.cpp's isolated decode).
 
-The REFRACT round: all three engines hit 100.0 R-NIAH (long-context retrieval at 32K) under their respective 8-bit KV. Trajectory and KLD axes diverge. llama.cpp `q8_0` (block-quantized int8) produces 0.0025 nats of mean KL drift from fp16 KV. vLLM `fp8_e4m3` produces 0.037 nats. SGLang `fp8_e4m3` (forced through Triton attention because AITER's fp8 prefill kernel rejected the hybrid model) produces 0.021 nats. The two engines that both label their compression `fp8_e4m3` produce a 1.8× difference in mean KL drift.
+The KV Fidelity round: all three engines hit 100.0 R-NIAH (long-context retrieval at 32K) under their respective 8-bit KV. Trajectory and KLD axes diverge. llama.cpp `q8_0` (block-quantized int8) produces 0.0025 nats of mean KL drift from fp16 KV. vLLM `fp8_e4m3` produces 0.037 nats. SGLang `fp8_e4m3` (forced through Triton attention because AITER's fp8 prefill kernel rejected the hybrid model) produces 0.021 nats. The two engines that both label their compression `fp8_e4m3` produce a 1.8× difference in mean KL drift.
 
-Composite scores (harmonic mean of all four REFRACT axes): llama.cpp 89.39 PASS, SGLang 86.97 PASS, vLLM 84.31 DEGRADED.
+Composite scores (harmonic mean of all four KV Fidelity axes): llama.cpp 89.39 PASS, SGLang 86.97 PASS, vLLM 84.31 DEGRADED.
 
 The bench documents 8 nontrivial engine-side bugs encountered during bring-up. Total wall time: ~12 hours.
 
@@ -24,7 +24,7 @@ The bench documents 8 nontrivial engine-side bugs encountered during bring-up. T
 
 KV cache compression is one lever for fitting long context into GPU memory at inference time. Three production engines support 8-bit KV cache compression on AMD MI300X via different paths: llama.cpp via `q8_0` (block-quantized int8), vLLM via `fp8_e4m3` (AMD's fnuz fp8 variant through ROCm flash-attention), and SGLang via `fp8_e4m3` (intended through AITER's fp8 prefill kernel, in this bench forced through Triton attention).
 
-This paper reports a controlled cross-engine measurement on a single MI300X. Methodology matches context length, tokenization, and reference anchoring across engines where the engine APIs permit. Fidelity scoring uses [REFRACT](../../components/refract/README.md), a 4-axis evaluation framework anchored to each engine's own fp/bf16 reference.
+This paper reports a controlled cross-engine measurement on a single MI300X. Methodology matches context length, tokenization, and reference anchoring across engines where the engine APIs permit. Fidelity scoring uses [KV Fidelity](../../components/kv-fidelity/README.md), a 4-axis evaluation framework anchored to each engine's own fp/bf16 reference.
 
 The bench is baseline-only. No advanced KV compression schemes are tested.
 
@@ -58,8 +58,8 @@ The vLLM and llama.cpp branches are the author's forks. The SGLang configuration
 - Eval corpus: `wikitext-2-raw/wiki.test.raw` (~1.3 MB, ~250K tokens)
 - Same `prompts/v0.1.jsonl` (30 prompts) across all three engines
 - BF16 baseline measured at 32K context
-- REFRACT axes measured at 4096 ctx (Trajectory, KLD, PLAD) and 32768 ctx_max (R-NIAH)
-- All REFRACT scores anchored to each engine's own fp/bf16 reference (not a global "fp16 truth")
+- KV Fidelity axes measured at 4096 ctx (Trajectory, KLD, PLAD) and 32768 ctx_max (R-NIAH)
+- All KV Fidelity scores anchored to each engine's own fp/bf16 reference (not a global "fp16 truth")
 - Single-trial measurements; no multi-run variance bounds
 
 ---
@@ -86,9 +86,9 @@ KV / state footprint numbers are not directly comparable: vLLM reserves a KV poo
 
 ---
 
-## 4. REFRACT 4-Axis Fidelity Results
+## 4. KV Fidelity 4-Axis Fidelity Results
 
-[REFRACT](../../components/refract/README.md) scores how much fidelity each engine retains when 8-bit KV compression is enabled, anchored to that engine's own fp/bf16 reference. Four axes:
+[KV Fidelity](../../components/kv-fidelity/README.md) scores how much fidelity each engine retains when 8-bit KV compression is enabled, anchored to that engine's own fp/bf16 reference. Four axes:
 
 - **Trajectory (gtm):** greedy-decode N tokens per prompt under both KV configs. Score = fraction of candidate tokens that match the reference token-by-token.
 - **KLD:** per-token KL divergence between candidate and reference next-token distributions on a natural-text corpus. Score = `100 * exp(-mean_kld)`.
@@ -97,7 +97,7 @@ KV / state footprint numbers are not directly comparable: vLLM reserves a KV poo
 
 Composite is the harmonic mean of the four. Bands: ≥95 EXCELLENT, ≥85 PASS, ≥70 DEGRADED, <70 FAIL.
 
-### Cross-engine REFRACT scores
+### Cross-engine KV Fidelity scores
 
 | Engine | Cand KV | gtm | kld | rniah | plad | Composite | Band |
 |---|---|---:|---:|---:|---:|---:|---|
@@ -152,21 +152,21 @@ This section documents bring-up failures and the workaround for each. Reproducib
 
 ### llama.cpp (1 issue)
 
-REFRACT's R-NIAH axis tokenizes the haystack via `runner.tokenize_to_ids`, which previously shelled out to a `llama-tokenize` binary. On hosts where the local llama.cpp checkout had drifted from the loaded library, this failed with `Symbol not found: _llama_memory_breakdown_print`. Fix: dispatch `tokenize_to_ids` to the active backend's own tokenizer when the backend is not llamacpp. This is a REFRACT framework change, not a llama.cpp engine issue.
+KV Fidelity's R-NIAH axis tokenizes the haystack via `runner.tokenize_to_ids`, which previously shelled out to a `llama-tokenize` binary. On hosts where the local llama.cpp checkout had drifted from the loaded library, this failed with `Symbol not found: _llama_memory_breakdown_print`. Fix: dispatch `tokenize_to_ids` to the active backend's own tokenizer when the backend is not llamacpp. This is a KV Fidelity framework change, not a llama.cpp engine issue.
 
 ### vLLM (5 issues)
 
 1. **Missing flash-attn ROCm wheel.** Qwen3.6 instantiates a `Qwen3_VisionTransformer` subcomponent at model load even for text-only use. Its RoPE imports `flash_attn.ops.triton.rotary`. There is no pre-built flash-attn wheel for ROCm. Built from source via `git+https://github.com/ROCm/flash-attention.git@main_perf` with `--no-build-isolation`. ~5,800 .hip object files. ~70 minutes wall time on the droplet.
 
-2. **`max_num_seqs` default vs Mamba blocks.** vLLM defaults to `max_num_seqs=1024`. Hybrid Qwen3.6's Mamba state allocator at `gpu_memory_utilization=0.45` produced only 784 cache blocks. Engine init crashed: `ValueError: max_num_seqs (1024) exceeds available Mamba cache blocks (784). Each decode sequence requires one Mamba cache block, so CUDA graph capture cannot proceed.` Fixed via `REFRACT_VLLM_MAX_NUM_SEQS=32` env knob.
+2. **`max_num_seqs` default vs Mamba blocks.** vLLM defaults to `max_num_seqs=1024`. Hybrid Qwen3.6's Mamba state allocator at `gpu_memory_utilization=0.45` produced only 784 cache blocks. Engine init crashed: `ValueError: max_num_seqs (1024) exceeds available Mamba cache blocks (784). Each decode sequence requires one Mamba cache block, so CUDA graph capture cannot proceed.` Fixed via `KV_FIDELITY_VLLM_MAX_NUM_SEQS=32` env knob.
 
-3. **`prompt_logprobs` cap.** REFRACT's KLD axis sent `prompt_logprobs=64`. vLLM caps this at 20: `VLLMValidationError: Requested prompt logprobs of 64, which is greater than max allowed: 20`. Fixed via `REFRACT_VLLM_KLD_TOPK=20`.
+3. **`prompt_logprobs` cap.** KV Fidelity's KLD axis sent `prompt_logprobs=64`. vLLM caps this at 20: `VLLMValidationError: Requested prompt logprobs of 64, which is greater than max allowed: 20`. Fixed via `KV_FIDELITY_VLLM_KLD_TOPK=20`.
 
-4. **Trajectory axis interleaving forces N model loads.** REFRACT's trajectory axis originally interleaved `ref` and `cand` calls per prompt. With our eviction-on-key-change cache (necessary because two LLM instances of this hybrid model don't fit 192 GB at high `gpu_memory_utilization`), interleaving meant ~60 model evictions per axis. Refactored axis to batch all-ref then all-cand. Two model loads total per axis.
+4. **Trajectory axis interleaving forces N model loads.** KV Fidelity's trajectory axis originally interleaved `ref` and `cand` calls per prompt. With our eviction-on-key-change cache (necessary because two LLM instances of this hybrid model don't fit 192 GB at high `gpu_memory_utilization`), interleaving meant ~60 model evictions per axis. Refactored axis to batch all-ref then all-cand. Two model loads total per axis.
 
 5. **vLLM v1 engine subprocess holds GPU memory across `del LLM()`.** vLLM's v1 architecture runs the engine core as a multiprocessing subprocess. `del LLM()` plus `gc.collect()` plus `torch.cuda.empty_cache()` did not release the engine subprocess's GPU allocations in our run. The second axis's LLM init saw 24 GB free out of 192 GB and crashed: `ValueError: Free memory on device cuda:0 (24.05/191.69 GiB) on startup is less than desired GPU memory utilization (0.85, 162.93 GiB)`. Fix: split each axis into its own python process (`--skip-kld` for axis A, `--skip-gtm` for axis B, etc.). Process exit guarantees teardown.
 
-For axis C R-NIAH specifically, also bumped `REFRACT_VLLM_MAX_MODEL_LEN=33792` since the 32K probe needs ctx ≥ 32K and the LLM is cached by `max_model_len`.
+For axis C R-NIAH specifically, also bumped `KV_FIDELITY_VLLM_MAX_MODEL_LEN=33792` since the 32K probe needs ctx ≥ 32K and the LLM is cached by `max_model_len`.
 
 ### SGLang (3 issues + orchestrator)
 
@@ -182,12 +182,12 @@ For axis C R-NIAH specifically, also bumped `REFRACT_VLLM_MAX_MODEL_LEN=33792` s
 
 2. **AITER fp8 prefill rejects hybrid model.** With Quark loading patched, the next failure surfaces at request time: AITER's `mha_batch_prefill_fp8bf16` kernel raises `RuntimeError: invalid argument for batch_prefill` on hybrid Qwen3.6 for both `fp8_e4m3` and `fp8_e5m2`. Workaround: `--attention-backend triton` forces SGLang to bypass AITER's prefill kernel and route through Triton attention. This affects what "fp8 KV" actually runs (see §5).
 
-3. **KV dtype is fixed at server launch.** SGLang has no per-request KV dtype switching. REFRACT's KLD axis wants to compare two configs in one run. Built a sequential orchestrator (`refract_sglang_seq.sh`):
+3. **KV dtype is fixed at server launch.** SGLang has no per-request KV dtype switching. KV Fidelity's KLD axis wants to compare two configs in one run. Built a sequential orchestrator (`kv_fidelity_sglang_seq.sh`):
    - Phase ref: launch BF16 server, run all probes via HTTP, dump to JSON, kill container
    - Phase cand: launch fp8 server, run same probes, dump to JSON, kill
-   - Aggregate: load both JSONs, compute KLD per chunk, generate REFRACT-format scores
+   - Aggregate: load both JSONs, compute KLD per chunk, generate KV Fidelity-format scores
 
-   For axes C (R-NIAH) and D (PLAD), `refract_sglang_cd_collect.py` imports REFRACT's needle generator (`refract.axes.rniah._build_prompt`, `_extract_needle_keyword`) and perturbation functions (`refract.axes.plad._PERTURBATION_FUNCS`) directly so the methodology is identical to native REFRACT. The aggregator uses HuggingFace's tokenizer for PLAD's edit distance to avoid shelling out to `llama-tokenize`.
+   For axes C (R-NIAH) and D (PLAD), `kv_fidelity_sglang_cd_collect.py` imports KV Fidelity's needle generator (`kv_fidelity.axes.rniah._build_prompt`, `_extract_needle_keyword`) and perturbation functions (`kv_fidelity.axes.plad._PERTURBATION_FUNCS`) directly so the methodology is identical to native KV Fidelity. The aggregator uses HuggingFace's tokenizer for PLAD's edit distance to avoid shelling out to `llama-tokenize`.
 
 ### Total bring-up cost
 
@@ -221,7 +221,7 @@ For axis C R-NIAH specifically, also bumped `REFRACT_VLLM_MAX_MODEL_LEN=33792` s
 
 Three production inference engines on the same model, same GPU, same `fp8_e4m3` dtype label produce measurably different output fidelity. The dtype label does not constrain the kernel implementation; the kernel implementation determines the actual fidelity outcome.
 
-Measured composite REFRACT scores under each engine's native 8-bit KV: llama.cpp `q8_0` 89.39 PASS, SGLang `fp8_e4m3` (Triton attn) 86.97 PASS, vLLM `fp8_e4m3` 84.31 DEGRADED. All three engines score 100.0 on R-NIAH at 32K under their respective 8-bit KV.
+Measured composite KV Fidelity scores under each engine's native 8-bit KV: llama.cpp `q8_0` 89.39 PASS, SGLang `fp8_e4m3` (Triton attn) 86.97 PASS, vLLM `fp8_e4m3` 84.31 DEGRADED. All three engines score 100.0 on R-NIAH at 32K under their respective 8-bit KV.
 
 For workload selection in the BF16 round: SGLang dominates 32K prefill; llama.cpp dominates decode and load time; vLLM sits in the middle on speed.
 
@@ -234,14 +234,14 @@ Methodology recommendations for cross-engine benches: (1) anchor scoring against
 All scripts and orchestrators on the droplet at `/root/scripts/`:
 
 - `cross_engine_bench.sh` — BF16 baseline (load / PPL / prefill / decode / KV size for all 3 engines)
-- `refract_llamacpp_full.sh` — REFRACT --full on llama.cpp
-- `refract_vllm_full.sh` / `refract_vllm_full_cd.sh` — REFRACT split-axis on vLLM
-- `refract_sglang_seq.sh` / `refract_sglang_cd_seq.sh` — REFRACT two-phase orchestrator on SGLang
-- `refract_sglang_collect.py` / `refract_sglang_cd_collect.py` — SGLang HTTP probe collectors (A+B and C+D)
-- `refract_sglang_aggregate.py` / `refract_sglang_cd_aggregate.py` — REFRACT-format scoring from collected dumps
+- `kv_fidelity_llamacpp_full.sh` — KV Fidelity --full on llama.cpp
+- `kv_fidelity_vllm_full.sh` / `kv_fidelity_vllm_full_cd.sh` — KV Fidelity split-axis on vLLM
+- `kv_fidelity_sglang_seq.sh` / `kv_fidelity_sglang_cd_seq.sh` — KV Fidelity two-phase orchestrator on SGLang
+- `kv_fidelity_sglang_collect.py` / `kv_fidelity_sglang_cd_collect.py` — SGLang HTTP probe collectors (A+B and C+D)
+- `kv_fidelity_sglang_aggregate.py` / `kv_fidelity_sglang_cd_aggregate.py` — KV Fidelity-format scoring from collected dumps
 - `sitecustomize.py` — `aiter.dtypes` stub for SGLang container
 
-REFRACT framework changes are now consolidated in the
+KV Fidelity framework changes are now consolidated in the
 [current monorepo](../../README.md):
 
 - vLLM backend: working implementation, evict-on-key-change cache, env knobs for `MAX_NUM_SEQS`, `KLD_TOPK`, `GPU_MEMORY_UTILIZATION`, `MAX_MODEL_LEN`
@@ -253,11 +253,11 @@ REFRACT framework changes are now consolidated in the
 
 ## References
 
-- [REFRACT framework](../../components/refract/README.md) — 4-axis KV-cache fidelity scoring
-- [REFRACT QUICKSTART](../../components/refract/QUICKSTART.md)
-- [REFRACT vLLM backend](../../components/refract/src/refract/backends/vllm.py)
-- [REFRACT SGLang backend](../../components/refract/src/refract/backends/sglang.py)
-- [REFRACT leaderboard](../../components/refract/LEADERBOARD.md)
+- [KV Fidelity framework](../../components/kv-fidelity/README.md) — 4-axis KV-cache fidelity scoring
+- [KV Fidelity QUICKSTART](../../components/kv-fidelity/QUICKSTART.md)
+- [KV Fidelity vLLM backend](../../components/kv-fidelity/src/kv_fidelity/backends/vllm.py)
+- [KV Fidelity SGLang backend](../../components/kv-fidelity/src/kv_fidelity/backends/sglang.py)
+- [KV Fidelity leaderboard](../../components/kv-fidelity/LEADERBOARD.md)
 - [Historical llama.cpp fork](../../docs/reference/historical-forks.md#llamacpp-experimental-forks) — public URL unavailable
 - [Historical vLLM fork](../../docs/reference/historical-forks.md#vllm-experimental-forks) — public URL unavailable
 - PPL artifacts on instruct models: [attn-rotation-and-ppl-artifact.md](attn-rotation-and-ppl-artifact.md)

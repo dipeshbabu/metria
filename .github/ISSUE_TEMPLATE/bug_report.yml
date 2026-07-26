@@ -13,7 +13,7 @@ body:
     attributes:
       label: Affected area
       options:
-        - REFRACT
+        - KV Fidelity
         - TurboQuant reference
         - Diagnostics
         - Validation or benchmark tools
@@ -28,7 +28,7 @@ body:
     attributes:
       label: Version or commit
       description: Provide the package version or exact git commit SHA.
-      placeholder: refract-llm 0.3.4 or commit abc1234
+      placeholder: kv-fidelity 0.3.5.dev0 or commit abc1234
     validations:
       required: true
 

@@ -41,7 +41,7 @@ identifiers remain in research reports solely to identify the measured code.
 
 The former `turboquant_plus` repository was consolidated into this monorepo.
 Current material is available in the [documentation index](../index.md), the
-[REFRACT component](../../components/refract/README.md), and the
+[KV Fidelity component](../../components/kv-fidelity/README.md), and the
 [research archive](../../research/README.md).
 
 ## Archived identifiers

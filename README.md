@@ -19,11 +19,11 @@ matches your goal. Commands below assume a cloned repository and run from its
 root unless the linked guide says otherwise.
 
 - **Evaluate a KV-cache configuration** — inference engineers can install the
-  REFRACT beta CLI with
-  `python -m pip install "./components/refract"`, then verify the command
-  with `refract --help`. The real workflow produces JSON and self-contained
+  KV Fidelity beta CLI with
+  `python -m pip install "./components/kv-fidelity"`, then verify the command
+  with `kv-fidelity --help`. The real workflow produces JSON and self-contained
   HTML fidelity reports. Continue with the
-  [REFRACT quick start](components/refract/QUICKSTART.md) to select a backend,
+  [KV Fidelity quick start](components/kv-fidelity/QUICKSTART.md) to select a backend,
   run `selftest`, and score a model.
 - **Experiment with TurboQuant algorithms** — researchers can install the
   alpha reference library with
@@ -51,17 +51,17 @@ root unless the linked guide says otherwise.
 
 | Component | Purpose | Stability |
 |---|---|---|
-| [REFRACT](components/refract/README.md) | Reference-anchored fidelity evaluation across llama.cpp, MLX, vLLM, and SGLang | Beta; distribution name `refract-llm` |
+| [KV Fidelity](components/kv-fidelity/README.md) | Reference-anchored fidelity evaluation across llama.cpp, MLX, vLLM, and SGLang | Beta; planned distribution `kv-fidelity` |
 | [TurboQuant Reference](components/turboquant-reference/README.md) | NumPy/SciPy implementation of PolarQuant, QJL, KV-cache compression, packing, and related experiments | Research reference |
 | [Tools](tools/README.md) | Diagnostics, quality validation, benchmarking, and model-conversion utilities | Mixed; see each tool's requirements |
 | [Research](research/README.md) | Dated papers, investigations, negative results, and archived plans | Evidence record |
 | [Artifacts](artifacts/README.md) | Retained raw benchmark output, NIAH proofs, ablations, and hardware profiles | Immutable evidence where noted |
 
-The repository name is the umbrella identity. Existing public component
-contracts remain unchanged:
+The repository name is the umbrella identity. Current component contracts are:
 
-- REFRACT distribution: `refract-llm`
-- REFRACT import and command: `refract`
+- KV Fidelity distribution: `kv-fidelity` (not yet released on PyPI)
+- KV Fidelity import: `kv_fidelity`
+- KV Fidelity command: `kv-fidelity`
 - TurboQuant reference distribution: `turboquant-reference`
 - TurboQuant reference import: `turboquant`
 
@@ -82,7 +82,7 @@ contracts remain unchanged:
 - [Historical TurboQuant+ engine setup](docs/guides/getting-started.md)
 - [TurboQuant configuration recommendations](docs/guides/turboquant-recommendations.md)
 - [Benchmark reference](docs/reference/benchmarks.md)
-- [REFRACT quick start](components/refract/QUICKSTART.md)
+- [KV Fidelity quick start](components/kv-fidelity/QUICKSTART.md)
 - [Repository contribution guide](CONTRIBUTING.md)
 - [Support routes](SUPPORT.md)
 - [Governance and maintainers](GOVERNANCE.md)
@@ -100,12 +100,12 @@ uv run pre-commit install
 uv run pytest
 ```
 
-Backend-specific REFRACT dependencies are optional. Add only the extra needed
+Backend-specific KV Fidelity dependencies are optional. Add only the extra needed
 for the backend under test:
 
 ```bash
-uv sync --all-packages --extra refract-mlx
-uv sync --all-packages --extra refract-sglang
+uv sync --all-packages --extra mlx
+uv sync --all-packages --extra sglang
 ```
 
 Avoid `--all-extras`: the backend stacks have different platform and hardware
@@ -138,7 +138,7 @@ within the tested model and hardware matrix:
    [layer-aware V study](research/papers/layer-aware-v-compression.md).
 
 These are evidence-bounded findings, not universal guarantees. Validate every
-new model, engine, context length, and hardware target. REFRACT exists to make
+new model, engine, context length, and hardware target. KV Fidelity exists to make
 that comparison behavioral rather than relying on perplexity alone.
 
 ## Production ecosystem
@@ -161,7 +161,7 @@ runtime flags.
 
 ```text
 components/
-  refract/                 Published fidelity-evaluation package
+  kv-fidelity/             Fidelity-evaluation package source
   turboquant-reference/    Portable quantization reference package
 docs/
   guides/                  Current operational guidance
@@ -200,7 +200,7 @@ uv run pytest
 Build components independently:
 
 ```bash
-uv run python -m build components/refract
+uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
 ```
 

@@ -8,7 +8,7 @@ and how contributors can propose changes or challenge a decision.
 
 The project maintains four kinds of material with different stability needs:
 
-- published software, currently REFRACT;
+- published software, currently KV Fidelity;
 - portable research reference implementations, currently TurboQuant;
 - diagnostics, validation, benchmark, and conversion tools; and
 - research reports and retained experimental evidence.

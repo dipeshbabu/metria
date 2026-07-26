@@ -7,7 +7,7 @@ branch. Older release lines may be asked to upgrade before receiving a fix.
 
 | Component | Supported versions |
 | --- | --- |
-| `refract-llm` | `0.3.x` |
+| `kv-fidelity` | `main` (no PyPI release yet) |
 | `turboquant-reference` | `0.1.x` and `main` |
 
 ## Reporting a vulnerability
