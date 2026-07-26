@@ -12,8 +12,8 @@ against the same config don't pay the ~3 minute weight-load cost twice.
 Env knobs
 ---------
 
-  KV_FIDELITY_VLLM_GPU_MEMORY_UTILIZATION   default 0.45 (fits two parallel
-                                        LLM instances on one GPU)
+  KV_FIDELITY_VLLM_GPU_MEMORY_UTILIZATION   default 0.85 (one cached LLM
+                                        instance is active at a time)
   KV_FIDELITY_VLLM_MAX_MODEL_LEN            default 4096; bumped per-call as
                                         needed by ctx + n_predict
   KV_FIDELITY_VLLM_KLD_TOPK                 default 64; top-K used for the

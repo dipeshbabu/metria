@@ -83,6 +83,22 @@ def _sanitize_home_arg(arg: str, home: Optional[str] = None) -> str:
     return arg
 
 
+def _looks_like_kv_fidelity_cli(argv: list[str]) -> bool:
+    """Return whether argv identifies the KV Fidelity CLI exactly."""
+    if not argv:
+        return False
+    script = argv[0].replace("\\", "/").rstrip("/")
+    executable = script.rsplit("/", 1)[-1].casefold()
+    if executable in {"kv-fidelity", "kv-fidelity.exe"}:
+        return True
+    if script.casefold().endswith("/kv_fidelity/cli.py"):
+        return True
+    return any(
+        argv[index] == "-m" and argv[index + 1] == "kv_fidelity.cli"
+        for index in range(len(argv) - 1)
+    )
+
+
 # v0.1.4: short, human description per axis. Used to label what each
 # axis actually measures so layman-readers can map "Axis A score is bad"
 # to a real-world consequence without reading the paper.
@@ -483,13 +499,7 @@ def json_report(
         import sys as _sys
 
         argv = [str(a) for a in _sys.argv]
-        looks_like_kv_fidelity = any(
-            "kv_fidelity.cli" in a
-            or a.replace("\\", "/").rstrip("/").endswith("/kv-fidelity")
-            or a == "kv-fidelity"
-            for a in argv
-        )
-        if looks_like_kv_fidelity:
+        if _looks_like_kv_fidelity_cli(argv):
             home = _os.path.expanduser("~")
             parts = [_shlex.quote(_sanitize_home_arg(a, home)) for a in argv]
             repro_cmd = " ".join(parts)

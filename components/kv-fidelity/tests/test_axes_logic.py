@@ -134,6 +134,12 @@ def test_apply_typo_returns_none_when_no_long_words():
     assert _apply_typo("a b c", rng) is None  # all words < 4 chars
 
 
+def test_apply_typo_retries_past_duplicate_adjacent_letters():
+    out = _apply_typo("book", random.Random(0))
+    assert out is not None
+    assert out != "book"
+
+
 def test_apply_case_lowers_capitalized_words():
     out = _apply_case("Hello World")
     assert out == "hello world"

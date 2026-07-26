@@ -195,14 +195,16 @@ def _eligible_words(prompt: str) -> list[tuple[int, int, str]]:
 
 def _apply_typo(prompt: str, rng: random.Random) -> Optional[str]:
     eligible = [(s, e, w) for (s, e, w) in _eligible_words(prompt) if len(w) >= 4]
-    if not eligible:
+    candidates = [
+        (s, e, w, i)
+        for s, e, w in eligible
+        for i in range(len(w) - 1)
+        if w[i] != w[i + 1]
+    ]
+    if not candidates:
         return None
-    s, e, w = rng.choice(eligible)
-    # Swap two adjacent characters at a random interior position
-    i = rng.randrange(0, len(w) - 1)
+    s, e, w, i = rng.choice(candidates)
     swapped = w[:i] + w[i + 1] + w[i] + w[i + 2 :]
-    if swapped == w:  # palindromic pair, e.g. "ee"; skip
-        return None
     return prompt[:s] + swapped + prompt[e:]
 
 

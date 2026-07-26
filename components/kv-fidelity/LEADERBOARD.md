@@ -153,6 +153,6 @@ candidate ctk=q8_0/ctv=turbo4, llamacpp backend, M5 Max" — the version
 
 ## Future automation
 
-A `kv_fidelity leaderboard --in dir/ --out LEADERBOARD.md` subcommand
+A `kv-fidelity leaderboard --in dir/ --out LEADERBOARD.md` subcommand
 that walks a directory of submitted JSONs is a v0.4 target. For now
 the table is curated from the matrix output JSONs.

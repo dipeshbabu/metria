@@ -99,7 +99,7 @@ Before submitting a change:
 
 ```bash
 uv run pre-commit run --all-files
-uv run pytest components/turboquant-reference/tests components/kv-fidelity/tests --cov=turboquant --cov=kv-fidelity --cov-report=term-missing -v --tb=short
+uv run pytest components/turboquant-reference/tests components/kv-fidelity/tests --cov=turboquant --cov=kv_fidelity --cov-report=term-missing -v --tb=short
 uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
 ```

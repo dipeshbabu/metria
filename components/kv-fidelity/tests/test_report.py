@@ -10,6 +10,7 @@ from kv_fidelity.report import (
     _axis_label,
     _band_color,
     _bar,
+    _looks_like_kv_fidelity_cli,
     _wrap_lines,
     json_report,
     text_report,
@@ -351,6 +352,16 @@ def test_json_report_repro_command_empty_when_not_a_kv_fidelity_run(monkeypatch)
         kld=kld,
     )
     assert rep["repro_command"] == ""
+
+
+def test_cli_detection_requires_exact_module_or_executable():
+    assert _looks_like_kv_fidelity_cli(["kv-fidelity", "score"])
+    assert _looks_like_kv_fidelity_cli(["python3", "-m", "kv_fidelity.cli", "score"])
+    assert _looks_like_kv_fidelity_cli(
+        ["/tmp/site-packages/kv_fidelity/cli.py", "score"]
+    )
+    assert not _looks_like_kv_fidelity_cli(["/tmp/kv-fidelity-helper", "score"])
+    assert not _looks_like_kv_fidelity_cli(["pytest", "test_kv_fidelity.cli.py"])
 
 
 def test_json_report_repro_command_populated_when_kv_fidelity_run(monkeypatch):

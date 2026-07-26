@@ -123,7 +123,7 @@ where Qwen2.5-1.5B-Instruct-8bit + q8_0/q8_0 KV produced KLD score NaN.
   `importlib.resources`). After installation, the minimum
   viable `kv-fidelity score` invocation is now:
 
-  ```
+  ```bash
   kv-fidelity score --backend mlx --model /path/to/model --candidate ctk=q8_0,ctv=q8_0
   ```
 

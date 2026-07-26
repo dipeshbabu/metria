@@ -38,7 +38,11 @@ from .axes.kld import KLDResult
 from .axes.plad import PLADResult
 from .axes.rniah import RNIAHResult
 from .axes.trajectory import TrajectoryResult
-from .report import _sanitize_home_arg, to_json_string
+from .report import (
+    _looks_like_kv_fidelity_cli,
+    _sanitize_home_arg,
+    to_json_string,
+)
 from .score import CompositeScore, band, interpret_pattern
 
 # Pretty band names shown to users (Excellent vs EXCELLENT).
@@ -229,8 +233,9 @@ def _repro_command(
     if raw_json and raw_json.get("repro_command"):
         return raw_json["repro_command"]
     home = os.path.expanduser("~")
-    if any("kv_fidelity" in a or "kv-fidelity" in a for a in sys.argv):
-        return " ".join(shlex.quote(_sanitize_home_arg(str(a), home)) for a in sys.argv)
+    argv = [str(arg) for arg in sys.argv]
+    if _looks_like_kv_fidelity_cli(argv):
+        return " ".join(shlex.quote(_sanitize_home_arg(arg, home)) for arg in argv)
     model_short = Path(model).name
     cmd = [
         "python3",

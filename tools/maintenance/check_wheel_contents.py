@@ -58,8 +58,14 @@ def check_wheel(path: Path) -> list[str]:
         entry_points = _read_single_member(path, names, ".dist-info/entry_points.txt")
         if entry_points is None:
             errors.append(f"{path}: expected exactly one entry_points.txt file")
-        elif "kv-fidelity = kv_fidelity.cli:main" not in entry_points:
-            errors.append(f"{path}: missing kv-fidelity console script")
+        else:
+            if "kv-fidelity = kv_fidelity.cli:main" not in entry_points:
+                errors.append(f"{path}: missing kv-fidelity console script")
+            if any(
+                line.partition("=")[0].strip() == "refract"
+                for line in entry_points.splitlines()
+            ):
+                errors.append(f"{path}: unexpectedly contains refract console script")
 
         required = {
             "kv_fidelity/prompts/v0.1.jsonl",
@@ -84,6 +90,8 @@ def check_wheel(path: Path) -> list[str]:
     else:
         errors.append(f"{path}: wheel contains neither component package")
 
+    if any(name.startswith("refract/") for name in names):
+        errors.append(f"{path}: unexpectedly contains refract")
     if not _has_suffix(names, "/LICENSE"):
         errors.append(f"{path}: missing LICENSE")
     if not _has_suffix(names, "/NOTICE"):
