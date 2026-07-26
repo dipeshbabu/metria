@@ -6,7 +6,7 @@ clearly separated.
 
 ## Repository boundaries
 
-- `components/refract/` contains the publishable `refract-llm` package.
+- `components/kv-fidelity/` contains the publishable `kv-fidelity` package.
 - `components/turboquant-reference/` contains the NumPy/SciPy TurboQuant
   reference implementation.
 - `docs/` contains current guidance and repository documentation.
@@ -40,12 +40,12 @@ uv run pytest
 
 `uv` creates `.venv`, installs both workspace packages, and uses the shared
 lockfile. The install command registers the repository's fast checks as a Git
-pre-commit hook. Backend-specific REFRACT dependencies remain optional. Add
+pre-commit hook. Backend-specific KV Fidelity dependencies remain optional. Add
 only the extra needed for the backend under test; for example:
 
 ```bash
-uv sync --all-packages --extra refract-mlx
-uv sync --all-packages --extra refract-sglang
+uv sync --all-packages --extra mlx
+uv sync --all-packages --extra sglang
 ```
 
 Do not use `--all-extras` for routine development because the backend stacks
@@ -60,7 +60,7 @@ import sorter. The root configuration targets Python 3.10 and uses an 88
 character line length. `E501` is intentionally left to the formatter instead
 of being reported as a separate lint error. Mypy checks the two package source
 trees and repository tools using Python 3.10 language assumptions. It is
-pinned to 1.19.1 so local and CI results use the same checker release.
+pinned to 2.3.0 so local and CI results use the same checker release.
 
 Check Python quality without changing files:
 
@@ -99,18 +99,18 @@ Before submitting a change:
 
 ```bash
 uv run pre-commit run --all-files
-uv run pytest components/turboquant-reference/tests components/refract/tests --cov=turboquant --cov=refract --cov-report=term-missing -v --tb=short
-uv run python -m build components/refract
+uv run pytest components/turboquant-reference/tests components/kv-fidelity/tests --cov=turboquant --cov=kv-fidelity --cov-report=term-missing -v --tb=short
+uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
 ```
 
-Changes to packaging must verify that REFRACT prompts, examples, `LICENSE`,
+Changes to packaging must verify that KV Fidelity prompts, examples, `LICENSE`,
 and `NOTICE` are present in the built artifacts.
 
 ## Releases
 
-Publishing is restricted to maintainers. `refract-llm` releases use a
-`refract-v<VERSION>` tag and the protected `pypi` environment;
+Publishing is restricted to maintainers. `kv-fidelity` releases use a
+`kv-fidelity-v<VERSION>` tag and the protected `pypi-kv-fidelity` environment;
 `turboquant-reference` releases use a `turboquant-reference-v<VERSION>` tag and
 the protected `pypi-turboquant-reference` environment. Each package has a
 separate PyPI Trusted Publisher and workflow. Follow the
@@ -144,6 +144,7 @@ repository-wide citation.
 The repository name is an umbrella. Preserve the public component contracts
 unless a deliberate breaking release is planned:
 
-- distribution: `refract-llm`
-- import and command: `refract`
+- distribution: `kv-fidelity`
+- import: `kv_fidelity`
+- command: `kv-fidelity`
 - reference implementation import: `turboquant`

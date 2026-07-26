@@ -1,0 +1,109 @@
+[project]
+name = "kv-fidelity"
+version = "0.3.5.dev0"
+description = "Multi-axis KV-cache fidelity scoring for LLMs across llama.cpp, MLX, vLLM, and SGLang."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.10,<3.15"
+authors = [
+    { name = "Dipesh Tharu Mahato (dipeshbabu)" },
+]
+keywords = [
+    "llm",
+    "kv-cache",
+    "quantization",
+    "evaluation",
+    "fidelity",
+    "llama-cpp",
+    "mlx",
+    "vllm",
+    "sglang",
+    "perplexity",
+    "kld",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# The framework itself deliberately has no non-stdlib runtime dependencies.
+# Backend extras opt into the libraries needed by each inference engine.
+dependencies = []
+
+[project.optional-dependencies]
+mlx = [
+    "mlx>=0.29.4; sys_platform == 'darwin'",
+    "mlx-lm>=0.31; sys_platform == 'darwin'",
+]
+sglang = [
+    "requests>=2.33",
+    "transformers>=5.3",
+]
+full = [
+    "mlx>=0.29.4; sys_platform == 'darwin'",
+    "mlx-lm>=0.31; sys_platform == 'darwin'",
+    "requests>=2.33",
+    "transformers>=5.3",
+]
+research = [
+    "numpy>=1.23",
+    "scipy>=1.10",
+]
+benchmarks = [
+    "numpy>=1.23",
+    "scipy>=1.10",
+    "torch>=2.13",
+    "transformers>=5.3",
+    "accelerate>=0.28",
+]
+dev = [
+    "numpy>=1.23",
+    "scipy>=1.10",
+    "pytest>=9.0.3",
+    "pytest-cov>=4.0",
+    "coverage>=7.15.2",
+    "build>=1.0",
+    "twine>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/dipeshbabu/efficient-llm-systems/tree/main/components/kv-fidelity"
+Repository = "https://github.com/dipeshbabu/efficient-llm-systems"
+Issues = "https://github.com/dipeshbabu/efficient-llm-systems/issues"
+Changelog = "https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/kv-fidelity/CHANGELOG.md"
+"Cross-engine bench" = "https://github.com/dipeshbabu/efficient-llm-systems/blob/main/research/papers/cross-engine-mi300x.md"
+
+[project.scripts]
+kv-fidelity = "kv_fidelity.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["kv_fidelity*"]
+
+[tool.setuptools.package-data]
+kv_fidelity = [
+    "prompts/*.jsonl",
+    "prompts/*.md",
+    "examples/*.json",
+    "examples/*.html",
+    "examples/*.md",
+]
+
+[build-system]
+requires = ["setuptools>=83.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

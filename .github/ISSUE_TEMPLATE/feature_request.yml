@@ -7,7 +7,7 @@ body:
     attributes:
       label: Target area
       options:
-        - REFRACT
+        - KV Fidelity
         - TurboQuant reference
         - Diagnostics
         - Validation or benchmark tools

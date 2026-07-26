@@ -398,7 +398,7 @@ The most durable result is the negative one: **per-coord MSE on K reconstruction
 
 ## 12. Limitations and Future Work
 
-1. **No PPL evaluation.** All KL claims are next-token KL@D. Multi-token PPL (REFRACT, wikitext-103) was not measured. ens_4way's 8% next-token rate may not survive multi-token averaging; F3's 50–60% likely does, but this is not proven.
+1. **No PPL evaluation.** All KL claims are next-token KL@D. Multi-token PPL (KV Fidelity, wikitext-103) was not measured. ens_4way's 8% next-token rate may not survive multi-token averaging; F3's 50–60% likely does, but this is not proven.
 2. **Single primary model for the deployable-algorithm arc.** Qwen3-0.6B drives the H8–H29 arc. F1–F3 cover five models for the universal-K story.
 3. **No external comparison.** This investigation lives entirely inside the TurboQuant+ design space. KIVI, SmoothQuant, GPTQ K-cache variants were out of scope.
 4. **Catastrophic-rate confidence intervals are wide.** N=30 and N=100 give Wilson-95% CIs that span 5–10 percentage points. The "8% ceiling" is empirical, not a tight bound.
@@ -466,7 +466,7 @@ Full ledger of all 35 hypotheses (including the EDEN-arc H1–H7, secondary fitt
 | 30 | ens_4way at b=2, b=3 (AMD) | b=3: 0/30, +75%. b=2: 17%, +30% |
 | 31 | ens_4way on Llama-3.2-1B | Pending |
 | 32 | ens_4way long context (1024-tok, N=20) | Same 10% catastrophic rate |
-| 33–35 | REFRACT PPL eval, low-bit cross-family, hybrid | Not run |
+| 33–35 | KV Fidelity PPL eval, low-bit cross-family, hybrid | Not run |
 | H_univ | Static "universal K" table from 2 models | L2 3× closer cross-model than to default |
 | F1 | Dump K from 3 new families | 5-model dataset assembled |
 | F2 | 5-model universal K cross-validation (MSE) | Strict FAIL; Cluster A subset +1–13% MSE |

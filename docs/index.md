@@ -21,7 +21,7 @@ Systems. Dated experiments and historical conclusions live under
 
 ## Components
 
-- [REFRACT](../components/refract/README.md)
+- [KV Fidelity](../components/kv-fidelity/README.md)
 - [TurboQuant reference](../components/turboquant-reference/README.md)
 
 ## Maintainers

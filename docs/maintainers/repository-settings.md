@@ -4,7 +4,7 @@ This page records contributor-facing GitHub settings that are not represented
 fully by tracked files. Maintainers should compare it with the live repository
 after policy or ownership changes.
 
-Last reviewed: 2026-07-19.
+Last reviewed: 2026-07-25.
 
 ## About and discovery
 
@@ -58,10 +58,17 @@ Dependabot security updates, secret scanning, and secret-scanning push
 protection are enabled. Release environment and publishing controls are
 documented in [the release guide](../guides/releasing.md).
 
-The expected protected publishing environments are `pypi` for tags matching
-`refract-v*` and `pypi-turboquant-reference` for tags matching
-`turboquant-reference-v*`. Both require review, prevent administrator bypass,
-and map to separate PyPI Trusted Publishers.
+The expected protected publishing environments are `pypi-kv-fidelity` for
+tags matching `kv-fidelity-v*` and `pypi-turboquant-reference` for tags
+matching `turboquant-reference-v*`. Both require review, prevent administrator
+bypass, and map to separate PyPI Trusted Publishers. The obsolete `pypi`
+environment must not be referenced by a workflow.
+
+The `pypi-kv-fidelity` environment was created on 2026-07-25 with
+`@dipeshbabu` as required reviewer and the expected tag policy. Its live
+`can_admins_bypass` setting remains `true`; change it to `false` in the GitHub
+environment settings before the first release. The REST API does not expose
+that toggle.
 
 ## Audit procedure
 

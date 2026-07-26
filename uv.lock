@@ -9,7 +9,7 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "refract-llm",
+    "kv-fidelity",
     "turboquant-reference",
 ]
 constraints = [
@@ -1749,9 +1749,9 @@ wheels = [
 ]
 
 [[package]]
-name = "refract-llm"
-version = "0.3.4"
-source = { editable = "components/refract" }
+name = "kv-fidelity"
+version = "0.3.5.dev0"
+source = { editable = "components/kv-fidelity" }
 
 [package.optional-dependencies]
 benchmarks = [
@@ -1782,11 +1782,11 @@ full = [
     { name = "requests" },
     { name = "transformers" },
 ]
-refract-mlx = [
+mlx = [
     { name = "mlx", marker = "sys_platform == 'darwin'" },
     { name = "mlx-lm", marker = "sys_platform == 'darwin'" },
 ]
-refract-sglang = [
+sglang = [
     { name = "requests" },
     { name = "transformers" },
 ]
@@ -1804,26 +1804,26 @@ requires-dist = [
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.0" },
     { name = "coverage", marker = "extra == 'dev'", specifier = ">=7.15.2" },
     { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'full'", specifier = ">=0.29.4" },
-    { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'refract-mlx'", specifier = ">=0.29.4" },
+    { name = "mlx", marker = "sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.29.4" },
     { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'full'", specifier = ">=0.31" },
-    { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'refract-mlx'", specifier = ">=0.31" },
+    { name = "mlx-lm", marker = "sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.31" },
     { name = "numpy", marker = "extra == 'benchmarks'", specifier = ">=1.23" },
     { name = "numpy", marker = "extra == 'dev'", specifier = ">=1.23" },
     { name = "numpy", marker = "extra == 'research'", specifier = ">=1.23" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0" },
     { name = "requests", marker = "extra == 'full'", specifier = ">=2.33" },
-    { name = "requests", marker = "extra == 'refract-sglang'", specifier = ">=2.33" },
+    { name = "requests", marker = "extra == 'sglang'", specifier = ">=2.33" },
     { name = "scipy", marker = "extra == 'benchmarks'", specifier = ">=1.10" },
     { name = "scipy", marker = "extra == 'dev'", specifier = ">=1.10" },
     { name = "scipy", marker = "extra == 'research'", specifier = ">=1.10" },
     { name = "torch", marker = "extra == 'benchmarks'", specifier = ">=2.13" },
     { name = "transformers", marker = "extra == 'benchmarks'", specifier = ">=5.3" },
     { name = "transformers", marker = "extra == 'full'", specifier = ">=5.3" },
-    { name = "transformers", marker = "extra == 'refract-sglang'", specifier = ">=5.3" },
+    { name = "transformers", marker = "extra == 'sglang'", specifier = ">=5.3" },
     { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0" },
 ]
-provides-extras = ["refract-mlx", "refract-sglang", "full", "research", "benchmarks", "dev"]
+provides-extras = ["mlx", "sglang", "full", "research", "benchmarks", "dev"]
 
 [[package]]
 name = "regex"

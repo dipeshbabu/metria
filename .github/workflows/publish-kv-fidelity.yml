@@ -1,0 +1,381 @@
+name: Publish kv-fidelity to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Exact kv-fidelity version to publish (for example, 0.3.5)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: publish-kv-fidelity-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and verify kv-fidelity
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out the release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.21"
+          enable-cache: true
+
+      - name: Validate release blockers, tag, package version, and changelog
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          for issue in 8 11 12; do
+            state="$(
+              gh issue view "${issue}" \
+                --repo "${GITHUB_REPOSITORY}" \
+                --json state \
+                --jq '.state'
+            )"
+            if [[ "${state}" != "CLOSED" ]]; then
+              echo "Release blocker #${issue} is ${state}; publication is forbidden."
+              exit 1
+            fi
+          done
+
+          expected_tag="kv-fidelity-v${REQUESTED_VERSION}"
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "Run this workflow from the release tag, not a branch."
+            exit 1
+          fi
+          if [[ "${GITHUB_REF_NAME}" != "${expected_tag}" ]]; then
+            echo "Expected tag ${expected_tag}; got ${GITHUB_REF_NAME}."
+            exit 1
+          fi
+
+          python - <<'PY'
+          import os
+          import re
+          import tomllib
+          from pathlib import Path
+
+          requested = os.environ["REQUESTED_VERSION"]
+          manifest = Path("components/kv-fidelity/pyproject.toml")
+          with manifest.open("rb") as stream:
+              project = tomllib.load(stream)["project"]
+          if project["name"] != "kv-fidelity":
+              raise SystemExit(
+                  f"Expected distribution kv-fidelity; got {project['name']}."
+              )
+          if project["version"] != requested:
+              raise SystemExit(
+                  f"Manifest version {project['version']} does not match {requested}."
+              )
+
+          init_text = Path(
+              "components/kv-fidelity/src/kv_fidelity/__init__.py"
+          ).read_text(encoding="utf-8")
+          if f'__version__ = "{requested}"' not in init_text:
+              raise SystemExit("Runtime version does not match the release version.")
+
+          changelog = Path(
+              "components/kv-fidelity/CHANGELOG.md"
+          ).read_text(encoding="utf-8")
+          pattern = rf"^## v{re.escape(requested)} .+ \(\d{{4}}-\d{{2}}-\d{{2}}\)$"
+          if re.search(pattern, changelog, flags=re.MULTILINE) is None:
+              raise SystemExit(
+                  "Changelog needs a dated release heading for " + requested
+              )
+          PY
+
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/main; then
+            echo "Release tag must point to a commit reachable from main."
+            exit 1
+          fi
+
+      - name: Sync locked workspace
+        run: uv sync --locked --all-packages
+
+      - name: Test kv-fidelity
+        run: uv run --locked pytest components/kv-fidelity/tests -v --tb=short
+
+      - name: Build distribution
+        run: >-
+          uv run --locked python -m build
+          --outdir dist/kv-fidelity
+          components/kv-fidelity
+
+      - name: Verify distribution and clean-wheel behavior
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          uv run --locked python -m twine check dist/kv-fidelity/*
+          uv run --locked python tools/maintenance/check_wheel_contents.py \
+            dist/kv-fidelity/*.whl
+          sha256sum dist/kv-fidelity/*
+
+          uv venv --clear .release-smoke-venv
+          uv pip install \
+            --python .release-smoke-venv/bin/python \
+            --force-reinstall \
+            dist/kv-fidelity/*.whl
+          .release-smoke-venv/bin/python - <<'PY'
+          import os
+          from importlib import resources
+          from importlib.metadata import distribution
+
+          dist = distribution("kv-fidelity")
+          metadata = dist.metadata
+          assert metadata["Name"] == "kv-fidelity"
+          assert metadata["Version"] == os.environ["REQUESTED_VERSION"]
+          assert metadata["License-Expression"] == "Apache-2.0"
+          assert metadata["Author"] == "Dipesh Tharu Mahato (dipeshbabu)"
+          project_urls = set(metadata.get_all("Project-URL") or ())
+          assert (
+              "Repository, https://github.com/dipeshbabu/efficient-llm-systems"
+              in project_urls
+          )
+          files = {str(path) for path in (dist.files or ())}
+          assert any(path.endswith(".dist-info/licenses/LICENSE") for path in files)
+          assert any(path.endswith(".dist-info/licenses/NOTICE") for path in files)
+          prompt = resources.files("kv_fidelity").joinpath("prompts/v0.1.jsonl")
+          assert len(prompt.read_text(encoding="utf-8").splitlines()) == 30
+          PY
+          test "$(
+            .release-smoke-venv/bin/kv-fidelity --version
+          )" = "kv-fidelity ${REQUESTED_VERSION}"
+          .release-smoke-venv/bin/kv-fidelity --help |
+            grep -F "multi-axis KV-cache fidelity evaluation"
+
+      - name: Store verified distribution
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: kv-fidelity-${{ inputs.version }}
+          path: dist/kv-fidelity/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish kv-fidelity ${{ inputs.version }}
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi-kv-fidelity
+      url: https://pypi.org/p/kv-fidelity
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download verified distribution
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: kv-fidelity-${{ inputs.version }}
+          path: dist/
+
+      - name: Publish with PyPI Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1
+        with:
+          packages-dir: dist/
+          verify-metadata: true
+          attestations: true
+
+  verify:
+    name: Verify kv-fidelity ${{ inputs.version }} from PyPI
+    needs: publish
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out the release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.21"
+          enable-cache: true
+
+      - name: Install the exact release from PyPI
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          python -m venv .pypi-smoke-venv
+          for attempt in {1..12}; do
+            if .pypi-smoke-venv/bin/python -m pip install \
+              --index-url https://pypi.org/simple \
+              --no-cache-dir \
+              --timeout 10 \
+              "kv-fidelity==${REQUESTED_VERSION}"
+            then
+              break
+            fi
+            if [[ "${attempt}" == "12" ]]; then
+              echo "Release did not become installable from PyPI."
+              exit 1
+            fi
+            echo "Waiting for PyPI index propagation (attempt ${attempt}/12)."
+            sleep 10
+          done
+
+      - name: Verify installed metadata, licenses, links, and CLI
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          .pypi-smoke-venv/bin/python - <<'PY'
+          import os
+          from importlib import resources
+          from importlib.metadata import distribution
+
+          dist = distribution("kv-fidelity")
+          metadata = dist.metadata
+          expected_urls = {
+              "Homepage, https://github.com/dipeshbabu/efficient-llm-systems/tree/main/components/kv-fidelity",
+              "Repository, https://github.com/dipeshbabu/efficient-llm-systems",
+              "Issues, https://github.com/dipeshbabu/efficient-llm-systems/issues",
+              "Changelog, https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/kv-fidelity/CHANGELOG.md",
+          }
+          assert metadata["Name"] == "kv-fidelity"
+          assert metadata["Version"] == os.environ["REQUESTED_VERSION"]
+          assert metadata["License-Expression"] == "Apache-2.0"
+          assert metadata["Author"] == "Dipesh Tharu Mahato (dipeshbabu)"
+          assert expected_urls <= set(metadata.get_all("Project-URL") or ())
+          files = {str(path) for path in (dist.files or ())}
+          assert any(path.endswith(".dist-info/licenses/LICENSE") for path in files)
+          assert any(path.endswith(".dist-info/licenses/NOTICE") for path in files)
+          prompt = resources.files("kv_fidelity").joinpath("prompts/v0.1.jsonl")
+          assert len(prompt.read_text(encoding="utf-8").splitlines()) == 30
+          PY
+          test "$(
+            .pypi-smoke-venv/bin/kv-fidelity --version
+          )" = "kv-fidelity ${REQUESTED_VERSION}"
+          .pypi-smoke-venv/bin/kv-fidelity --help |
+            grep -F "multi-axis KV-cache fidelity evaluation"
+
+      - name: Verify PyPI provenance and Trusted Publisher identity
+        shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "${RUNNER_TEMP}/kv-fidelity-urls.txt"
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+
+          def load_json(url, *, headers=None):
+              request = urllib.request.Request(url, headers=headers or {})
+              for attempt in range(1, 7):
+                  try:
+                      with urllib.request.urlopen(request, timeout=30) as response:
+                          return json.load(response)
+                  except urllib.error.HTTPError as exc:
+                      if exc.code != 404 or attempt == 6:
+                          raise
+                      time.sleep(10)
+              raise AssertionError("unreachable")
+
+          version = os.environ["REQUESTED_VERSION"]
+          api_url = f"https://pypi.org/pypi/kv-fidelity/{version}/json"
+          release = load_json(api_url)
+
+          files = release["urls"]
+          if {item["packagetype"] for item in files} != {"bdist_wheel", "sdist"}:
+              raise SystemExit("Expected exactly wheel and sdist release types.")
+          for item in files:
+              filename = item["filename"]
+              provenance_url = (
+                  "https://pypi.org/integrity/kv-fidelity/"
+                  f"{version}/{filename}/provenance"
+              )
+              provenance = load_json(
+                  provenance_url,
+                  headers={"Accept": "application/vnd.pypi.integrity.v1+json"},
+              )
+              publishers = {
+                  (
+                      bundle["publisher"]["kind"],
+                      bundle["publisher"]["repository"],
+                      bundle["publisher"]["workflow"],
+                      bundle["publisher"]["environment"],
+                  )
+                  for bundle in provenance["attestation_bundles"]
+              }
+              expected = {
+                  (
+                      "GitHub",
+                      "dipeshbabu/efficient-llm-systems",
+                      "publish-kv-fidelity.yml",
+                      "pypi-kv-fidelity",
+                  )
+              }
+              if publishers != expected:
+                  raise SystemExit(
+                      f"Unexpected Trusted Publisher for {filename}: {publishers}"
+                  )
+              print(item["url"])
+          PY
+
+          while IFS= read -r url; do
+            uvx \
+              --from pypi-attestations==0.0.29 \
+              pypi-attestations verify pypi \
+              --repository \
+              https://github.com/dipeshbabu/efficient-llm-systems \
+              "${url}"
+          done < "${RUNNER_TEMP}/kv-fidelity-urls.txt"
+
+  release:
+    name: Create GitHub release for kv-fidelity ${{ inputs.version }}
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download published distribution
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: kv-fidelity-${{ inputs.version }}
+          path: dist/
+
+      - name: Create release with verified artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          gh release create "${GITHUB_REF_NAME}" dist/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --verify-tag \
+            --title "kv-fidelity ${REQUESTED_VERSION}" \
+            --generate-notes
