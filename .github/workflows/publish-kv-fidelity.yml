@@ -153,7 +153,7 @@ jobs:
           assert metadata["Author"] == "Dipesh Tharu Mahato (dipeshbabu)"
           project_urls = set(metadata.get_all("Project-URL") or ())
           assert (
-              "Repository, https://github.com/dipeshbabu/efficient-llm-systems"
+              "Repository, https://github.com/dipeshbabu/metria"
               in project_urls
           )
           files = {str(path) for path in (dist.files or ())}
@@ -261,10 +261,10 @@ jobs:
           dist = distribution("kv-fidelity")
           metadata = dist.metadata
           expected_urls = {
-              "Homepage, https://github.com/dipeshbabu/efficient-llm-systems/tree/main/components/kv-fidelity",
-              "Repository, https://github.com/dipeshbabu/efficient-llm-systems",
-              "Issues, https://github.com/dipeshbabu/efficient-llm-systems/issues",
-              "Changelog, https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/kv-fidelity/CHANGELOG.md",
+              "Homepage, https://github.com/dipeshbabu/metria/tree/main/components/kv-fidelity",
+              "Repository, https://github.com/dipeshbabu/metria",
+              "Issues, https://github.com/dipeshbabu/metria/issues",
+              "Changelog, https://github.com/dipeshbabu/metria/blob/main/components/kv-fidelity/CHANGELOG.md",
           }
           assert metadata["Name"] == "kv-fidelity"
           assert metadata["Version"] == os.environ["REQUESTED_VERSION"]
@@ -337,7 +337,7 @@ jobs:
               expected = {
                   (
                       "GitHub",
-                      "dipeshbabu/efficient-llm-systems",
+                      "dipeshbabu/metria",
                       "publish-kv-fidelity.yml",
                       "pypi-kv-fidelity",
                   )
@@ -354,7 +354,7 @@ jobs:
               --from pypi-attestations==0.0.29 \
               pypi-attestations verify pypi \
               --repository \
-              https://github.com/dipeshbabu/efficient-llm-systems \
+              https://github.com/dipeshbabu/metria \
               "${url}"
           done < "${RUNNER_TEMP}/kv-fidelity-urls.txt"
 
