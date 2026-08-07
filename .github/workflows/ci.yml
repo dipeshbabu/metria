@@ -170,23 +170,49 @@ jobs:
       - name: Sync workspace
         run: uv sync --locked --all-packages
 
-      - name: Build components
+      - name: Build distributions
         run: |
+          uv run python -m build --outdir dist/metria .
           uv run python -m build --outdir dist/kv-fidelity components/kv-fidelity
           uv run python -m build --outdir dist/turboquant components/turboquant-reference
 
-      - name: Check metadata and wheel contents
+      - name: Check metadata and distribution contents
         run: |
-          uv run python -m twine check dist/kv-fidelity/* dist/turboquant/*
-          uv run python tools/maintenance/check_wheel_contents.py dist/kv-fidelity/*.whl dist/turboquant/*.whl
+          uv run python -m twine check dist/metria/* dist/kv-fidelity/* dist/turboquant/*
+          uv run python tools/maintenance/check_wheel_contents.py dist/metria/*.whl dist/kv-fidelity/*.whl dist/turboquant/*.whl
+          uv run python tools/maintenance/check_sdist_contents.py dist/metria/*.tar.gz
 
       - name: Install built wheels and smoke-test imports
+        shell: bash
         run: |
           uv venv --clear .smoke-venv
-          uv pip install --python .smoke-venv/bin/python --force-reinstall dist/kv-fidelity/*.whl dist/turboquant/*.whl
+          uv pip install --python .smoke-venv/bin/python --force-reinstall dist/metria/*.whl dist/kv-fidelity/*.whl dist/turboquant/*.whl
+          .smoke-venv/bin/metria --version
+          .smoke-venv/bin/metria --help
           .smoke-venv/bin/kv-fidelity --version
           .smoke-venv/bin/kv-fidelity --help
-          .smoke-venv/bin/python -c "import kv_fidelity, turboquant; print(kv_fidelity.__version__)"
+          .smoke-venv/bin/python -c "import metria, kv_fidelity, turboquant; print(metria.__version__, kv_fidelity.__version__)"
+          cat > .smoke-study.json <<'JSON'
+          {
+            "schema": "metria.study_recipe.v1",
+            "study": {
+              "name": "package-smoke",
+              "runs": [
+                {
+                  "model": {"id": "example/model"},
+                  "runtime": {"name": "vllm"},
+                  "scenario": {"name": "decode"},
+                  "measurements": ["smoke.measurement"]
+                }
+              ],
+              "comparison": {}
+            },
+            "measurement_configs": {"smoke.measurement": {}},
+            "environment": {}
+          }
+          JSON
+          .smoke-venv/bin/metria recipe validate .smoke-study.json
+          .smoke-venv/bin/metria recipe digest .smoke-study.json
           .smoke-venv/bin/python components/turboquant-reference/benchmarks/examples/demo.py
           .smoke-venv/bin/python tools/diagnostics/turbo_hardware_diag.py --help
 
