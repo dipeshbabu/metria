@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from ._freeze import freeze_mapping, freeze_typed_mapping
+
 
 class TreatmentType(str, Enum):
     """How a study changes the system under test."""
@@ -48,6 +50,11 @@ class TreatmentSpec:
     kind: TreatmentType
     config: Mapping[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        """Detach treatment configuration from caller-owned mutable state."""
+
+        object.__setattr__(self, "config", freeze_mapping(self.config))
+
 
 @dataclass(frozen=True)
 class ComparisonPlan:
@@ -58,6 +65,11 @@ class ComparisonPlan:
     block_by: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
+        """Normalize dimension sets and reject contradictory study roles."""
+
+        object.__setattr__(self, "vary", frozenset(self.vary))
+        object.__setattr__(self, "control", frozenset(self.control))
+        object.__setattr__(self, "block_by", frozenset(self.block_by))
         overlap = (
             (self.vary & self.control)
             | (self.vary & self.block_by)
@@ -80,6 +92,21 @@ class RunSpec:
     trial_policy: Mapping[str, Any] = field(default_factory=dict)
     environment_selector: Mapping[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        """Normalize a requested run into detached immutable values."""
+
+        object.__setattr__(self, "model", freeze_mapping(self.model))
+        object.__setattr__(self, "runtime", freeze_mapping(self.runtime))
+        object.__setattr__(self, "scenario", freeze_mapping(self.scenario))
+        object.__setattr__(self, "measurements", tuple(self.measurements))
+        object.__setattr__(self, "treatments", tuple(self.treatments))
+        object.__setattr__(self, "trial_policy", freeze_mapping(self.trial_policy))
+        object.__setattr__(
+            self,
+            "environment_selector",
+            freeze_mapping(self.environment_selector),
+        )
+
 
 @dataclass(frozen=True)
 class StudySpec:
@@ -92,6 +119,11 @@ class StudySpec:
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validate the study and detach retained study metadata."""
+
+        object.__setattr__(self, "runs", tuple(self.runs))
+        object.__setattr__(self, "constants", freeze_mapping(self.constants))
+        object.__setattr__(self, "metadata", freeze_mapping(self.metadata))
         if not self.name.strip():
             raise ValueError("study name must not be empty")
         if not self.runs:
@@ -110,6 +142,8 @@ class MetricDefinition:
 
     @property
     def identity(self) -> tuple[str, str, str, str, str]:
+        """Return the complete identity required for direct metric comparison."""
+
         return (
             self.name,
             self.unit,
@@ -126,6 +160,11 @@ class MetricSample:
     value: float
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        """Detach per-sample metadata from mutable caller state."""
+
+        object.__setattr__(self, "metadata", freeze_mapping(self.metadata))
+
 
 @dataclass(frozen=True)
 class MetricSummary:
@@ -137,6 +176,12 @@ class MetricSummary:
     aggregation: str = "single"
     uncertainty: Mapping[str, float] = field(default_factory=dict)
     coverage: float | None = None
+
+    def __post_init__(self) -> None:
+        """Freeze retained samples and summary uncertainty metadata."""
+
+        object.__setattr__(self, "samples", tuple(self.samples))
+        object.__setattr__(self, "uncertainty", freeze_mapping(self.uncertainty))
 
 
 @dataclass(frozen=True)
@@ -159,6 +204,24 @@ class RunRecord:
     artifacts: tuple[Mapping[str, Any], ...] = ()
     provenance: Mapping[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        """Seal run evidence against mutation through retained aliases."""
+
+        object.__setattr__(self, "resolved", freeze_mapping(self.resolved))
+        object.__setattr__(self, "observed", freeze_mapping(self.observed))
+        object.__setattr__(self, "metrics", freeze_typed_mapping(self.metrics))
+        object.__setattr__(
+            self,
+            "events",
+            tuple(freeze_mapping(event) for event in self.events),
+        )
+        object.__setattr__(
+            self,
+            "artifacts",
+            tuple(freeze_mapping(artifact) for artifact in self.artifacts),
+        )
+        object.__setattr__(self, "provenance", freeze_mapping(self.provenance))
+
 
 @dataclass(frozen=True)
 class CompatibilityIssue:
@@ -178,6 +241,17 @@ class CompatibilityReport:
     issues: tuple[CompatibilityIssue, ...] = ()
     comparable_metrics: tuple[str, ...] = ()
     incompatible_metrics: Mapping[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        """Normalize report collections into immutable values."""
+
+        object.__setattr__(self, "issues", tuple(self.issues))
+        object.__setattr__(self, "comparable_metrics", tuple(self.comparable_metrics))
+        object.__setattr__(
+            self,
+            "incompatible_metrics",
+            freeze_mapping(self.incompatible_metrics),
+        )
 
 
 def freeze_treatments(items: Sequence[TreatmentSpec]) -> tuple[TreatmentSpec, ...]:
