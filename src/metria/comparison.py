@@ -11,8 +11,13 @@ from .models import (
     RunRecord,
 )
 
+_MISSING = object()
+_MISSING_LABEL = "<missing>"
+
 
 def _requested_dimension(record: RunRecord, dimension: str) -> Any:
+    """Resolve a named comparison dimension without conflating missing and None."""
+
     spec = record.requested
     values: dict[str, Any] = {
         "model": spec.model,
@@ -27,11 +32,17 @@ def _requested_dimension(record: RunRecord, dimension: str) -> Any:
         return values[dimension]
     if dimension.startswith("observed."):
         key = dimension.removeprefix("observed.")
-        return record.observed.get(key)
+        return record.observed[key] if key in record.observed else _MISSING
     if dimension.startswith("resolved."):
         key = dimension.removeprefix("resolved.")
-        return record.resolved.get(key)
+        return record.resolved[key] if key in record.resolved else _MISSING
     raise KeyError(dimension)
+
+
+def _display_value(value: Any) -> Any:
+    """Convert the private missing sentinel into a readable issue value."""
+
+    return _MISSING_LABEL if value is _MISSING else value
 
 
 def _check_dimension(
@@ -40,6 +51,8 @@ def _check_dimension(
     dimension: str,
     role: str,
 ) -> CompatibilityIssue | None:
+    """Check one controlled or blocking dimension for pairwise comparability."""
+
     try:
         left_value = _requested_dimension(left, dimension)
         right_value = _requested_dimension(right, dimension)
@@ -51,6 +64,13 @@ def _check_dimension(
             reason=f"unknown {role} dimension",
         )
 
+    if left_value is _MISSING or right_value is _MISSING:
+        return CompatibilityIssue(
+            dimension=dimension,
+            left=_display_value(left_value),
+            right=_display_value(right_value),
+            reason=f"required {role} dimension is missing",
+        )
     if left_value == right_value:
         return None
     return CompatibilityIssue(
