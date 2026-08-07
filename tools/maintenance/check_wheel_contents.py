@@ -10,10 +10,10 @@ from email.parser import Parser
 from pathlib import Path
 
 KV_FIDELITY_PROJECT_URLS = {
-    "Homepage, https://github.com/dipeshbabu/efficient-llm-systems/tree/main/components/kv-fidelity",
-    "Repository, https://github.com/dipeshbabu/efficient-llm-systems",
-    "Issues, https://github.com/dipeshbabu/efficient-llm-systems/issues",
-    "Changelog, https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/kv-fidelity/CHANGELOG.md",
+    "Homepage, https://github.com/dipeshbabu/metria/tree/main/components/kv-fidelity",
+    "Repository, https://github.com/dipeshbabu/metria",
+    "Issues, https://github.com/dipeshbabu/metria/issues",
+    "Changelog, https://github.com/dipeshbabu/metria/blob/main/components/kv-fidelity/CHANGELOG.md",
 }
 
 

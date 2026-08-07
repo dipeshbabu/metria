@@ -1,9 +1,8 @@
 # TurboQuant Reference
 
 `turboquant-reference` is the NumPy/SciPy reference implementation of
-TurboQuant KV-cache compression in the Efficient LLM Systems repository. The
-distribution name is `turboquant-reference`; the stable Python import remains
-`turboquant`.
+TurboQuant KV-cache compression in the Metria repository. The distribution
+name is `turboquant-reference`; the stable Python import remains `turboquant`.
 
 This component is intended for algorithm inspection, reproducibility, and
 experimentation. Production inference integrations live in their respective

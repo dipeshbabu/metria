@@ -23,7 +23,7 @@ that a package-index version is available. The first planned stable version is
 
 1. In PyPI, create a pending Trusted Publisher for project `kv-fidelity` with:
    - GitHub owner: `dipeshbabu`
-   - repository: `efficient-llm-systems`
+   - repository: `metria`
    - workflow: `publish-kv-fidelity.yml`
    - environment: `pypi-kv-fidelity`
 2. Create the GitHub environment `pypi-kv-fidelity`. Require a reviewer,
@@ -33,7 +33,7 @@ that a package-index version is available. The first planned stable version is
    Prefer a PyPI organization account; otherwise keep at least two trusted
    people as project Owners, with two-factor authentication and separate
    recovery codes.
-4. Confirm that release-blocking issues #8, #11, and #12 are closed. The
+4. Confirm that release-blocking issues #8, #11, #12, and #40 are closed. The
    workflow also checks them and refuses to build while any is open.
 5. Keep the GitHub environment and Trusted Publisher values exact. The
    workflow has no password or long-lived token fallback.
@@ -91,7 +91,7 @@ maintainer owns its changelog and release notes according to
 3. Add a PyPI Trusted Publisher, or a pending publisher for the first release,
    with:
    - owner: `dipeshbabu`
-   - repository: `efficient-llm-systems`
+   - repository: `metria`
    - workflow: `publish-turboquant-reference.yml`
    - environment: `pypi-turboquant-reference`
 4. Keep the environment and publisher configuration synchronized. Do not add a

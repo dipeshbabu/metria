@@ -13,15 +13,15 @@ Environment:  KV_FIDELITY_*
 Report schema: kv_fidelity.report.*
 ```
 
-The `kv-fidelity` name returned 404 from PyPI's project JSON API on
-2026-07-25. That check does not reserve the name. A maintainer must create the
-pending Trusted Publisher described below before treating the name as secured.
+Package-index availability is not a reservation or ownership guarantee. A
+maintainer must configure and verify the pending Trusted Publisher described
+below before treating the public package name as secured.
 
 The source tree is versioned as `0.3.5.dev0`. The first planned stable release
 under this identity is `0.3.5`, after release blockers
-[#8](https://github.com/dipeshbabu/efficient-llm-systems/issues/8),
-[#11](https://github.com/dipeshbabu/efficient-llm-systems/issues/11), and
-[#12](https://github.com/dipeshbabu/efficient-llm-systems/issues/12) are closed.
+[#8](https://github.com/dipeshbabu/metria/issues/8),
+[#11](https://github.com/dipeshbabu/metria/issues/11), and
+[#12](https://github.com/dipeshbabu/metria/issues/12) are closed.
 The publishing workflow enforces those issue states.
 
 ## Legacy `refract-llm` releases
@@ -29,9 +29,8 @@ The publishing workflow enforces those issue states.
 PyPI's `refract-llm` releases through 0.3.2.3 were uploaded by a legacy
 maintainer with MIT, author, and repository metadata that do not describe this
 repository. They contain an earlier codebase from this project's development
-ancestry, but they were not released from
-`dipeshbabu/efficient-llm-systems` and are not Apache-2.0 releases of this
-repository.
+ancestry, but they were not released from `dipeshbabu/metria` and are not
+Apache-2.0 releases of this repository.
 
 Do not install `refract-llm` as a substitute for this source tree, and do not
 rewrite its historical PyPI metadata. KV Fidelity deliberately uses a
@@ -47,7 +46,7 @@ values:
 |---|---|
 | PyPI project | `kv-fidelity` |
 | GitHub owner | `dipeshbabu` |
-| GitHub repository | `dipeshbabu/efficient-llm-systems` |
+| GitHub repository | `dipeshbabu/metria` |
 | Workflow | `publish-kv-fidelity.yml` |
 | GitHub environment | `pypi-kv-fidelity` |
 | Allowed tag pattern | `kv-fidelity-v*` |
@@ -58,10 +57,10 @@ post-publish job checks the PyPI Integrity API for the exact repository,
 workflow, and environment, then cryptographically verifies both the wheel and
 source distribution.
 
-As of 2026-07-25, the GitHub environment exists with `@dipeshbabu` as required
-reviewer and the `kv-fidelity-v*` tag policy. Administrator bypass is still
-enabled and must be disabled in the GitHub environment settings before a
-release. The pending PyPI Trusted Publisher has not yet been created.
+The repository-side environment and PyPI-side Trusted Publisher settings must
+be re-verified immediately before the first release. Do not rely on a dated
+configuration snapshot as proof that current release controls are still
+correct.
 
 ## Ownership continuity
 
