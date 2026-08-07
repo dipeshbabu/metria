@@ -15,7 +15,9 @@ from metria.runtimes.llamacpp import LlamaCppAdapter, LlamaCppSession
 def _files(tmp_path: Path, *, completion: bool = True) -> tuple[Path, Path]:
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
-    cli = bin_dir / ("llama-cli.exe" if llamacpp_module.os.name == "nt" else "llama-cli")
+    cli = bin_dir / (
+        "llama-cli.exe" if llamacpp_module.os.name == "nt" else "llama-cli"
+    )
     cli.write_bytes(b"fake llama cli")
     if completion:
         trajectory = bin_dir / (
@@ -97,7 +99,9 @@ def test_probe_is_fail_loud_for_missing_model_or_cli(tmp_path: Path) -> None:
     assert any("llama-cli not found" in reason for reason in report.reasons)
 
 
-def test_resolve_records_binary_hash_and_requested_model_identity(tmp_path: Path) -> None:
+def test_resolve_records_binary_hash_and_requested_model_identity(
+    tmp_path: Path,
+) -> None:
     bin_dir, model = _files(tmp_path)
     adapter = LlamaCppAdapter()
 
@@ -174,7 +178,9 @@ def test_token_capture_uses_existing_trajectory_patch_abi(
     assert observed["invocations"][0]["token_capture_observed"] is True
 
 
-def test_token_capture_fails_if_completion_binary_is_unavailable(tmp_path: Path) -> None:
+def test_token_capture_fails_if_completion_binary_is_unavailable(
+    tmp_path: Path,
+) -> None:
     bin_dir, model = _files(tmp_path, completion=False)
     adapter = LlamaCppAdapter()
     session = adapter.launch(adapter.resolve(_spec(bin_dir, model), {}), {})
