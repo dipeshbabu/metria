@@ -1,0 +1,53 @@
+name: Metria core
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Core / ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            python-version: "3.10"
+          - os: windows-2025
+            python-version: "3.13"
+          - os: macos-15
+            python-version: "3.13"
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.21"
+          enable-cache: true
+
+      - name: Sync workspace
+        run: uv sync --locked --all-packages
+
+      - name: Run Metria core tests
+        run: uv run --locked pytest metria_tests -v --tb=short
+
+      - name: Check Metria types
+        run: uv run --locked mypy src/metria
+
+      - name: Check Metria formatting and lint
+        run: |
+          uv run --locked ruff check src/metria metria_tests
+          uv run --locked ruff format --check src/metria metria_tests
