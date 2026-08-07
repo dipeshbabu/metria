@@ -77,13 +77,13 @@ def test_recipe_round_trip_preserves_requested_study_semantics() -> None:
     assert parsed == recipe
     assert data["schema"] == STUDY_RECIPE_SCHEMA
     assert data["study"]["comparison"]["vary"] == ["runtime", "treatments"]
-    assert data["study"]["comparison"]["analyses"] == [
-        "kv_fidelity.trajectory_match"
-    ]
+    assert data["study"]["comparison"]["analyses"] == ["kv_fidelity.trajectory_match"]
     assert data["study"]["runs"][0]["treatments"][0]["kind"] == "runtime_feature"
 
 
-def test_recipe_json_is_deterministic_and_digest_ignores_mapping_insertion_order() -> None:
+def test_recipe_json_is_deterministic_and_digest_ignores_mapping_insertion_order() -> (
+    None
+):
     first = _recipe(environment={"hardware_class": "h100", "zone": "a"})
     second = _recipe(environment={"zone": "a", "hardware_class": "h100"})
 
@@ -133,7 +133,9 @@ def test_recipe_rejects_invalid_treatment_kind() -> None:
 def test_recipe_rejects_measurement_config_not_requested_by_study() -> None:
     recipe = _recipe()
 
-    with pytest.raises(ValueError, match="not requested by the study: typo.measurement"):
+    with pytest.raises(
+        ValueError, match="not requested by the study: typo.measurement"
+    ):
         StudyRecipe(
             study=recipe.study,
             measurement_configs={"typo.measurement": {}},
