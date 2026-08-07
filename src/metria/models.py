@@ -190,7 +190,8 @@ class RunRecord:
 
     Requested state records user intent. Resolved state records what Metria
     selected before launch. Observed state records what the runtime and host
-    actually reported after launch. These are kept separate intentionally.
+    actually reported after launch. Method-specific run evidence is kept in
+    ``evidence`` rather than being mixed into runtime provenance or artifacts.
     """
 
     study_name: str
@@ -200,6 +201,7 @@ class RunRecord:
     observed: Mapping[str, Any]
     status: RunStatus
     metrics: Mapping[str, MetricSummary] = field(default_factory=dict)
+    evidence: Mapping[str, Any] = field(default_factory=dict)
     events: tuple[Mapping[str, Any], ...] = ()
     artifacts: tuple[Mapping[str, Any], ...] = ()
     provenance: Mapping[str, Any] = field(default_factory=dict)
@@ -210,6 +212,7 @@ class RunRecord:
         object.__setattr__(self, "resolved", freeze_mapping(self.resolved))
         object.__setattr__(self, "observed", freeze_mapping(self.observed))
         object.__setattr__(self, "metrics", freeze_typed_mapping(self.metrics))
+        object.__setattr__(self, "evidence", freeze_mapping(self.evidence))
         object.__setattr__(
             self,
             "events",
