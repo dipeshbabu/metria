@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from metria import (
@@ -16,6 +18,7 @@ from metria import (
     TreatmentType,
     compare_runs,
 )
+from metria.protocols import InferenceBatch, InferenceRequest, SupportReport
 
 
 def _run_spec(*, runtime: str = "llamacpp", treatment: str = "baseline") -> RunSpec:
@@ -148,6 +151,41 @@ def test_blocking_dimension_must_match_for_pairwise_comparison() -> None:
     assert report.issues[0].reason == "runs belong to different comparison blocks"
 
 
+def test_missing_nested_dimension_cannot_prove_comparability() -> None:
+    plan = ComparisonPlan(
+        vary=frozenset({"runtime"}),
+        block_by=frozenset({"observed.hardware_class"}),
+    )
+    left = replace(_record(runtime="llamacpp"), observed={"runtime": "llamacpp"})
+    right = replace(_record(runtime="vllm"), observed={"runtime": "vllm"})
+
+    report = compare_runs(left, right, plan)
+
+    assert not report.compatible
+    assert report.issues[0].left == "<missing>"
+    assert report.issues[0].right == "<missing>"
+    assert report.issues[0].reason == "required block dimension is missing"
+
+
+def test_explicit_none_is_distinct_from_a_missing_dimension() -> None:
+    plan = ComparisonPlan(
+        vary=frozenset({"runtime"}),
+        block_by=frozenset({"observed.hardware_class"}),
+    )
+    left = replace(
+        _record(runtime="llamacpp"),
+        observed={"runtime": "llamacpp", "hardware_class": None},
+    )
+    right = replace(
+        _record(runtime="vllm"),
+        observed={"runtime": "vllm", "hardware_class": None},
+    )
+
+    report = compare_runs(left, right, plan)
+
+    assert report.compatible
+
+
 def test_metric_method_identity_prevents_invalid_raw_comparison() -> None:
     plan = ComparisonPlan(vary=frozenset({"runtime"}))
 
@@ -168,3 +206,73 @@ def test_requested_resolved_and_observed_state_are_distinct() -> None:
     assert record.requested.treatments[0].config["kv_dtype"] == "fp8"
     assert record.resolved["kv_dtype"] == "fp8"
     assert record.observed["runtime"] == "llamacpp"
+
+
+def test_evidence_models_detach_and_deeply_freeze_nested_values() -> None:
+    config = {"kv": {"flags": ["fp8", "scaled"]}}
+    treatment = TreatmentSpec(
+        name="fp8",
+        kind=TreatmentType.RUNTIME_FEATURE,
+        config=config,
+    )
+    config["kv"]["flags"].append("mutated")
+
+    assert treatment.config["kv"]["flags"] == ("fp8", "scaled")
+    with pytest.raises(TypeError):
+        treatment.config["new"] = "value"  # type: ignore[index]
+    with pytest.raises(TypeError):
+        treatment.config["kv"]["new"] = "value"  # type: ignore[index]
+
+
+def test_run_record_evidence_is_detached_from_source_mappings() -> None:
+    resolved = {"runtime": {"flags": ["--ctx-size", "4096"]}}
+    observed = {"hardware": {"gpus": ["gpu-a"]}}
+    record = RunRecord(
+        study_name="immutability",
+        run_id="one",
+        requested=_run_spec(),
+        resolved=resolved,
+        observed=observed,
+        status=RunStatus.COMPLETED,
+        events=({"stage": "launch", "details": {"attempts": [1]}},),
+        artifacts=({"path": "run.json", "hashes": ["abc"]},),
+        provenance={"commits": ["deadbeef"]},
+    )
+    resolved["runtime"]["flags"].append("--mutated")
+    observed["hardware"]["gpus"].append("gpu-b")
+
+    assert record.resolved["runtime"]["flags"] == ("--ctx-size", "4096")
+    assert record.observed["hardware"]["gpus"] == ("gpu-a",)
+    assert record.events[0]["details"]["attempts"] == (1,)
+    assert record.artifacts[0]["hashes"] == ("abc",)
+    assert record.provenance["commits"] == ("deadbeef",)
+
+
+def test_runtime_payloads_are_deeply_immutable() -> None:
+    generation = {"stop": ["</s>"]}
+    request = InferenceRequest(prompt="hello", generation=generation)
+    batch = InferenceBatch(
+        outputs=["world"],
+        captures={"token_ids": [1, 2, 3]},
+        metadata={"runtime": {"version": ["1"]}},
+    )
+    support = SupportReport(
+        status="supported",
+        evidence={"features": ["logprobs"]},
+    )
+    generation["stop"].append("mutated")
+
+    assert request.generation["stop"] == ("</s>",)
+    assert batch.outputs == ("world",)
+    assert batch.captures["token_ids"] == (1, 2, 3)
+    assert batch.metadata["runtime"]["version"] == ("1",)
+    assert support.evidence["features"] == ("logprobs",)
+
+
+def test_unsupported_live_objects_are_rejected_from_evidence() -> None:
+    with pytest.raises(TypeError, match="unsupported evidence value type"):
+        TreatmentSpec(
+            name="bad",
+            kind=TreatmentType.INSTRUMENTATION,
+            config={"live_object": object()},
+        )
