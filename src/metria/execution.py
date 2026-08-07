@@ -6,8 +6,8 @@ import hashlib
 from collections.abc import Mapping
 from typing import Any
 
-from .models import RunRecord, RunSpec, RunStatus
-from .protocols import MeasurementProtocol, RuntimeAdapter, RuntimeSession, SupportReport
+from .models import MetricSummary, RunRecord, RunSpec, RunStatus
+from .protocols import MeasurementProtocol, RuntimeAdapter, RuntimeSession
 
 _EXECUTOR_NAME = "metria.execute_run"
 _EXECUTOR_VERSION = "1"
@@ -38,7 +38,7 @@ def _record(
     status: RunStatus,
     resolved: Mapping[str, Any],
     observed: Mapping[str, Any],
-    metrics: Mapping[str, Any],
+    metrics: Mapping[str, MetricSummary],
     evidence: Mapping[str, Any],
     events: list[Mapping[str, Any]],
     artifacts: tuple[Mapping[str, Any], ...],
@@ -98,7 +98,7 @@ def execute_run(
     events: list[Mapping[str, Any]] = []
     resolved: Mapping[str, Any] = {}
     observed: Mapping[str, Any] = {}
-    metrics: Mapping[str, Any] = {}
+    metrics: Mapping[str, MetricSummary] = {}
     evidence: Mapping[str, Any] = {}
     artifacts: tuple[Mapping[str, Any], ...] = ()
     session: RuntimeSession | None = None
@@ -217,6 +217,7 @@ def execute_run(
             provenance=provenance,
         )
 
+    assert session is not None
     failure_status: RunStatus | None = None
     try:
         try:
