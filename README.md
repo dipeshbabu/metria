@@ -1,218 +1,199 @@
-# Efficient LLM Systems
+# Metria
 
-Research, reference implementations, evaluation tools, and reproducible
-evidence for making large-language-model inference more efficient without
-losing behavioral fidelity.
+Metria is an open-source evidence and experimentation layer for LLM inference
+systems.
 
-This repository is an umbrella for work on KV-cache and weight compression,
-quantization, sparse and long-context attention, inference kernels, hardware
-diagnostics, cross-engine validation, and deployment-quality evaluation.
-Production engine integrations live in their respective upstream projects;
-this repository keeps the portable Python components, experimental tools,
-current guidance, and the evidence behind the recommendations.
+It is designed to help researchers define inference-system studies, verify what
+actually ran, measure systems and behavioral effects under explicit protocols,
+and determine when results can or cannot be validly compared.
 
-## Choose your path
+Metria is **not** another serving engine or universal quantization library.
+Production runtimes and optimization implementations should normally stay in
+projects such as vLLM, SGLang, llama.cpp, MLX, TensorRT-LLM, torchao, LLM
+Compressor, or custom research code. Metria provides the experiment and evidence
+layer around them.
 
-The repository root is not a Python distribution. Do not run
-`pip install efficient-llm-systems`; choose the component or workflow that
-matches your goal. Commands below assume a cloned repository and run from its
-root unless the linked guide says otherwise.
+## Direction
 
-- **Evaluate a KV-cache configuration** — inference engineers can install the
-  KV Fidelity beta CLI with
-  `python -m pip install "./components/kv-fidelity"`, then verify the command
-  with `kv-fidelity --help`. The real workflow produces JSON and self-contained
-  HTML fidelity reports. Continue with the
-  [KV Fidelity quick start](components/kv-fidelity/QUICKSTART.md) to select a backend,
-  run `selftest`, and score a model.
-- **Experiment with TurboQuant algorithms** — researchers can install the
-  alpha reference library with
-  `python -m pip install "./components/turboquant-reference"`, then run
-  `python components/turboquant-reference/benchmarks/examples/demo.py`.
-  The demo prints reconstruction, compression, and inner-product metrics. See
-  the [TurboQuant Reference README](components/turboquant-reference/README.md)
-  for the public Python API and benchmark extras.
-- **Diagnose or benchmark an engine build** — systems and kernel developers can
-  start with `python tools/diagnostics/turbo_hardware_diag.py --help`. Full
-  runs produce a shareable diagnostic archive containing text, JSON, and CSV
-  evidence. These tools have mixed stability and external engine/hardware
-  requirements; follow the [tools guide](tools/README.md) before a long run.
-- **Integrate TurboQuant into production** — application developers should use
-  a supported inference-engine integration. This monorepo does not install
-  production kernels or expose a drop-in serving runtime. Start with the
-  [production ecosystem](#production-ecosystem) and the selected engine's
-  documentation.
-- **Contribute to the monorepo** — contributors can run `uv sync --all-packages`
-  followed by `uv run pytest`. The expected output is a synchronized workspace
-  and passing component tests. See [CONTRIBUTING.md](CONTRIBUTING.md) for the
-  complete validation and evidence requirements.
+The core model is deliberately study-oriented:
 
-## Components
+```text
+Study = factors + controls + comparison plan
 
-| Component | Purpose | Stability |
+Run = system under test
+    × scenario
+    × measurement protocol
+    @ observed environment
+```
+
+A run record keeps three states separate:
+
+1. **Requested** — what the recipe asked for.
+2. **Resolved** — the exact configuration and artifacts selected before launch.
+3. **Observed** — what the runtime and environment reported actually ran.
+
+This distinction matters for inference research: requesting a cache dtype,
+model revision, attention backend, or kernel path is not evidence that the
+launched system actually used it.
+
+See [Metria core architecture](docs/architecture/metria-core.md) for the
+provisional study, run, metric, treatment, and comparison contracts.
+
+## First milestone
+
+The initial stable target is intentionally narrow:
+
+> Metria can reproducibly run, record, and validly compare a defined
+> inference-systems study across at least two runtimes.
+
+Automated recommendation, active search, a universal fidelity score, production
+serving, and a universal all-runtime dependency environment are explicitly
+outside the first milestone.
+
+## Current repository
+
+Metria is a research monorepo with components at different maturity levels.
+
+| Area | Purpose | Status |
 |---|---|---|
-| [KV Fidelity](components/kv-fidelity/README.md) | Reference-anchored fidelity evaluation across llama.cpp, MLX, vLLM, and SGLang | Beta; planned distribution `kv-fidelity` |
-| [TurboQuant Reference](components/turboquant-reference/README.md) | NumPy/SciPy implementation of PolarQuant, QJL, KV-cache compression, packing, and related experiments | Research reference |
-| [Tools](tools/README.md) | Diagnostics, quality validation, benchmarking, and model-conversion utilities | Mixed; see each tool's requirements |
-| [Research](research/README.md) | Dated papers, investigations, negative results, and archived plans | Evidence record |
-| [Artifacts](artifacts/README.md) | Retained raw benchmark output, NIAH proofs, ablations, and hardware profiles | Immutable evidence where noted |
+| `src/metria/` | Shared study, run, metric, comparison, runtime, and measurement contracts | Provisional foundation |
+| [KV Fidelity](components/kv-fidelity/README.md) | Reference-anchored KV-cache behavioral evaluation across llama.cpp, MLX, vLLM, and SGLang | Beta; independent focused distribution |
+| [TurboQuant Reference](components/turboquant-reference/README.md) | NumPy/SciPy reference implementation of PolarQuant, QJL, and TurboQuant KV-cache compression | Research reference; independent focused distribution |
+| [Tools](tools/README.md) | Existing diagnostics, validation, benchmarking, and conversion utilities | Mixed; being migrated into reusable protocols over time |
+| [Research](research/README.md) | Dated studies, investigations, negative results, and archived plans | Evidence record |
+| [Artifacts](artifacts/README.md) | Retained benchmark output and experiment evidence | Evidence; provenance varies for historical artifacts |
 
-The repository name is the umbrella identity. Current component contracts are:
+KV Fidelity and TurboQuant Reference keep their own package names and release
+lifecycles while the shared Metria layer matures.
 
-- KV Fidelity distribution: `kv-fidelity` (not yet released on PyPI)
-- KV Fidelity import: `kv_fidelity`
-- KV Fidelity command: `kv-fidelity`
-- TurboQuant reference distribution: `turboquant-reference`
-- TurboQuant reference import: `turboquant`
+## What Metria should own
 
-## Research areas
+Metria's differentiated responsibilities are:
 
-- KV-cache and weight compression
-- Scalar, vector, and residual quantization
-- Sparse, selective, and long-context attention
-- Layer-aware and asymmetric K/V policies
-- Decode and prefill kernel performance
-- Apple Silicon, CUDA, ROCm, Vulkan, and CPU behavior
-- Cross-engine reproducibility and fidelity evaluation
-- Hardware diagnostics and benchmark methodology
+- explicit study design: what varies, what is controlled, and what is blocked;
+- requested, resolved, and observed configuration provenance;
+- runtime lifecycle and applied-configuration evidence;
+- measurement protocols with typed units, methods, samples, aggregation, and
+  uncertainty;
+- comparison semantics that prevent invalid cross-system conclusions;
+- behavioral and systems metrics under one evidence model;
+- hardware-aware capability discovery;
+- reproducibility bundles for research results.
 
-## Start here
-
-- [Documentation index](docs/index.md)
-- [Historical TurboQuant+ engine setup](docs/guides/getting-started.md)
-- [TurboQuant configuration recommendations](docs/guides/turboquant-recommendations.md)
-- [Benchmark reference](docs/reference/benchmarks.md)
-- [KV Fidelity quick start](components/kv-fidelity/QUICKSTART.md)
-- [Repository contribution guide](CONTRIBUTING.md)
-- [Support routes](SUPPORT.md)
-- [Governance and maintainers](GOVERNANCE.md)
+Metria should generally **not** own inference kernels, schedulers, serving
+engines, or duplicate every upstream quantizer.
 
 ## Development setup
 
-Install `uv`, then synchronize the workspace from the repository root:
+Clone the repository and synchronize the workspace:
 
 ```bash
-git clone https://github.com/dipeshbabu/efficient-llm-systems.git
-cd efficient-llm-systems
+git clone https://github.com/dipeshbabu/metria.git
+cd metria
 
 uv sync --all-packages
 uv run pre-commit install
 uv run pytest
 ```
 
-Backend-specific KV Fidelity dependencies are optional. Add only the extra needed
-for the backend under test:
+Run the provisional Metria core checks directly with:
 
 ```bash
-uv sync --all-packages --extra mlx
-uv sync --all-packages --extra sglang
+uv run pytest metria_tests -v
+uv run mypy src/metria
+uv run ruff check src/metria metria_tests
+uv run ruff format --check src/metria metria_tests
 ```
 
-Avoid `--all-extras`: the backend stacks have different platform and hardware
-requirements. The vLLM adapter remains in the source tree, but its managed
-extra is temporarily unavailable: the latest published vLLM release pins
-PyTorch 2.11.0, which is affected by
-[GHSA-rrmf-rvhw-rf47](https://github.com/advisories/GHSA-rrmf-rvhw-rf47).
-Do not override that pin; use an existing audited environment or another
-backend until vLLM publishes support for PyTorch 2.13 or newer.
+Backend-specific KV Fidelity dependencies remain optional. Add only the stack
+needed for the backend under test; do not assume all inference runtimes can
+share one Python environment.
 
-Python code follows PEP 8. Ruff enforces linting and import order and formats
-the codebase using the repository's Python 3.10 target and 88 character line
-length. Line-length rule `E501` is delegated to the formatter. Pre-commit runs
-Ruff, mypy, and the repository's lightweight file checks before each commit.
-See the [contribution guide](CONTRIBUTING.md) for check and fix commands.
+## Existing focused workflows
 
-## Current findings
+### Evaluate KV-cache fidelity
 
-The repository's controlled experiments support three recurring conclusions
-within the tested model and hardware matrix:
+Install the focused component from a checkout:
 
-1. Value-cache compression can often be substantially more aggressive than
-   key-cache compression. See the
-   [asymmetric K/V study](research/papers/asymmetric-kv-compression.md).
-2. Key precision usually dominates quality because K controls attention
-   routing. See the
-   [M5 Max stress test](research/papers/m5-max-stress-test.md).
-3. Boundary layers are disproportionately sensitive on several tested
-   architectures. See the
-   [layer-aware V study](research/papers/layer-aware-v-compression.md).
+```bash
+python -m pip install "./components/kv-fidelity"
+kv-fidelity --help
+```
 
-These are evidence-bounded findings, not universal guarantees. Validate every
-new model, engine, context length, and hardware target. KV Fidelity exists to make
-that comparison behavioral rather than relying on perplexity alone.
+Continue with the [KV Fidelity quick start](components/kv-fidelity/QUICKSTART.md).
 
-## Production ecosystem
+### Reproduce TurboQuant algorithms
 
-The production implementations are maintained outside this research
-monorepo:
+```bash
+python -m pip install "./components/turboquant-reference"
+python components/turboquant-reference/benchmarks/examples/demo.py
+```
 
-| Project | Role |
-|---|---|
-| [vLLM](https://github.com/vllm-project/vllm) | Upstream TurboQuant attention backend |
-| [llama.cpp](https://github.com/ggml-org/llama.cpp) | Upstream Hadamard KV rotation and platform kernels |
-| [Historical llama.cpp TurboQuant fork](docs/reference/historical-forks.md#llamacpp-experimental-forks) | Full TurboQuant KV and weight formats across Metal, CUDA, HIP, and CPU; public fork URL currently unavailable |
-| [mlx-swift-lm](https://github.com/ekryski/mlx-swift-lm) | Apple Silicon inference and TurboQuant collaboration |
-| [Historical vllm-swift prototype](docs/reference/historical-forks.md#swift-and-long-context-prototypes) | Swift serving on Apple Silicon; public prototype URL currently unavailable |
+See the [TurboQuant Reference README](components/turboquant-reference/README.md)
+for its public Python API and benchmark extras.
 
-Use the component and engine documentation for supported formats and current
-runtime flags.
+### Inspect existing diagnostic tools
 
-## Repository layout
+```bash
+python tools/diagnostics/turbo_hardware_diag.py --help
+```
+
+The current scripts contain useful operational knowledge but are not yet the
+stable Metria benchmark protocol. See [tools/README.md](tools/README.md) for
+requirements and limitations.
+
+## Repository organization
 
 ```text
+src/metria/                 Provisional shared Metria core
+metria_tests/               Core contract tests
 components/
-  kv-fidelity/             Fidelity-evaluation package source
-  turboquant-reference/    Portable quantization reference package
-docs/
-  guides/                  Current operational guidance
-  reference/               Curated benchmark and compatibility references
-research/
-  papers/                  Dated research reports
-  investigations/          Engineering experiments and validation records
-  archive/                 Superseded plans and historical documentation
-tools/
-  diagnostics/             Hardware and runtime diagnostics
-  validation/              Quality, NIAH, and regression gates
-  benchmarks/              System benchmark drivers
-  conversion/              Model conversion helpers
-  maintenance/             Repository integrity checks
-artifacts/
-  benchmarks/              Retained raw benchmark output
-  niah/                    Retrieval evidence
-  mlx/                     MLX quality output
-  ablations/               Controlled ablation logs
-  profiles/                Hardware baselines
+  kv-fidelity/              Focused fidelity evaluator
+  turboquant-reference/     Portable algorithm reference
+docs/                       Current guidance and architecture
+research/                   Dated research and investigations
+artifacts/                  Retained experiment evidence
+tools/                      Existing diagnostics and benchmark utilities
 ```
 
 Current guidance belongs in `docs/`. Dated claims and negative results belong
-in `research/`. Generated evidence belongs in `artifacts/`. Executable
-workflows belong in `tools/` or the component that owns them.
+in `research/`. Generated evidence belongs in `artifacts/`. Historical evidence
+is preserved rather than rewritten to match newer conclusions.
 
 ## Verification
 
-Run the complete Python gate:
+Run the complete repository gate:
 
 ```bash
 uv run pre-commit run --all-files
 uv run pytest
 ```
 
-Build components independently:
+Focused components can still be built independently:
 
 ```bash
 uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
 ```
 
-The root is deliberately not a publishable Python distribution. Each
-component owns its dependencies, tests, package data, and release lifecycle.
+The root Metria core is still provisional and is not published from this branch.
+Public contracts should remain explicitly unstable until the runtime and
+measurement boundaries have been exercised by at least two materially
+different inference runtimes.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [GOVERNANCE.md](GOVERNANCE.md), and
+[SUPPORT.md](SUPPORT.md). Changes to public experiment semantics, metric
+methodology, comparison rules, packaging, or release policy should be discussed
+before being stabilized.
 
 ## Citing this work
 
-Use the repository's [citation metadata](CITATION.cff) when software or the
-repository as a whole supports your work. When relying on a result or claim
-from `research/`, also cite the specific report so readers can recover its
-model, engine, hardware, configuration, and date.
+Use [CITATION.cff](CITATION.cff) when the repository as a whole supports your
+work. When relying on a specific result under `research/`, cite that report as
+well so readers can recover its model, runtime, hardware, configuration, and
+date.
 
 ## License
 
