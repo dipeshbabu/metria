@@ -57,7 +57,7 @@ repos:
         language: system
         files: |
           (?x)^(
-              (components/(kv-fidelity|turboquant-reference)/src/|tools/).*\.pyi?
+              (src/metria/|components/(kv-fidelity|turboquant-reference)/src/|tools/).*\.pyi?
               | (components/(kv-fidelity|turboquant-reference)/)?pyproject\.toml
               | \.pre-commit-config\.yaml
               | uv\.lock

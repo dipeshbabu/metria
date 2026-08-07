@@ -1,9 +1,12 @@
 # Documentation
 
-This directory contains current, maintained guidance for Efficient LLM
-Systems. Dated experiments and historical conclusions live under
-[`research/`](../research/README.md); generated evidence lives under
-[`artifacts/`](../artifacts/README.md).
+This directory contains current, maintained guidance for Metria. Dated
+experiments and historical conclusions live under [`research/`](../research/README.md);
+generated evidence lives under [`artifacts/`](../artifacts/README.md).
+
+## Architecture
+
+- [Metria core architecture](architecture/metria-core.md)
 
 ## Guides
 
