@@ -10,6 +10,7 @@ generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
 ## Guides
 
+- [Metria llama.cpp runtime adapter](guides/metria-llamacpp-runtime.md)
 - [Historical TurboQuant+ engine setup](guides/getting-started.md)
 - [TurboQuant configuration recommendations](guides/turboquant-recommendations.md)
 - [MLX port](guides/mlx-port.md)

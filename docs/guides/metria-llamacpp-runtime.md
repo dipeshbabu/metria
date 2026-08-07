@@ -1,0 +1,110 @@
+# Metria llama.cpp runtime adapter
+
+The first Metria runtime adapter drives local llama.cpp command-line binaries
+without using KV Fidelity's module-global backend dispatch.
+
+It is intentionally narrow. The current adapter proves the runtime lifecycle and
+evidence model before Metria adds more engines.
+
+## What it supports
+
+- local `llama-cli` text generation;
+- local GGUF model paths;
+- explicit `n_gpu_layers`, flash-attention, and expert `extra_args`;
+- one runtime treatment: `llamacpp.kv_cache`;
+- requested → resolved → observed runtime evidence;
+- content hashing for llama.cpp binaries;
+- exact redacted command records for invocations;
+- optional decode-time `token_ids` capture when a compatible patched
+  `llama-completion` binary is present;
+- timeout and non-zero-exit failure reporting;
+- instance-local sessions with no Metria global backend selector.
+
+It does **not** yet provide server mode, batching/concurrency load generation,
+per-token log probabilities, perplexity/KLD measurement, remote model download,
+or a stable public CLI.
+
+## Run specification
+
+```python
+from metria import RunSpec, TreatmentSpec, TreatmentType
+from metria.protocols import InferenceRequest
+from metria.runtimes import LlamaCppAdapter
+
+spec = RunSpec(
+    model={"path": "/models/model.gguf", "id": "org/model"},
+    runtime={
+        "name": "llamacpp",
+        "bin_dir": "/opt/llama.cpp/build/bin",
+        "n_gpu_layers": 99,
+        "flash_attention": True,
+    },
+    scenario={"context": 8192, "max_tokens": 128},
+    measurements=("text",),
+    treatments=(
+        TreatmentSpec(
+            name="llamacpp.kv_cache",
+            kind=TreatmentType.RUNTIME_FEATURE,
+            config={"key_dtype": "q8_0", "value_dtype": "q4_0"},
+        ),
+    ),
+)
+
+adapter = LlamaCppAdapter()
+environment = {"hardware_class": "local-gpu"}
+
+support = adapter.probe(spec, environment)
+if support.status != "supported":
+    raise RuntimeError(support.reasons)
+
+resolved = adapter.resolve(spec, environment)
+session = adapter.launch(resolved, environment)
+try:
+    batch = session.infer((InferenceRequest(prompt="Explain KV caches briefly."),))
+    observed = adapter.observe(session)
+finally:
+    session.close()
+```
+
+## KV-cache treatment
+
+The adapter currently accepts one `runtime_feature` treatment named either
+`llamacpp.kv_cache` or `kv_cache`.
+
+Supported fields are:
+
+| Field | Meaning |
+|---|---|
+| `key_dtype` | llama.cpp `-ctk` value; default `f16` |
+| `value_dtype` | llama.cpp `-ctv` value; default `f16` |
+| `attention_rotation_k` | patched `LLAMA_ATTN_ROT_K_OVERRIDE` value |
+| `attention_rotation_v` | patched `LLAMA_ATTN_ROT_V_OVERRIDE` value |
+| `attention_rotation_disable` | patched `LLAMA_ATTN_ROT_DISABLE` value |
+
+Unknown treatments and unknown fields fail explicitly. Metria does not silently
+ignore a treatment it cannot prove it applied.
+
+## Token-ID capture
+
+`CaptureRequest(kind="token_ids")` selects `llama-completion` and uses the
+existing `KV_FIDELITY_TRAJECTORY` patch ABI. Merely finding that binary is
+recorded as `binary_present_unverified`; a run only records token capture as
+observed when token records are actually returned.
+
+This keeps the existing research instrumentation usable without making that
+patch part of Metria's stable runtime contract.
+
+## Evidence and privacy
+
+The resolved runtime record includes the content hash of each llama.cpp binary
+and file metadata for the model. Large model files are not automatically hashed
+by this adapter; stronger model-artifact verification belongs in Metria's future
+artifact resolver.
+
+For each invocation, Metria records the actual managed command flags and managed
+environment overrides. Prompt and system-message contents are replaced with
+`<redacted>` in command evidence and represented by SHA-256 fingerprints.
+
+`extra_args` is available for expert llama.cpp options, but cannot override
+flags that Metria manages directly. This prevents the recorded resolved state
+from disagreeing with the effective command line.

@@ -98,7 +98,11 @@ class RuntimeAdapter(Protocol):
         """Report whether the requested run is supported in this environment."""
         ...
 
-    def resolve(self, spec: RunSpec) -> Mapping[str, Any]:
+    def resolve(
+        self,
+        spec: RunSpec,
+        environment: Mapping[str, Any],
+    ) -> Mapping[str, Any]:
         """Resolve user intent into an exact pre-launch runtime specification."""
         ...
 
