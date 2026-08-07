@@ -40,10 +40,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dipeshbabu/efficient-llm-systems/tree/main/components/turboquant-reference"
-Repository = "https://github.com/dipeshbabu/efficient-llm-systems"
-Issues = "https://github.com/dipeshbabu/efficient-llm-systems/issues"
-Changelog = "https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/turboquant-reference/CHANGELOG.md"
+Homepage = "https://github.com/dipeshbabu/metria/tree/main/components/turboquant-reference"
+Repository = "https://github.com/dipeshbabu/metria"
+Issues = "https://github.com/dipeshbabu/metria/issues"
+Changelog = "https://github.com/dipeshbabu/metria/blob/main/components/turboquant-reference/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
