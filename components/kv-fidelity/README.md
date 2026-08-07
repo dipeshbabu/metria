@@ -18,7 +18,7 @@ legacy `refract-llm` project as a substitute: its releases were not published
 from this repository and use different ownership and license metadata.
 
 Install from source until a verified `kv-fidelity` release exists. The
-[package-identity record](https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/kv-fidelity/PACKAGE-IDENTITY.md)
+[package-identity record](https://github.com/dipeshbabu/metria/blob/main/components/kv-fidelity/PACKAGE-IDENTITY.md)
 explains the rename and the legacy release boundary.
 
 After PyPI shows version 0.3.5 with provenance from this repository's
@@ -45,8 +45,8 @@ a version-sensitive llama.cpp source patch.
 ### From source (for hacking / contributing)
 
 ```bash
-git clone https://github.com/dipeshbabu/efficient-llm-systems.git
-cd efficient-llm-systems/components/kv-fidelity
+git clone https://github.com/dipeshbabu/metria.git
+cd metria/components/kv-fidelity
 pip install -e .          # editable install, base
 pip install -e .[mlx]     # editable + MLX backend
 pip install -e .[sglang]  # editable + SGLang backend
