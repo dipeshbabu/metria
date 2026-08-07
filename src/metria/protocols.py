@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from ._freeze import freeze_mapping
+from ._freeze import freeze_mapping, freeze_typed_mapping
 from .models import MetricSummary, RunSpec
 
 
@@ -65,6 +65,33 @@ class InferenceBatch:
         object.__setattr__(self, "outputs", tuple(self.outputs))
         object.__setattr__(self, "captures", freeze_mapping(self.captures))
         object.__setattr__(self, "metadata", freeze_mapping(self.metadata))
+
+
+@dataclass(frozen=True)
+class MeasurementResult:
+    """Metrics plus immutable evidence produced by a measurement method.
+
+    Metrics are compact numerical summaries suitable for comparison and
+    reporting. Evidence retains the method-specific observations needed to
+    reproduce or derive those summaries. Large binary payloads should be stored
+    externally and represented here by artifact references instead of live
+    objects.
+    """
+
+    metrics: Mapping[str, MetricSummary] = field(default_factory=dict)
+    evidence: Mapping[str, Any] = field(default_factory=dict)
+    artifacts: tuple[Mapping[str, Any], ...] = ()
+
+    def __post_init__(self) -> None:
+        """Detach all retained measurement output from mutable caller state."""
+
+        object.__setattr__(self, "metrics", freeze_typed_mapping(self.metrics))
+        object.__setattr__(self, "evidence", freeze_mapping(self.evidence))
+        object.__setattr__(
+            self,
+            "artifacts",
+            tuple(freeze_mapping(artifact) for artifact in self.artifacts),
+        )
 
 
 class RuntimeSession(Protocol):
@@ -131,6 +158,6 @@ class MeasurementProtocol(Protocol):
         session: RuntimeSession,
         scenario: Mapping[str, Any],
         config: Mapping[str, Any],
-    ) -> Mapping[str, MetricSummary]:
-        """Execute the measurement and return named metric summaries."""
+    ) -> MeasurementResult:
+        """Execute the method and return numerical summaries plus evidence."""
         ...
