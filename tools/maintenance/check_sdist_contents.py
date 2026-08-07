@@ -37,7 +37,9 @@ def check_sdist(path: Path) -> list[str]:
     for filename in sorted(_REQUIRED_ROOT_FILES):
         expected = f"{root}/{filename}"
         if expected not in member_set:
-            errors.append(f"{path}: missing required source-distribution file {expected}")
+            errors.append(
+                f"{path}: missing required source-distribution file {expected}"
+            )
     return errors
 
 
