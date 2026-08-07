@@ -18,6 +18,7 @@ from .models import (
     TreatmentType,
 )
 from .protocols import MeasurementResult
+from .study_execution import StudyExecutionResult, StudyPairComparison, execute_study
 
 __version__ = "0.1.0.dev0"
 
@@ -33,9 +34,12 @@ __all__ = [
     "RunRecord",
     "RunSpec",
     "RunStatus",
+    "StudyExecutionResult",
+    "StudyPairComparison",
     "StudySpec",
     "TreatmentSpec",
     "TreatmentType",
     "compare_runs",
     "execute_run",
+    "execute_study",
 ]

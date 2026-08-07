@@ -9,6 +9,7 @@ from .models import (
     CompatibilityIssue,
     CompatibilityReport,
     RunRecord,
+    RunStatus,
 )
 
 _MISSING = object()
@@ -90,12 +91,16 @@ def compare_runs(
     right: RunRecord,
     plan: ComparisonPlan,
 ) -> CompatibilityReport:
-    """Determine whether two runs support the comparison described by ``plan``.
+    """Determine whether two completed runs support the comparison in ``plan``.
 
     Dimensions listed in ``vary`` are intentionally allowed to differ.
     Controlled dimensions must match. Blocking dimensions must also match for
     a direct pairwise comparison; callers can group records into blocks before
     invoking this function.
+
+    Direct comparison is deliberately strict about lifecycle state. A failed,
+    timed-out, or partial record remains useful experiment evidence, but is not
+    analysis-ready by default. Both records must therefore be ``COMPLETED``.
 
     Metric compatibility is stricter than study compatibility: two metrics are
     directly comparable only when their complete metric identities match.
@@ -104,6 +109,19 @@ def compare_runs(
     """
 
     issues: list[CompatibilityIssue] = []
+    if (
+        left.status is not RunStatus.COMPLETED
+        or right.status is not RunStatus.COMPLETED
+    ):
+        issues.append(
+            CompatibilityIssue(
+                dimension="status",
+                left=left.status.value,
+                right=right.status.value,
+                reason="both runs must be completed for direct comparison",
+            )
+        )
+
     for dimension in sorted(plan.control):
         issue = _check_dimension(left, right, dimension, "control")
         if issue is not None:

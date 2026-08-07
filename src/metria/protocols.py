@@ -115,7 +115,9 @@ class RuntimeSession(Protocol):
 
 
 class RuntimeAdapter(Protocol):
-    """Resolve, launch, and observe an inference runtime."""
+    """A named adapter that resolves, launches, and observes an inference runtime."""
+
+    name: str
 
     def probe(
         self,
