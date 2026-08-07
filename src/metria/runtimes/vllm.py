@@ -423,7 +423,9 @@ class VLLMSession:
             token_ids = getattr(output, "token_ids", None)
             if not isinstance(text, str):
                 raise RuntimeError(f"vLLM response[{index}] text is not a string")
-            if isinstance(token_ids, (str, bytes)) or not isinstance(token_ids, Sequence):
+            if isinstance(token_ids, (str, bytes)) or not isinstance(
+                token_ids, Sequence
+            ):
                 raise RuntimeError(
                     f"vLLM response[{index}] does not expose output token IDs"
                 )
@@ -474,7 +476,9 @@ class VLLMSession:
             "mode": "reference_release",
             "explicit_shutdown_called": False,
         }
-        shutdown = getattr(self._llm, "shutdown", None) if self._llm is not None else None
+        shutdown = (
+            getattr(self._llm, "shutdown", None) if self._llm is not None else None
+        )
         if callable(shutdown):
             shutdown()
             cleanup["mode"] = "public_shutdown"
