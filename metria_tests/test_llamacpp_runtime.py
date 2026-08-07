@@ -6,10 +6,10 @@ from typing import Any
 
 import pytest
 
+import metria.runtimes.llamacpp as llamacpp_module
 from metria import RunSpec, TreatmentSpec, TreatmentType
 from metria.protocols import CaptureRequest, InferenceRequest
 from metria.runtimes.llamacpp import LlamaCppAdapter, LlamaCppSession
-import metria.runtimes.llamacpp as llamacpp_module
 
 
 def _files(tmp_path: Path, *, completion: bool = True) -> tuple[Path, Path]:
