@@ -109,7 +109,10 @@ def compare_runs(
     """
 
     issues: list[CompatibilityIssue] = []
-    if left.status is not RunStatus.COMPLETED or right.status is not RunStatus.COMPLETED:
+    if (
+        left.status is not RunStatus.COMPLETED
+        or right.status is not RunStatus.COMPLETED
+    ):
         issues.append(
             CompatibilityIssue(
                 dimension="status",
