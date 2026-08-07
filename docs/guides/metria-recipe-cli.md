@@ -15,31 +15,37 @@ metria recipe normalize <study.json>
 The implementation uses only the standard library and the existing
 `metria.study_recipe.v1` schema.
 
-## Running from a source checkout
+## Install from a source checkout
 
-The root Metria distribution is still provisional and is not yet installed as a
-console-script package by this change. From a repository checkout, run:
+The root Metria framework is installable from a checkout and provides a real
+`metria` console command:
 
 ```bash
-PYTHONPATH=src python -m metria --version
-PYTHONPATH=src python -m metria recipe validate study.json
+git clone https://github.com/dipeshbabu/metria.git
+cd metria
+python -m pip install .
+metria --version
+metria recipe validate study.json
 ```
 
-On Windows PowerShell, the equivalent is:
+The root distribution remains provisional and is not published by this
+repository. The local package metadata is not a claim that a public package
+index namespace is owned or available.
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m metria recipe validate study.json
+Developers using the uv workspace can instead run:
+
+```bash
+uv sync --all-packages
+uv run metria --version
+uv run metria recipe validate study.json
 ```
 
-Packaging the root Metria core and installing a `metria` console script should
-be a separate change so packaging/release semantics are reviewed independently
-from the CLI contract.
+`python -m metria` remains an equivalent module entry point after installation.
 
 ## Validate
 
 ```bash
-PYTHONPATH=src python -m metria recipe validate study.json
+metria recipe validate study.json
 ```
 
 Successful human-readable output includes:
@@ -53,7 +59,7 @@ It does not print prompt text.
 For structural machine-readable metadata:
 
 ```bash
-PYTHONPATH=src python -m metria recipe validate study.json --json
+metria recipe validate study.json --json
 ```
 
 The JSON output contains the study name, run count, runtime names, measurement
@@ -66,7 +72,7 @@ stderr rather than a Python traceback.
 ## Digest
 
 ```bash
-PYTHONPATH=src python -m metria recipe digest study.json
+metria recipe digest study.json
 ```
 
 This prints only the canonical SHA-256 digest from `study_recipe_digest()`.
@@ -76,14 +82,13 @@ runtime applied the request.
 ## Normalize
 
 ```bash
-PYTHONPATH=src python -m metria recipe normalize study.json
+metria recipe normalize study.json
 ```
 
 or:
 
 ```bash
-PYTHONPATH=src python -m metria recipe normalize study.json \
-  --output normalized-study.json
+metria recipe normalize study.json --output normalized-study.json
 ```
 
 `normalize` validates the recipe and emits deterministic human-readable JSON.
@@ -100,14 +105,13 @@ Do not pipe normalized private recipes into public logs or publish them under
 ## Why execution is not here yet
 
 Study execution requires explicit runtime, measurement, and pairwise-analysis
-registries. Adding automatic plugin discovery at the same time as the first CLI
-would silently introduce a code-loading policy and make the command harder to
-audit.
+registries. Installing the root CLI does not change that execution policy and
+does not auto-import arbitrary plugins.
 
-The safer sequence is:
+The safer sequence remains:
 
 1. stabilize recipe parsing and digesting;
-2. stabilize this non-executing CLI surface;
+2. stabilize the non-executing CLI surface;
 3. package the root Metria core;
 4. add explicit built-in registry selection;
 5. add `metria run` only after its execution/provenance semantics are clear.

@@ -83,6 +83,35 @@ Metria's differentiated responsibilities are:
 Metria should generally **not** own inference kernels, schedulers, serving
 engines, or duplicate every upstream quantizer.
 
+## Install Metria from a checkout
+
+The root Metria framework is buildable and installable from source, but this
+repository does **not** publish a root `metria` distribution to a package index
+at this stage. Do not infer public package-name ownership from the local
+distribution metadata.
+
+From a checkout:
+
+```bash
+git clone https://github.com/dipeshbabu/metria.git
+cd metria
+python -m pip install .
+metria --version
+metria --help
+```
+
+The installed root framework provides the recipe CLI without installing any
+inference engine:
+
+```bash
+metria recipe validate study.json
+metria recipe digest study.json
+metria recipe normalize study.json
+```
+
+Inference runtimes remain optional and user-managed. The focused
+`kv-fidelity` and `turboquant-reference` distributions remain independent.
+
 ## Development setup
 
 Clone the repository and synchronize the workspace:
@@ -96,7 +125,9 @@ uv run pre-commit install
 uv run pytest
 ```
 
-Run the provisional Metria core checks directly with:
+The workspace sync installs the provisional root Metria package together with
+the focused workspace members for development. Run the core checks directly
+with:
 
 ```bash
 uv run pytest metria_tests -v
@@ -169,17 +200,18 @@ uv run pre-commit run --all-files
 uv run pytest
 ```
 
-Focused components can still be built independently:
+All three workspace distributions can be built independently:
 
 ```bash
+uv run python -m build .
 uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
 ```
 
-The root Metria core is still provisional and is not published from this branch.
-Public contracts should remain explicitly unstable until the runtime and
-measurement boundaries have been exercised by at least two materially
-different inference runtimes.
+The root Metria distribution remains provisional and is **not published** by
+this repository. Public package-index identity, release controls, recovery
+ownership, and versioning policy must be reviewed separately before any first
+public root release.
 
 ## Contributing
 
