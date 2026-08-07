@@ -28,7 +28,8 @@ def check_sdist(path: Path) -> list[str]:
     }
     if len(roots) != 1:
         errors.append(
-            f"{path}: expected exactly one top-level directory; found {sorted(roots)!r}"
+            f"{path}: expected exactly one top-level directory; "
+            f"found {sorted(roots)!r}"
         )
         return errors
 
