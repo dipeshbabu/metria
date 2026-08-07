@@ -1,7 +1,7 @@
 # Repository-level tool configuration.
 #
-# Efficient LLM Systems is a monorepo, not a publishable root distribution.
-# Each component owns its package manifest and release lifecycle.
+# Metria is a research monorepo. The root Metria core remains provisional;
+# focused components own their package manifests and release lifecycles.
 
 [dependency-groups]
 dev = [
@@ -36,6 +36,7 @@ members = [
 target-version = "py310"
 line-length = 88
 src = [
+    "src",
     "components/kv-fidelity/src",
     "components/turboquant-reference/src",
 ]
@@ -55,6 +56,7 @@ ignore = [
 
 [tool.mypy]
 files = [
+    "src/metria",
     "components/kv-fidelity/src/kv_fidelity",
     "components/turboquant-reference/src/turboquant",
     "tools",
@@ -89,10 +91,12 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = [
+    "metria_tests",
     "components/turboquant-reference/tests",
     "components/kv-fidelity/tests",
 ]
 pythonpath = [
+    "src",
     "components/turboquant-reference/src",
     "components/kv-fidelity/src",
 ]
