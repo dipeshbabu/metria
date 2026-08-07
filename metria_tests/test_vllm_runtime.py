@@ -8,13 +8,13 @@ from typing import Any
 
 import pytest
 
+import metria.runtimes.llamacpp as llamacpp_module
+import metria.runtimes.vllm as vllm_module
 from metria import RunSpec, RunStatus, TreatmentSpec, TreatmentType, execute_run
 from metria.measurements import TokenTrajectoryProtocol, compare_trajectory_results
 from metria.protocols import CaptureRequest, InferenceRequest, MeasurementResult
 from metria.runtimes.llamacpp import LlamaCppAdapter
 from metria.runtimes.vllm import VLLMAdapter, VLLMSession
-import metria.runtimes.llamacpp as llamacpp_module
-import metria.runtimes.vllm as vllm_module
 
 
 class FakeSamplingParams:
@@ -38,7 +38,7 @@ class FakeTokenizer:
 
 
 class FakeLLM:
-    instances: list["FakeLLM"] = []
+    instances: list[FakeLLM] = []
 
     def __init__(self, **kwargs: Any) -> None:
         self.kwargs = kwargs
@@ -287,7 +287,10 @@ def test_close_releases_instance_without_claiming_unavailable_shutdown(
 def test_close_uses_public_shutdown_if_future_runtime_exposes_it(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    fake_module = SimpleNamespace(LLM=FakeLLMWithShutdown, SamplingParams=FakeSamplingParams)
+    fake_module = SimpleNamespace(
+        LLM=FakeLLMWithShutdown,
+        SamplingParams=FakeSamplingParams,
+    )
     _patch_vllm(monkeypatch, fake_module)
     FakeLLMWithShutdown.instances.clear()
     adapter = VLLMAdapter()
