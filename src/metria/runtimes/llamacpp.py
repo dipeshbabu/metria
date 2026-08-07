@@ -292,7 +292,11 @@ def _generation_options(
     system = choose("system", None)
     reasoning = choose("reasoning", "off")
 
-    for key, value in (("max_tokens", max_tokens), ("context", context), ("seed", seed)):
+    for key, value in (
+        ("max_tokens", max_tokens),
+        ("context", context),
+        ("seed", seed),
+    ):
         if isinstance(value, bool) or not isinstance(value, int):
             raise TypeError(f"generation {key} must be an integer")
     if max_tokens < 0:
@@ -629,7 +633,9 @@ class LlamaCppAdapter:
             bin_dir = _bin_dir(spec, environment)
             _kv_treatment(spec.treatments)
         except (TypeError, ValueError) as exc:
-            return SupportReport(status="unsupported", reasons=(str(exc),), evidence=evidence)
+            return SupportReport(
+                status="unsupported", reasons=(str(exc),), evidence=evidence
+            )
 
         cli = _find_binary(bin_dir, "llama-cli")
         completion = _find_binary(bin_dir, "llama-completion")
@@ -664,7 +670,9 @@ class LlamaCppAdapter:
 
         support = self.probe(spec, environment)
         if support.status != "supported":
-            raise ValueError("; ".join(support.reasons) or "llama.cpp run is unsupported")
+            raise ValueError(
+                "; ".join(support.reasons) or "llama.cpp run is unsupported"
+            )
         runtime = _runtime_config(spec)
         model_path = _model_path(spec)
         bin_dir = _bin_dir(spec, environment)
