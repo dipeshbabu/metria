@@ -4,6 +4,7 @@
 # focused components own their package manifests and release lifecycles.
 
 [dependency-groups]
+# Grouped maintenance-tool bumps are reviewed together with the workspace lockfile.
 dev = [
     "build>=1.0",
     "coverage>=7.15.3",
