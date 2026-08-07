@@ -36,6 +36,10 @@ RunRecord
   ├── events
   ├── artifacts
   └── provenance
+
+StudyExecutionResult
+  ├── records: RunRecord[]
+  └── comparisons: StudyPairComparison[]
 ```
 
 ## Study semantics
@@ -122,8 +126,8 @@ share a benchmark label.
 The provisional protocols separate runtime lifecycle from measurement
 methodology:
 
-- `RuntimeAdapter` probes support, resolves configuration, launches a session,
-  and records observed runtime evidence.
+- `RuntimeAdapter` is explicitly named, probes support, resolves configuration,
+  launches a session, and records observed runtime evidence.
 - `RuntimeSession` performs inference and owns reset/cleanup behavior.
 - `MeasurementProtocol` is explicitly named/versioned, declares evidence
   requirements, and returns a `MeasurementResult` containing metrics and
@@ -163,6 +167,38 @@ failure, and it always attempts to close a successfully launched session.
 Lifecycle exception text is not embedded verbatim because third-party runtimes
 may include prompts or other sensitive input in errors. The record retains the
 exception type and a SHA-256 fingerprint of the message instead.
+
+## Study execution lifecycle
+
+`execute_study()` routes every `RunSpec` through registered runtime adapters and
+measurement protocols, then evaluates the study's pairwise comparison semantics:
+
+```text
+StudySpec
+  -> validate all registry routes
+  -> execute run-0000
+  -> execute run-0001
+  -> ...
+  -> compare every run pair with ComparisonPlan
+  -> StudyExecutionResult
+```
+
+Registry mistakes are configuration errors, not experimental outcomes. The
+study executor therefore validates every requested runtime and measurement
+before the first run starts. Once execution begins, however, runtime or
+measurement failures are preserved as `RunRecord` values and do not prevent
+later runs from executing.
+
+Direct pairwise comparison is lifecycle-aware. `compare_runs()` requires both
+records to be `COMPLETED`; failed, timed-out, or partial records remain useful
+evidence but are not analysis-ready by default. Controlled and blocking
+requirements are still checked and reported alongside the lifecycle issue so a
+study can diagnose more than one incompatibility at once.
+
+The first study executor deliberately supports exactly one measurement per run
+and one shared environment mapping. Multi-measurement scheduling, heterogeneous
+host placement, retries, persistence, parallel execution, and CLI recipes remain
+separate later concerns rather than hidden behavior in the initial contract.
 
 ## What is not in the first core
 
