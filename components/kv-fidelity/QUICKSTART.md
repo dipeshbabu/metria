@@ -53,7 +53,7 @@ different ownership and must not be used as a substitute. Use the source
 installation below until a release is verified.
 
 Once PyPI shows `kv-fidelity` 0.3.5 with provenance from
-`dipeshbabu/efficient-llm-systems`, the package-index commands are:
+`dipeshbabu/metria`, the package-index commands are:
 
 ```bash
 # Apple Silicon
@@ -86,8 +86,8 @@ version-sensitive llama.cpp trajectory extension are installed separately.
 ### Source install
 
 ```bash
-git clone https://github.com/dipeshbabu/efficient-llm-systems.git
-cd efficient-llm-systems/components/kv-fidelity
+git clone https://github.com/dipeshbabu/metria.git
+cd metria/components/kv-fidelity
 
 pip install -e .                   # editable install, base
 pip install -e .[mlx]      # editable + MLX backend
