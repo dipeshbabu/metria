@@ -125,6 +125,8 @@ def check_wheel(path: Path) -> list[str]:
             for name in names
         ):
             errors.append(f"{path}: missing packaged KV Fidelity JSON examples")
+        if any(name.startswith("metria/") for name in names):
+            errors.append(f"{path}: unexpectedly contains metria")
         if any(name.startswith("turboquant/") for name in names):
             errors.append(f"{path}: unexpectedly contains turboquant")
         if any(name.startswith("kv_fidelity/tests/") for name in names):
