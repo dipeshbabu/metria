@@ -58,8 +58,10 @@ class ComparisonPlan:
     block_by: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
-        overlap = (self.vary & self.control) | (self.vary & self.block_by) | (
-            self.control & self.block_by
+        overlap = (
+            (self.vary & self.control)
+            | (self.vary & self.block_by)
+            | (self.control & self.block_by)
         )
         if overlap:
             names = ", ".join(sorted(overlap))
