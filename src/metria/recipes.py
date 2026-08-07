@@ -27,17 +27,29 @@ class StudyRecipe:
     """
 
     study: StudySpec
-    measurement_configs: Mapping[str, Any] = field(default_factory=dict)
+    measurement_configs: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     environment: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Detach recipe inputs from mutable caller-owned state."""
+        """Validate recipe routing and detach mutable caller-owned state."""
 
-        object.__setattr__(
-            self,
-            "measurement_configs",
-            freeze_mapping(self.measurement_configs),
-        )
+        requested_measurements = {
+            measurement for run in self.study.runs for measurement in run.measurements
+        }
+        configs: dict[str, Mapping[str, Any]] = {}
+        for name, config in self.measurement_configs.items():
+            if not isinstance(name, str) or not name:
+                raise TypeError("measurement config names must be non-empty strings")
+            if not isinstance(config, Mapping):
+                raise TypeError(f"measurement config {name!r} must be a mapping")
+            configs[name] = config
+        unknown = sorted(set(configs) - requested_measurements)
+        if unknown:
+            raise ValueError(
+                "measurement configs are not requested by the study: "
+                + ", ".join(unknown)
+            )
+        object.__setattr__(self, "measurement_configs", freeze_mapping(configs))
         object.__setattr__(self, "environment", freeze_mapping(self.environment))
 
 
