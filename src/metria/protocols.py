@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from ._freeze import freeze_mapping, freeze_typed_mapping
+from .identity import SupportLevel
 from .models import MetricSummary, RunRecord, RunSpec
 
 
@@ -14,14 +15,23 @@ from .models import MetricSummary, RunRecord, RunSpec
 class SupportReport:
     """Evidence-backed support state for a requested run."""
 
-    status: str
+    status: SupportLevel | str
     reasons: tuple[str, ...] = ()
     evidence: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Detach support evidence from mutable adapter-owned state."""
+        """Normalize support state and detach adapter-owned evidence."""
 
-        object.__setattr__(self, "reasons", tuple(self.reasons))
+        try:
+            status = SupportLevel(self.status)
+        except ValueError as exc:
+            supported = ", ".join(level.value for level in SupportLevel)
+            raise ValueError(f"support status must be one of: {supported}") from exc
+        reasons = tuple(self.reasons)
+        if any(not isinstance(reason, str) or not reason.strip() for reason in reasons):
+            raise ValueError("support reasons must be non-empty strings")
+        object.__setattr__(self, "status", status)
+        object.__setattr__(self, "reasons", reasons)
         object.__setattr__(self, "evidence", freeze_mapping(self.evidence))
 
 

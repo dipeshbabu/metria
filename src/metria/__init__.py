@@ -2,6 +2,16 @@
 
 from .comparison import compare_runs
 from .execution import execute_run
+from .identity import (
+    ArtifactManifest,
+    Capability,
+    CapabilitySet,
+    HardwareFingerprint,
+    ModelRef,
+    RuntimeConfig,
+    SupportLevel,
+    WorkloadSpec,
+)
 from .models import (
     ComparisonPlan,
     CompatibilityIssue,
@@ -38,25 +48,33 @@ from .study_execution import (
 __version__ = "0.1.0.dev0"
 
 __all__ = [
+    "ArtifactManifest",
+    "Capability",
+    "CapabilitySet",
     "ComparisonPlan",
     "CompatibilityIssue",
     "CompatibilityReport",
+    "HardwareFingerprint",
     "MeasurementResult",
     "MetricDefinition",
     "MetricDirection",
     "MetricSample",
     "MetricSummary",
+    "ModelRef",
     "PairwiseAnalysisStatus",
     "RunRecord",
     "RunSpec",
     "RunStatus",
+    "RuntimeConfig",
     "StudyExecutionResult",
     "StudyPairAnalysis",
     "StudyPairComparison",
     "StudyRecipe",
     "StudySpec",
+    "SupportLevel",
     "TreatmentSpec",
     "TreatmentType",
+    "WorkloadSpec",
     "compare_runs",
     "dump_study_recipe",
     "execute_run",
