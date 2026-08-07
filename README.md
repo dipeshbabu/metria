@@ -30,7 +30,7 @@ A run record keeps three states separate:
 
 1. **Requested** — what the recipe asked for.
 2. **Resolved** — the exact configuration and artifacts selected before launch.
-3. **Observed** — what the runtime and environment reported actually ran.
+3. **Observed** — what the runtime and environment report as having actually run.
 
 This distinction matters for inference research: requesting a cache dtype,
 model revision, attention backend, or kernel path is not evidence that the
