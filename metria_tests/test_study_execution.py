@@ -161,7 +161,10 @@ def test_execute_study_routes_runs_and_builds_pairwise_comparisons() -> None:
     assert isinstance(result, StudyExecutionResult)
     assert tuple(record.run_id for record in result.records) == ("run-0000", "run-0001")
     assert all(record.status is RunStatus.COMPLETED for record in result.records)
-    assert tuple(record.metrics["score"].value for record in result.records) == (3.0, 3.0)
+    assert tuple(record.metrics["score"].value for record in result.records) == (
+        3.0,
+        3.0,
+    )
     assert len(result.comparisons) == 1
     comparison = result.comparisons[0]
     assert comparison.left_run_id == "run-0000"
