@@ -392,7 +392,9 @@ def compare_trajectory_results(
         match_samples.append(
             MetricSample(1.0 if matched else 0.0, metadata=sample_metadata)
         )
-        prefix_samples.append(MetricSample(float(prefix_steps), metadata=sample_metadata))
+        prefix_samples.append(
+            MetricSample(float(prefix_steps), metadata=sample_metadata)
+        )
         comparison_rows.append(
             {
                 "id": prompt_id,
