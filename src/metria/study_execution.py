@@ -45,8 +45,13 @@ class StudyPairAnalysis:
 
         if self.status is PairwiseAnalysisStatus.COMPLETED and self.result is None:
             raise ValueError("completed pairwise analysis must contain a result")
-        if self.status is not PairwiseAnalysisStatus.COMPLETED and self.result is not None:
-            raise ValueError("non-completed pairwise analysis must not contain a result")
+        if (
+            self.status is not PairwiseAnalysisStatus.COMPLETED
+            and self.result is not None
+        ):
+            raise ValueError(
+                "non-completed pairwise analysis must not contain a result"
+            )
 
 
 @dataclass(frozen=True)
@@ -137,7 +142,9 @@ def _validate_registries(
             )
     for key, analysis in analyses.items():
         if not isinstance(key, str) or not key:
-            raise ValueError("pairwise analysis registry keys must be non-empty strings")
+            raise ValueError(
+                "pairwise analysis registry keys must be non-empty strings"
+            )
         if analysis.name != key:
             raise ValueError(
                 f"pairwise analysis registry key {key!r} does not match analysis.name "
