@@ -18,7 +18,13 @@ from .models import (
     TreatmentType,
 )
 from .protocols import MeasurementResult
-from .study_execution import StudyExecutionResult, StudyPairComparison, execute_study
+from .study_execution import (
+    PairwiseAnalysisStatus,
+    StudyExecutionResult,
+    StudyPairAnalysis,
+    StudyPairComparison,
+    execute_study,
+)
 
 __version__ = "0.1.0.dev0"
 
@@ -31,10 +37,12 @@ __all__ = [
     "MetricDirection",
     "MetricSample",
     "MetricSummary",
+    "PairwiseAnalysisStatus",
     "RunRecord",
     "RunSpec",
     "RunStatus",
     "StudyExecutionResult",
+    "StudyPairAnalysis",
     "StudyPairComparison",
     "StudySpec",
     "TreatmentSpec",

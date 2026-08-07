@@ -1,30 +1,77 @@
-"""Study-level orchestration across registered runtimes and measurements."""
+"""Study-level orchestration across runtimes, measurements, and analyses."""
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass
+from enum import Enum
 from itertools import combinations
 from typing import Any
 
 from .comparison import compare_runs
 from .execution import execute_run
 from .models import CompatibilityReport, RunRecord, RunSpec, StudySpec
-from .protocols import MeasurementProtocol, RuntimeAdapter
+from .protocols import (
+    MeasurementProtocol,
+    MeasurementResult,
+    PairwiseAnalysis,
+    RuntimeAdapter,
+)
+
+
+class PairwiseAnalysisStatus(str, Enum):
+    """Lifecycle status of one requested analysis for one run pair."""
+
+    COMPLETED = "completed"
+    SKIPPED = "skipped"
+    FAILED = "failed"
+
+
+@dataclass(frozen=True)
+class StudyPairAnalysis:
+    """Outcome of one named pairwise analysis."""
+
+    name: str
+    version: str
+    status: PairwiseAnalysisStatus
+    result: MeasurementResult | None = None
+    reason: str | None = None
+    error_type: str | None = None
+    message_sha256: str | None = None
+
+    def __post_init__(self) -> None:
+        """Reject contradictory outcome payloads."""
+
+        if self.status is PairwiseAnalysisStatus.COMPLETED and self.result is None:
+            raise ValueError("completed pairwise analysis must contain a result")
+        if (
+            self.status is not PairwiseAnalysisStatus.COMPLETED
+            and self.result is not None
+        ):
+            raise ValueError(
+                "non-completed pairwise analysis must not contain a result"
+            )
 
 
 @dataclass(frozen=True)
 class StudyPairComparison:
-    """Compatibility result for one deterministic pair of study run records."""
+    """Compatibility plus derived analyses for one deterministic run pair."""
 
     left_run_id: str
     right_run_id: str
     report: CompatibilityReport
+    analyses: tuple[StudyPairAnalysis, ...] = ()
+
+    def __post_init__(self) -> None:
+        """Normalize pairwise analysis outcomes into an immutable tuple."""
+
+        object.__setattr__(self, "analyses", tuple(self.analyses))
 
 
 @dataclass(frozen=True)
 class StudyExecutionResult:
-    """All run records and pairwise compatibility results for one study."""
+    """All run records and pairwise study results."""
 
     study: StudySpec
     records: tuple[RunRecord, ...]
@@ -35,6 +82,12 @@ class StudyExecutionResult:
 
         object.__setattr__(self, "records", tuple(self.records))
         object.__setattr__(self, "comparisons", tuple(self.comparisons))
+
+
+def _message_fingerprint(exc: Exception) -> str:
+    """Fingerprint analysis errors without retaining possibly sensitive text."""
+
+    return hashlib.sha256(str(exc).encode("utf-8")).hexdigest()
 
 
 def _runtime_name(spec: RunSpec, *, index: int) -> str:
@@ -66,8 +119,9 @@ def _validate_registries(
     study: StudySpec,
     adapters: Mapping[str, RuntimeAdapter],
     measurements: Mapping[str, MeasurementProtocol],
+    analyses: Mapping[str, PairwiseAnalysis],
 ) -> tuple[tuple[str, str], ...]:
-    """Validate every run route before executing any experiment work."""
+    """Validate every run and pairwise-analysis route before experiment work."""
 
     routes: list[tuple[str, str]] = []
     for key, adapter in adapters.items():
@@ -86,6 +140,25 @@ def _validate_registries(
                 f"measurement registry key {key!r} does not match measurement.name "
                 f"{measurement.name!r}"
             )
+    for key, analysis in analyses.items():
+        if not isinstance(key, str) or not key:
+            raise ValueError(
+                "pairwise analysis registry keys must be non-empty strings"
+            )
+        if analysis.name != key:
+            raise ValueError(
+                f"pairwise analysis registry key {key!r} does not match analysis.name "
+                f"{analysis.name!r}"
+            )
+        if not isinstance(analysis.version, str) or not analysis.version.strip():
+            raise ValueError(f"pairwise analysis {key!r} must define a version")
+
+    for analysis_name in study.comparison.analyses:
+        if analysis_name not in analyses:
+            raise ValueError(
+                f"comparison plan requires unregistered pairwise analysis "
+                f"{analysis_name!r}"
+            )
 
     for index, spec in enumerate(study.runs):
         runtime_name = _runtime_name(spec, index=index)
@@ -103,6 +176,52 @@ def _validate_registries(
     return tuple(routes)
 
 
+def _analyze_pair(
+    left: RunRecord,
+    right: RunRecord,
+    report: CompatibilityReport,
+    analysis_names: tuple[str, ...],
+    analyses: Mapping[str, PairwiseAnalysis],
+) -> tuple[StudyPairAnalysis, ...]:
+    """Run declared analyzers only when the pair is directly comparable."""
+
+    outcomes: list[StudyPairAnalysis] = []
+    for name in analysis_names:
+        analysis = analyses[name]
+        if not report.compatible:
+            outcomes.append(
+                StudyPairAnalysis(
+                    name=analysis.name,
+                    version=analysis.version,
+                    status=PairwiseAnalysisStatus.SKIPPED,
+                    reason="pair is not directly comparable under the study plan",
+                )
+            )
+            continue
+        try:
+            result = analysis.analyze(left, right)
+        except Exception as exc:
+            outcomes.append(
+                StudyPairAnalysis(
+                    name=analysis.name,
+                    version=analysis.version,
+                    status=PairwiseAnalysisStatus.FAILED,
+                    error_type=type(exc).__name__,
+                    message_sha256=_message_fingerprint(exc),
+                )
+            )
+        else:
+            outcomes.append(
+                StudyPairAnalysis(
+                    name=analysis.name,
+                    version=analysis.version,
+                    status=PairwiseAnalysisStatus.COMPLETED,
+                    result=result,
+                )
+            )
+    return tuple(outcomes)
+
+
 def execute_study(
     study: StudySpec,
     *,
@@ -110,13 +229,21 @@ def execute_study(
     measurements: Mapping[str, MeasurementProtocol],
     measurement_configs: Mapping[str, Mapping[str, Any]],
     environment: Mapping[str, Any],
+    analyses: Mapping[str, PairwiseAnalysis] | None = None,
 ) -> StudyExecutionResult:
-    """Execute every run in a study and retain all outcomes for comparison.
+    """Execute every run, validate pair compatibility, and derive analyses.
 
     Registry/configuration mistakes are validated before the first run starts so
     a programming error does not create a half-executed study. Once execution
     begins, experimental failures are preserved as ``RunRecord`` values and do
     not abort later runs.
+
+    Pairwise analyzers are declared by ``study.comparison.analyses`` and run only
+    after ``compare_runs`` reports the pair directly compatible. Analyzer
+    failures are retained as hashed failure outcomes rather than aborting the
+    study. The left/right order is deterministic study order; directional
+    analyzers should interpret the earlier run deliberately (for example as a
+    reference baseline).
 
     The initial study executor uses one shared environment mapping for all runs
     and supports exactly one measurement per ``RunSpec``. These constraints are
@@ -124,7 +251,13 @@ def execute_study(
     can be added without silently changing current study semantics.
     """
 
-    routes = _validate_registries(study, adapters, measurements)
+    analysis_registry: Mapping[str, PairwiseAnalysis] = analyses or {}
+    routes = _validate_registries(
+        study,
+        adapters,
+        measurements,
+        analysis_registry,
+    )
     unknown_configs = sorted(set(measurement_configs) - set(measurements))
     if unknown_configs:
         raise ValueError(
@@ -148,11 +281,19 @@ def execute_study(
 
     pairwise: list[StudyPairComparison] = []
     for left, right in combinations(records, 2):
+        report = compare_runs(left, right, study.comparison)
         pairwise.append(
             StudyPairComparison(
                 left_run_id=left.run_id,
                 right_run_id=right.run_id,
-                report=compare_runs(left, right, study.comparison),
+                report=report,
+                analyses=_analyze_pair(
+                    left,
+                    right,
+                    report,
+                    study.comparison.analyses,
+                    analysis_registry,
+                ),
             )
         )
 

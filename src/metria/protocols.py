@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from ._freeze import freeze_mapping, freeze_typed_mapping
-from .models import MetricSummary, RunSpec
+from .models import MetricSummary, RunRecord, RunSpec
 
 
 @dataclass(frozen=True)
@@ -165,4 +165,15 @@ class MeasurementProtocol(Protocol):
         config: Mapping[str, Any],
     ) -> MeasurementResult:
         """Execute the method and return numerical summaries plus evidence."""
+        ...
+
+
+class PairwiseAnalysis(Protocol):
+    """A named, versioned analysis derived from two compatible run records."""
+
+    name: str
+    version: str
+
+    def analyze(self, left: RunRecord, right: RunRecord) -> MeasurementResult:
+        """Derive pairwise metrics/evidence from two analysis-ready run records."""
         ...
