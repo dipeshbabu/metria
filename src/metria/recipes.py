@@ -127,9 +127,7 @@ def _run_from_data(value: Any, *, index: int) -> RunSpec:
         mapping,
         name=f"run[{index}]",
         required=frozenset({"model", "runtime", "scenario", "measurements"}),
-        optional=frozenset(
-            {"treatments", "trial_policy", "environment_selector"}
-        ),
+        optional=frozenset({"treatments", "trial_policy", "environment_selector"}),
     )
     raw_treatments = mapping.get("treatments", ())
     if isinstance(raw_treatments, (str, bytes)) or not isinstance(
