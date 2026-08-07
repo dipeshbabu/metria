@@ -18,6 +18,15 @@ from .models import (
     TreatmentType,
 )
 from .protocols import MeasurementResult
+from .recipes import (
+    StudyRecipe,
+    dump_study_recipe,
+    load_study_recipe,
+    study_recipe_digest,
+    study_recipe_from_data,
+    study_recipe_to_data,
+    study_recipe_to_json,
+)
 from .study_execution import (
     PairwiseAnalysisStatus,
     StudyExecutionResult,
@@ -44,10 +53,17 @@ __all__ = [
     "StudyExecutionResult",
     "StudyPairAnalysis",
     "StudyPairComparison",
+    "StudyRecipe",
     "StudySpec",
     "TreatmentSpec",
     "TreatmentType",
     "compare_runs",
+    "dump_study_recipe",
     "execute_run",
     "execute_study",
+    "load_study_recipe",
+    "study_recipe_digest",
+    "study_recipe_from_data",
+    "study_recipe_to_data",
+    "study_recipe_to_json",
 ]
