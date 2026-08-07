@@ -16,6 +16,7 @@ from .models import (
     TreatmentSpec,
     TreatmentType,
 )
+from .protocols import MeasurementResult
 
 __version__ = "0.1.0.dev0"
 
@@ -23,6 +24,7 @@ __all__ = [
     "ComparisonPlan",
     "CompatibilityIssue",
     "CompatibilityReport",
+    "MeasurementResult",
     "MetricDefinition",
     "MetricDirection",
     "MetricSample",
