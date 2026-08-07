@@ -17,6 +17,7 @@ repos:
         args: [--markdown-linebreak-ext=md]
         exclude: ^(artifacts/|research/)
 
+  # Ruff hook updates are reviewed against the root lint/type configuration.
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.1
     hooks:
