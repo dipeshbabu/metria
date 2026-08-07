@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify package boundaries and required data in built component wheels."""
+"""Verify package boundaries and required data in built Metria workspace wheels."""
 
 from __future__ import annotations
 
@@ -9,6 +9,12 @@ import zipfile
 from email.parser import Parser
 from pathlib import Path
 
+AUTHOR = "Dipesh Tharu Mahato (dipeshbabu)"
+METRIA_PROJECT_URLS = {
+    "Homepage, https://github.com/dipeshbabu/metria",
+    "Repository, https://github.com/dipeshbabu/metria",
+    "Issues, https://github.com/dipeshbabu/metria/issues",
+}
 KV_FIDELITY_PROJECT_URLS = {
     "Homepage, https://github.com/dipeshbabu/metria/tree/main/components/kv-fidelity",
     "Repository, https://github.com/dipeshbabu/metria",
@@ -29,33 +35,76 @@ def _read_single_member(path: Path, names: set[str], suffix: str) -> str | None:
         return archive.read(matches[0]).decode("utf-8")
 
 
+def _metadata(
+    path: Path,
+    names: set[str],
+    *,
+    expected_name: str,
+    expected_urls: set[str] | None = None,
+) -> list[str]:
+    errors: list[str] = []
+    metadata_text = _read_single_member(path, names, ".dist-info/METADATA")
+    if metadata_text is None:
+        return [f"{path}: expected exactly one METADATA file"]
+
+    metadata = Parser().parsestr(metadata_text)
+    expected_fields = {
+        "Name": expected_name,
+        "License-Expression": "Apache-2.0",
+        "Author": AUTHOR,
+    }
+    for field, expected in expected_fields.items():
+        actual = metadata.get(field)
+        if actual != expected:
+            errors.append(f"{path}: {field} is {actual!r}; expected {expected!r}")
+    if expected_urls is not None:
+        project_urls = set(metadata.get_all("Project-URL") or ())
+        for project_url in sorted(expected_urls - project_urls):
+            errors.append(f"{path}: missing Project-URL {project_url!r}")
+    return errors
+
+
+def _entry_points(path: Path, names: set[str]) -> str | None:
+    return _read_single_member(path, names, ".dist-info/entry_points.txt")
+
+
 def check_wheel(path: Path) -> list[str]:
     errors: list[str] = []
     with zipfile.ZipFile(path) as archive:
         names = set(archive.namelist())
 
-    if "kv_fidelity/__init__.py" in names:
-        metadata_text = _read_single_member(path, names, ".dist-info/METADATA")
-        if metadata_text is None:
-            errors.append(f"{path}: expected exactly one METADATA file")
-        else:
-            metadata = Parser().parsestr(metadata_text)
-            expected_fields = {
-                "Name": "kv-fidelity",
-                "License-Expression": "Apache-2.0",
-                "Author": "Dipesh Tharu Mahato (dipeshbabu)",
-            }
-            for field, expected in expected_fields.items():
-                actual = metadata.get(field)
-                if actual != expected:
-                    errors.append(
-                        f"{path}: {field} is {actual!r}; expected {expected!r}"
-                    )
-            project_urls = set(metadata.get_all("Project-URL") or ())
-            for project_url in sorted(KV_FIDELITY_PROJECT_URLS - project_urls):
-                errors.append(f"{path}: missing Project-URL {project_url!r}")
-
-        entry_points = _read_single_member(path, names, ".dist-info/entry_points.txt")
+    if "metria/__init__.py" in names:
+        errors.extend(
+            _metadata(
+                path,
+                names,
+                expected_name="metria",
+                expected_urls=METRIA_PROJECT_URLS,
+            )
+        )
+        entry_points = _entry_points(path, names)
+        if entry_points is None:
+            errors.append(f"{path}: expected exactly one entry_points.txt file")
+        elif "metria = metria.cli:main" not in entry_points:
+            errors.append(f"{path}: missing metria console script")
+        if any(name.startswith("kv_fidelity/") for name in names):
+            errors.append(
+                f"{path}: root Metria wheel unexpectedly contains kv_fidelity"
+            )
+        if any(name.startswith("turboquant/") for name in names):
+            errors.append(f"{path}: root Metria wheel unexpectedly contains turboquant")
+        if any(name.startswith("metria_tests/") for name in names):
+            errors.append(f"{path}: root Metria wheel unexpectedly contains tests")
+    elif "kv_fidelity/__init__.py" in names:
+        errors.extend(
+            _metadata(
+                path,
+                names,
+                expected_name="kv-fidelity",
+                expected_urls=KV_FIDELITY_PROJECT_URLS,
+            )
+        )
+        entry_points = _entry_points(path, names)
         if entry_points is None:
             errors.append(f"{path}: expected exactly one entry_points.txt file")
         else:
@@ -78,17 +127,22 @@ def check_wheel(path: Path) -> list[str]:
             for name in names
         ):
             errors.append(f"{path}: missing packaged KV Fidelity JSON examples")
+        if any(name.startswith("metria/") for name in names):
+            errors.append(f"{path}: unexpectedly contains metria")
         if any(name.startswith("turboquant/") for name in names):
             errors.append(f"{path}: unexpectedly contains turboquant")
         if any(name.startswith("kv_fidelity/tests/") for name in names):
             errors.append(f"{path}: unexpectedly contains KV Fidelity tests")
     elif "turboquant/__init__.py" in names:
+        errors.extend(_metadata(path, names, expected_name="turboquant-reference"))
+        if any(name.startswith("metria/") for name in names):
+            errors.append(f"{path}: unexpectedly contains metria")
         if any(name.startswith("kv_fidelity/") for name in names):
             errors.append(f"{path}: unexpectedly contains kv_fidelity")
         if any("/tests/" in name or name.startswith("tests/") for name in names):
             errors.append(f"{path}: unexpectedly contains tests")
     else:
-        errors.append(f"{path}: wheel contains neither component package")
+        errors.append(f"{path}: wheel contains no recognized Metria workspace package")
 
     if any(name.startswith("refract/") for name in names):
         errors.append(f"{path}: unexpectedly contains refract")
@@ -110,7 +164,7 @@ def main() -> int:
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
-    print(f"Validated {len(args.wheels)} component wheel(s).")
+    print(f"Validated {len(args.wheels)} workspace wheel(s).")
     return 0
 
 

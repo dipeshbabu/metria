@@ -1,0 +1,72 @@
+name: Root package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Root Metria distribution
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.11.21"
+          enable-cache: true
+          prune-cache: true
+
+      - name: Sync workspace
+        run: uv sync --locked --all-packages
+
+      - name: Build root distribution
+        run: uv run python -m build --outdir dist/metria .
+
+      - name: Check root metadata and contents
+        run: |
+          uv run python -m twine check dist/metria/*
+          uv run python tools/maintenance/check_wheel_contents.py dist/metria/*.whl
+          uv run python tools/maintenance/check_sdist_contents.py dist/metria/*.tar.gz
+
+      - name: Install root wheel and smoke-test CLI
+        shell: bash
+        run: |
+          uv venv --clear .root-smoke-venv
+          uv pip install --python .root-smoke-venv/bin/python --force-reinstall dist/metria/*.whl
+          .root-smoke-venv/bin/metria --version
+          .root-smoke-venv/bin/metria --help
+          .root-smoke-venv/bin/python -c "import metria; print(metria.__version__)"
+          cat > .smoke-study.json <<'JSON'
+          {
+            "schema": "metria.study_recipe.v1",
+            "study": {
+              "name": "package-smoke",
+              "runs": [
+                {
+                  "model": {"id": "example/model"},
+                  "runtime": {"name": "vllm"},
+                  "scenario": {"name": "decode"},
+                  "measurements": ["smoke.measurement"]
+                }
+              ],
+              "comparison": {}
+            },
+            "measurement_configs": {"smoke.measurement": {}},
+            "environment": {}
+          }
+          JSON
+          .root-smoke-venv/bin/metria recipe validate .smoke-study.json
+          .root-smoke-venv/bin/metria recipe digest .smoke-study.json
