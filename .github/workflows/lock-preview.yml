@@ -1,0 +1,41 @@
+name: Root lockfile refresh
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  lock:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'agent/root-metria-packaging'
+    name: Regenerate lockfile and remove refresh workflow
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: agent/root-metria-packaging
+          persist-credentials: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.11.21"
+          enable-cache: false
+
+      - name: Regenerate lockfile
+        run: uv lock
+
+      - name: Commit lockfile and remove this temporary workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add uv.lock
+          git rm .github/workflows/lock-preview.yml
+          git commit -m "Refresh root Metria workspace lockfile"
+          git push origin HEAD:agent/root-metria-packaging
