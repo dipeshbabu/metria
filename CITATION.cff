@@ -1,25 +1,26 @@
 cff-version: 1.2.0
 message: >-
-  If you use this repository, cite Efficient LLM Systems and cite the specific
-  research report that supports any claim you rely on.
-title: Efficient LLM Systems
+  If you use this repository, cite Metria and cite the specific research report
+  that supports any claim you rely on.
+title: Metria
 type: software
 authors:
   - family-names: Tharu Mahato
     given-names: Dipesh
     alias: dipeshbabu
-repository-code: https://github.com/dipeshbabu/efficient-llm-systems
-url: https://github.com/dipeshbabu/efficient-llm-systems
+repository-code: https://github.com/dipeshbabu/metria
+url: https://github.com/dipeshbabu/metria
 license: Apache-2.0
 abstract: >-
-  Research, reference implementations, evaluation tools, and reproducible
-  evidence for improving large-language-model inference efficiency while
-  preserving behavioral fidelity.
+  A neutral evidence and experimentation layer for reproducible LLM inference
+  systems studies, including runtime comparison, behavioral fidelity,
+  performance measurement, hardware evidence, and research provenance.
 keywords:
   - large language models
-  - inference
-  - KV cache
-  - quantization
-  - compression
+  - inference systems
+  - benchmarking
   - evaluation
   - reproducible research
+  - hardware
+  - quantization
+  - KV cache
