@@ -176,10 +176,11 @@ jobs:
           uv run python -m build --outdir dist/kv-fidelity components/kv-fidelity
           uv run python -m build --outdir dist/turboquant components/turboquant-reference
 
-      - name: Check metadata and wheel contents
+      - name: Check metadata and distribution contents
         run: |
           uv run python -m twine check dist/metria/* dist/kv-fidelity/* dist/turboquant/*
           uv run python tools/maintenance/check_wheel_contents.py dist/metria/*.whl dist/kv-fidelity/*.whl dist/turboquant/*.whl
+          uv run python tools/maintenance/check_sdist_contents.py dist/metria/*.tar.gz
 
       - name: Install built wheels and smoke-test imports
         shell: bash
