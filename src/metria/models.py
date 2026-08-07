@@ -58,18 +58,20 @@ class TreatmentSpec:
 
 @dataclass(frozen=True)
 class ComparisonPlan:
-    """Declare which study dimensions may vary and which must be controlled."""
+    """Declare study comparison dimensions and requested pairwise analyses."""
 
     vary: frozenset[str] = frozenset()
     control: frozenset[str] = frozenset()
     block_by: frozenset[str] = frozenset()
+    analyses: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Normalize dimension sets and reject contradictory study roles."""
+        """Normalize comparison roles and reject contradictory declarations."""
 
         object.__setattr__(self, "vary", frozenset(self.vary))
         object.__setattr__(self, "control", frozenset(self.control))
         object.__setattr__(self, "block_by", frozenset(self.block_by))
+        object.__setattr__(self, "analyses", tuple(self.analyses))
         overlap = (
             (self.vary & self.control)
             | (self.vary & self.block_by)
@@ -78,6 +80,10 @@ class ComparisonPlan:
         if overlap:
             names = ", ".join(sorted(overlap))
             raise ValueError(f"comparison dimensions cannot overlap: {names}")
+        if any(not isinstance(name, str) or not name.strip() for name in self.analyses):
+            raise ValueError("comparison analyses must be non-empty strings")
+        if len(set(self.analyses)) != len(self.analyses):
+            raise ValueError("comparison analyses must not contain duplicates")
 
 
 @dataclass(frozen=True)
