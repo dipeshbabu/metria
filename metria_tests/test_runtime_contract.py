@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from runtime_contract import RuntimeContractCase, exercise_runtime_contract
+
 from metria import RunSpec
 from metria.protocols import (
     CaptureRequest,
@@ -10,8 +12,6 @@ from metria.protocols import (
     InferenceRequest,
     SupportReport,
 )
-
-from runtime_contract import RuntimeContractCase, exercise_runtime_contract
 
 
 class _ContractSession:
