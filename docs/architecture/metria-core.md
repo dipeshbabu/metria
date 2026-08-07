@@ -21,6 +21,11 @@ RunSpec
   ├── trial policy
   └── environment selector
 
+MeasurementResult
+  ├── metrics
+  ├── evidence
+  └── artifacts
+
 RunRecord
   ├── requested
   ├── resolved
@@ -84,6 +89,29 @@ KL divergence and top-k KL estimates, from being silently treated as the same
 metric. Cross-method studies can still compare matched-baseline effect sizes,
 but that analysis must be explicit.
 
+## Measurement results and evidence
+
+`MeasurementProtocol` returns a `MeasurementResult`, not only a metric mapping.
+The result separates compact numerical summaries from the observations needed
+to reproduce or derive them:
+
+- `metrics` contains typed `MetricSummary` values;
+- `evidence` contains immutable method-specific observations;
+- `artifacts` points to large external payloads when embedding them would make a
+  run record impractical.
+
+This distinction is important for fidelity methods. A decode-time token
+trajectory, for example, is evidence produced by one run. Its agreement score
+is not a property of that run by itself; the score exists only after comparing a
+reference trajectory with a candidate trajectory. Metria therefore retains the
+run-local trajectories first and derives the pairwise score at comparison time.
+
+Pairwise derived metrics must verify that the underlying evidence refers to the
+same experimental object. The trajectory bridge checks prompt identifiers,
+prompt fingerprints, capture schema, and method version before computing a
+score. This avoids silently comparing two different prompt sets that happen to
+share a benchmark label.
+
 ## Runtime and measurement boundaries
 
 The provisional protocols separate runtime lifecycle from measurement
@@ -92,7 +120,8 @@ methodology:
 - `RuntimeAdapter` probes support, resolves configuration, launches a session,
   and records observed runtime evidence.
 - `RuntimeSession` performs inference and owns reset/cleanup behavior.
-- `MeasurementProtocol` declares evidence requirements and computes metrics.
+- `MeasurementProtocol` declares evidence requirements and returns a
+  `MeasurementResult` containing metrics and retained evidence.
 
 These protocols are intentionally provisional until exercised by at least two
 materially different runtimes.
