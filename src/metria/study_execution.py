@@ -12,7 +12,12 @@ from typing import Any
 from .comparison import compare_runs
 from .execution import execute_run
 from .models import CompatibilityReport, RunRecord, RunSpec, StudySpec
-from .protocols import MeasurementProtocol, MeasurementResult, PairwiseAnalysis, RuntimeAdapter
+from .protocols import (
+    MeasurementProtocol,
+    MeasurementResult,
+    PairwiseAnalysis,
+    RuntimeAdapter,
+)
 
 
 class PairwiseAnalysisStatus(str, Enum):
