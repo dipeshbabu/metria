@@ -147,7 +147,10 @@ class RuntimeAdapter(Protocol):
 
 
 class MeasurementProtocol(Protocol):
-    """A named measurement method with explicit evidence requirements."""
+    """A named, versioned measurement method with explicit evidence requirements."""
+
+    name: str
+    version: str
 
     def requirements(self, config: Mapping[str, Any]) -> tuple[CaptureRequest, ...]:
         """Describe the inference evidence required by this measurement."""

@@ -1,6 +1,7 @@
 """Metria core models for reproducible inference-systems studies."""
 
 from .comparison import compare_runs
+from .execution import execute_run
 from .models import (
     ComparisonPlan,
     CompatibilityIssue,
@@ -36,4 +37,5 @@ __all__ = [
     "TreatmentSpec",
     "TreatmentType",
     "compare_runs",
+    "execute_run",
 ]

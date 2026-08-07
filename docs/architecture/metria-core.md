@@ -32,6 +32,7 @@ RunRecord
   ├── observed
   ├── status
   ├── metrics
+  ├── evidence
   ├── events
   ├── artifacts
   └── provenance
@@ -100,6 +101,10 @@ to reproduce or derive them:
 - `artifacts` points to large external payloads when embedding them would make a
   run record impractical.
 
+When a measurement completes, its run-local evidence is retained under
+`RunRecord.evidence`. `RunRecord.provenance` is reserved for how the run was
+executed and resolved rather than being used as a catch-all for method output.
+
 This distinction is important for fidelity methods. A decode-time token
 trajectory, for example, is evidence produced by one run. Its agreement score
 is not a property of that run by itself; the score exists only after comparing a
@@ -120,11 +125,44 @@ methodology:
 - `RuntimeAdapter` probes support, resolves configuration, launches a session,
   and records observed runtime evidence.
 - `RuntimeSession` performs inference and owns reset/cleanup behavior.
-- `MeasurementProtocol` declares evidence requirements and returns a
-  `MeasurementResult` containing metrics and retained evidence.
+- `MeasurementProtocol` is explicitly named/versioned, declares evidence
+  requirements, and returns a `MeasurementResult` containing metrics and
+  retained evidence.
 
 These protocols are intentionally provisional until exercised by at least two
 materially different runtimes.
+
+## Run execution lifecycle
+
+`execute_run()` is the first orchestration boundary. It intentionally executes
+one runtime and one measurement protocol at a time:
+
+```text
+RunSpec
+  -> probe
+  -> resolve
+  -> launch
+  -> measure
+  -> observe
+  -> close
+  -> RunRecord
+```
+
+Failed runs are still evidence. The executor uses the lifecycle status to avoid
+turning missing data into apparent success:
+
+- unsupported requests and failures before launch become `PREFLIGHT_FAILED`;
+- launch or measurement failures become `FAILED`;
+- a measurement-level `TimeoutError` becomes `TIMED_OUT`;
+- completed metrics with missing observed runtime evidence or failed cleanup
+  become `PARTIAL`;
+- only completed measurement, observation, and cleanup yield `COMPLETED`.
+
+The executor attempts to observe a launched runtime even after measurement
+failure, and it always attempts to close a successfully launched session.
+Lifecycle exception text is not embedded verbatim because third-party runtimes
+may include prompts or other sensitive input in errors. The record retains the
+exception type and a SHA-256 fingerprint of the message instead.
 
 ## What is not in the first core
 
