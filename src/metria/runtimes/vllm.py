@@ -311,7 +311,7 @@ def _introspect_applied_config(llm: Any) -> dict[str, Any]:
     parallel_config = getattr(vllm_config, "parallel_config", None)
     if parallel_config is not None and hasattr(parallel_config, "tensor_parallel_size"):
         fields["parallel.tensor_parallel_size"] = _evidence_scalar(
-            getattr(parallel_config, "tensor_parallel_size")
+            parallel_config.tensor_parallel_size
         )
 
     return {
