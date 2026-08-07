@@ -80,11 +80,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dipeshbabu/efficient-llm-systems/tree/main/components/kv-fidelity"
-Repository = "https://github.com/dipeshbabu/efficient-llm-systems"
-Issues = "https://github.com/dipeshbabu/efficient-llm-systems/issues"
-Changelog = "https://github.com/dipeshbabu/efficient-llm-systems/blob/main/components/kv-fidelity/CHANGELOG.md"
-"Cross-engine bench" = "https://github.com/dipeshbabu/efficient-llm-systems/blob/main/research/papers/cross-engine-mi300x.md"
+Homepage = "https://github.com/dipeshbabu/metria/tree/main/components/kv-fidelity"
+Repository = "https://github.com/dipeshbabu/metria"
+Issues = "https://github.com/dipeshbabu/metria/issues"
+Changelog = "https://github.com/dipeshbabu/metria/blob/main/components/kv-fidelity/CHANGELOG.md"
+"Cross-engine bench" = "https://github.com/dipeshbabu/metria/blob/main/research/papers/cross-engine-mi300x.md"
 
 [project.scripts]
 kv-fidelity = "kv_fidelity.cli:main"
