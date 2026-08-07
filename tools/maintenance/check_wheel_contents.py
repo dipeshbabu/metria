@@ -92,9 +92,7 @@ def check_wheel(path: Path) -> list[str]:
                 f"{path}: root Metria wheel unexpectedly contains kv_fidelity"
             )
         if any(name.startswith("turboquant/") for name in names):
-            errors.append(
-                f"{path}: root Metria wheel unexpectedly contains turboquant"
-            )
+            errors.append(f"{path}: root Metria wheel unexpectedly contains turboquant")
         if any(name.startswith("metria_tests/") for name in names):
             errors.append(f"{path}: root Metria wheel unexpectedly contains tests")
     elif "kv_fidelity/__init__.py" in names:
@@ -136,9 +134,7 @@ def check_wheel(path: Path) -> list[str]:
         if any(name.startswith("kv_fidelity/tests/") for name in names):
             errors.append(f"{path}: unexpectedly contains KV Fidelity tests")
     elif "turboquant/__init__.py" in names:
-        errors.extend(
-            _metadata(path, names, expected_name="turboquant-reference")
-        )
+        errors.extend(_metadata(path, names, expected_name="turboquant-reference"))
         if any(name.startswith("metria/") for name in names):
             errors.append(f"{path}: unexpectedly contains metria")
         if any(name.startswith("kv_fidelity/") for name in names):
