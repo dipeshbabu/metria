@@ -166,6 +166,13 @@ def _capture_rows(result: MeasurementResult) -> tuple[Mapping[str, Any], ...]:
     raw_rows = evidence.get("prompts")
     if isinstance(raw_rows, (str, bytes)) or not isinstance(raw_rows, Sequence):
         raise ValueError("trajectory evidence prompts must be a sequence")
+    if not raw_rows:
+        raise ValueError("trajectory evidence must contain at least one prompt")
+    declared_prompts = evidence.get("n_prompts")
+    if declared_prompts != len(raw_rows):
+        raise ValueError(
+            "trajectory evidence n_prompts does not match retained prompt rows"
+        )
 
     rows: list[Mapping[str, Any]] = []
     seen: set[str] = set()
@@ -183,7 +190,12 @@ def _capture_rows(result: MeasurementResult) -> tuple[Mapping[str, Any], ...]:
             raise ValueError(
                 f"trajectory evidence prompt[{index}] has invalid prompt fingerprint"
             )
-        _token_batches((tokens,), expected=1)
+        validated_tokens = _token_batches((tokens,), expected=1)[0]
+        token_count = row.get("token_count")
+        if token_count != len(validated_tokens):
+            raise ValueError(
+                f"trajectory evidence prompt[{index}] token_count does not match token_ids"
+            )
         rows.append(row)
     return tuple(rows)
 
@@ -356,7 +368,7 @@ def compare_trajectory_results(
             candidate_tokens,
         )
         matched = first_divergence is None
-        if matched:
+        if first_divergence is None:
             full_matches += 1
         else:
             first_divergences.append(first_divergence)
