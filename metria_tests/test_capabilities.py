@@ -169,9 +169,7 @@ def test_override_shape_is_validated_without_matching_treatment() -> None:
 
 
 def test_unrecognized_override_is_retained_as_blocking_evidence() -> None:
-    spec = _plain_spec(
-        trial_policy={"capability_overrides": ("turboquant.kv_cache",)}
-    )
+    spec = _plain_spec(trial_policy={"capability_overrides": ("turboquant.kv_cache",)})
 
     result = inspect_run_capabilities(spec)
     capability = result.capabilities.get("metria.capability_overrides")
