@@ -1,4 +1,4 @@
-"""Command-line interface for versioned Metria recipes and inspection."""
+"""Command-line interface for versioned Metria recipes, records, and inspection."""
 
 from __future__ import annotations
 
@@ -7,12 +7,15 @@ import json
 import sys
 from collections.abc import Mapping, Sequence
 from enum import Enum
+from itertools import combinations
 from pathlib import Path
 from typing import Any, TextIO
 
 from .capabilities import inspect_model_geometry
+from .comparison import compare_runs
 from .hardware import capture_hardware_fingerprint
 from .inspection import capability_inspection_to_mapping, inspect_run_capabilities
+from .models import CompatibilityReport, RunRecord
 from .recipes import (
     STUDY_RECIPE_SCHEMA,
     StudyRecipe,
@@ -20,8 +23,10 @@ from .recipes import (
     study_recipe_digest,
     study_recipe_to_json,
 )
+from .records import load_run_record, run_evidence_digest, run_record_digest
 
 INSPECTION_SCHEMA = "metria.inspection.v1"
+COMPARISON_REPORT_SCHEMA = "metria.comparison_report.v1"
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -85,6 +90,29 @@ def _parser() -> argparse.ArgumentParser:
         dest="json_output",
         help="emit machine-readable inspection evidence",
     )
+
+    compare = subparsers.add_parser(
+        "compare",
+        help="compare saved run records under an explicit study comparison plan",
+    )
+    compare.add_argument(
+        "records",
+        type=Path,
+        nargs="+",
+        help="two or more metria.run_record.v1 files",
+    )
+    compare.add_argument(
+        "--recipe",
+        type=Path,
+        required=True,
+        help="study recipe whose ComparisonPlan governs comparability",
+    )
+    compare.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="emit a machine-readable pairwise comparison report",
+    )
     return parser
 
 
@@ -101,6 +129,15 @@ def _load(path: Path) -> StudyRecipe:
 
     try:
         return load_study_recipe(path)
+    except (OSError, TypeError, ValueError) as exc:
+        raise ValueError(f"{path}: {exc}") from exc
+
+
+def _load_record(path: Path) -> RunRecord:
+    """Load one saved record with its source path in diagnostics."""
+
+    try:
+        return load_run_record(path)
     except (OSError, TypeError, ValueError) as exc:
         raise ValueError(f"{path}: {exc}") from exc
 
@@ -217,6 +254,119 @@ def _write_inspection_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
             stdout.write(f"  {name}: {capability.get('status')}\n")
 
 
+def _validate_record_plan_binding(
+    record: RunRecord,
+    recipe: StudyRecipe,
+    *,
+    path: Path,
+) -> None:
+    """Require a saved record to belong to the recipe supplying its comparison plan."""
+
+    if record.study_name != recipe.study.name:
+        raise ValueError(
+            f"{path}: record study {record.study_name!r} does not match "
+            f"comparison recipe study {recipe.study.name!r}"
+        )
+    if record.requested not in recipe.study.runs:
+        raise ValueError(
+            f"{path}: requested RunSpec is not present in comparison recipe "
+            f"{recipe.study.name!r}"
+        )
+
+
+def _compatibility_to_data(report: CompatibilityReport) -> dict[str, Any]:
+    return {
+        "compatible": report.compatible,
+        "issues": [
+            {
+                "dimension": issue.dimension,
+                "left": _jsonable(issue.left),
+                "right": _jsonable(issue.right),
+                "reason": issue.reason,
+            }
+            for issue in report.issues
+        ],
+        "comparable_metrics": list(report.comparable_metrics),
+        "incompatible_metrics": dict(report.incompatible_metrics),
+    }
+
+
+def _comparison_payload(
+    recipe: StudyRecipe,
+    recipe_path: Path,
+    loaded: Sequence[tuple[Path, RunRecord]],
+) -> dict[str, Any]:
+    """Compare every saved record pair under one explicit study plan."""
+
+    records: list[dict[str, Any]] = []
+    for path, record in loaded:
+        _validate_record_plan_binding(record, recipe, path=path)
+        records.append(
+            {
+                "path": str(path),
+                "run_id": record.run_id,
+                "record_digest": run_record_digest(record),
+                "evidence_digest": run_evidence_digest(record),
+            }
+        )
+
+    pairs: list[dict[str, Any]] = []
+    for (left_path, left), (right_path, right) in combinations(loaded, 2):
+        pairs.append(
+            {
+                "left": {"path": str(left_path), "run_id": left.run_id},
+                "right": {"path": str(right_path), "run_id": right.run_id},
+                "report": _compatibility_to_data(
+                    compare_runs(left, right, recipe.study.comparison)
+                ),
+            }
+        )
+
+    return {
+        "schema": COMPARISON_REPORT_SCHEMA,
+        "recipe": {
+            "path": str(recipe_path),
+            "study": recipe.study.name,
+            "digest": study_recipe_digest(recipe),
+        },
+        "records": records,
+        "pairs": pairs,
+        "compatible": all(pair["report"]["compatible"] for pair in pairs),
+    }
+
+
+def _write_comparison_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
+    """Render pairwise comparability without hiding metric-level incompatibility."""
+
+    pairs = payload["pairs"]
+    assert isinstance(pairs, Sequence)
+    for pair in pairs:
+        assert isinstance(pair, Mapping)
+        left = pair["left"]
+        right = pair["right"]
+        report = pair["report"]
+        assert isinstance(left, Mapping)
+        assert isinstance(right, Mapping)
+        assert isinstance(report, Mapping)
+        stdout.write(
+            f"compare {left['run_id']} {right['run_id']} "
+            f"compatible={str(bool(report['compatible'])).lower()}\n"
+        )
+        comparable = report["comparable_metrics"]
+        assert isinstance(comparable, Sequence)
+        if comparable:
+            stdout.write("  comparable_metrics: " + ", ".join(comparable) + "\n")
+        issues = report["issues"]
+        assert isinstance(issues, Sequence)
+        for issue in issues:
+            assert isinstance(issue, Mapping)
+            stdout.write(f"  issue {issue['dimension']}: {issue['reason']}\n")
+        incompatible = report["incompatible_metrics"]
+        assert isinstance(incompatible, Mapping)
+        for name in sorted(incompatible):
+            stdout.write(f"  metric {name}: {incompatible[name]}\n")
+
+
 def main(
     argv: Sequence[str] | None = None,
     *,
@@ -237,8 +387,20 @@ def main(
         parser.print_help(file=err)
         return 2
 
-    path: Path = args.path
     try:
+        if args.command == "compare":
+            if len(args.records) < 2:
+                raise ValueError("compare requires at least two run record files")
+            recipe = _load(args.recipe)
+            loaded = tuple((path, _load_record(path)) for path in args.records)
+            payload = _comparison_payload(recipe, args.recipe, loaded)
+            if args.json_output:
+                out.write(json.dumps(_jsonable(payload), sort_keys=True) + "\n")
+            else:
+                _write_comparison_human(payload, out)
+            return 0 if payload["compatible"] else 1
+
+        path: Path = args.path
         recipe = _load(path)
         if args.command == "inspect":
             payload = _inspection_payload(recipe, path)

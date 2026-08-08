@@ -33,7 +33,9 @@ so existing runtime adapters do not need a parallel typed code path.
 
 This also preserves `metria.study_recipe.v1`: a typed constructor and the
 semantically equivalent dictionary produce the same recipe data and canonical
-digest.
+digest. The same RunSpec serializer/parser is reused by
+`metria.run_record.v1`, so saved evidence does not introduce a second requested
+configuration schema.
 
 ## Requested identity is not observed identity
 
@@ -52,7 +54,7 @@ whatever authoritative post-launch evidence their runtime can expose. Missing
 observed evidence should remain unknown rather than being inferred from the
 request.
 
-## ModelRef
+## ModelRef and geometry inspection
 
 `ModelRef` requires at least a model identifier or a local path. It can retain:
 
@@ -62,9 +64,17 @@ request.
 - model geometry supplied by an inspector or caller;
 - additional metadata.
 
-Geometry is evidence available to later capability checks. Merely storing
-`head_dim`, KV-head count, or an architecture label does not itself mark an
-optimization as supported.
+`ModelGeometry` now normalizes explicit geometry evidence and derives `head_dim`
+only when `hidden_size / num_attention_heads` is exact and internally
+consistent. Metria does not infer architecture facts from a model-family name.
+Contradictory or missing evidence remains `unknown`.
+
+The first enforced capability consumer is the documented TurboQuant KV-cache
+head-dimension guardrail. Known unsupported/unknown active configurations fail
+before runtime probing; explicit experimental overrides are retained as
+requested study intent rather than being hidden command-line bypasses.
+
+See [capability inspection](../guides/metria-inspection.md).
 
 ## RuntimeConfig and WorkloadSpec
 
@@ -108,7 +118,7 @@ metadata into a confident incompatibility claim, and it should not turn a user
 request into proof of support.
 
 `SupportReport` uses the same `SupportLevel` vocabulary so runtime preflight and
-future `metria inspect` functionality can converge on one meaning.
+`metria inspect` converge on one meaning.
 
 ## HardwareFingerprint
 
@@ -116,9 +126,12 @@ future `metria inspect` functionality can converge on one meaning.
 request. It can retain platform, host, accelerator, software, and additional
 metadata while remaining deeply immutable.
 
-The initial type deliberately does not define a GPU-family support matrix or
-claim that a hardware name determines performance. Capability rules and measured
-results should consume the fingerprint as evidence.
+`capture_hardware_fingerprint()` provides a stdlib-only baseline containing
+platform/software identity, CPU count when exposed, and a domain-separated
+hostname correlation digest rather than the raw host name. That digest supports
+record correlation; it is not a secrecy guarantee for guessable host names.
+Accelerator identity remains runtime/adapter-observed until an authoritative
+shared probe is implemented.
 
 ## ArtifactManifest
 
@@ -138,18 +151,37 @@ The type validates SHA-256 syntax and byte sizes but does not claim that a hash
 was independently verified. Downloaders and resolvers remain responsible for
 computing and checking digests before constructing verified provenance.
 
-## What these types do not solve yet
+## Versioned run evidence
 
-This layer does not yet provide:
+`metria.run_record.v1` is the durable JSON boundary for one `RunRecord`. It
+preserves requested, resolved, and observed state together with lifecycle status,
+typed metric identity and raw samples, measurement evidence, artifacts, events,
+and provenance.
 
-- automatic model-geometry inspection;
-- runtime capability rules;
-- server-side model/tokenizer verification;
-- automatic hardware capture;
-- versioned `RunRecord` serialization;
-- artifact downloading or safe archive extraction;
-- a root `metria` distribution release.
+Two digests serve different identity needs:
 
-Those are follow-on consumers of this shared vocabulary. In particular, new
-runtime, benchmark, evaluator, and provenance work should reuse these primitives
-instead of introducing another incompatible identity schema.
+- `run_record_digest()` covers the complete versioned record, including local
+  run identity and requested intent;
+- `run_evidence_digest()` covers produced evidence while excluding `study_name`,
+  `run_id`, and requested intent.
+
+Neither digest implies that two records are valid to compare. Study-specific
+`ComparisonPlan` semantics and metric method/version identity remain
+authoritative. The `metria compare` CLI therefore requires an explicit study
+recipe instead of treating a digest match as a comparison rule.
+
+See [run records and comparison](../guides/metria-run-records.md).
+
+## What this layer still does not solve
+
+Remaining follow-on work includes:
+
+- stronger server-side model/tokenizer/applied-runtime verification;
+- authoritative accelerator inventory beyond runtime-observed evidence;
+- artifact downloading, verification, and safe archive extraction;
+- automatic recipe/hardware digest attachment by the execution CLI;
+- hardware-qualified runtime evidence lanes;
+- public root package release policy.
+
+New runtime, benchmark, evaluator, and provenance work should reuse these
+primitives and schemas instead of introducing incompatible identity paths.

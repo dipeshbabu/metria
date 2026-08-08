@@ -119,7 +119,7 @@ def _treatment_from_data(value: Any, *, index: int) -> TreatmentSpec:
     return TreatmentSpec(name=name, kind=treatment_type, config=config)
 
 
-def _run_from_data(value: Any, *, index: int) -> RunSpec:
+def run_spec_from_data(value: Any, *, index: int = 0) -> RunSpec:
     """Parse one requested run without resolving runtime-specific state."""
 
     mapping = _mapping(value, name=f"run[{index}]")
@@ -210,7 +210,7 @@ def _study_from_data(value: Any) -> StudySpec:
     return StudySpec(
         name=name,
         runs=tuple(
-            _run_from_data(run, index=index) for index, run in enumerate(raw_runs)
+            run_spec_from_data(run, index=index) for index, run in enumerate(raw_runs)
         ),
         comparison=_comparison_from_data(mapping["comparison"]),
         constants=_mapping(mapping.get("constants", {}), name="study.constants"),
@@ -275,39 +275,44 @@ def _json_value(value: Any, *, path: str) -> Any:
     )
 
 
+def run_spec_to_data(run: RunSpec, *, path: str = "run") -> dict[str, Any]:
+    """Serialize one requested run using the canonical recipe RunSpec shape."""
+
+    return {
+        "model": _json_value(run.model, path=f"{path}.model"),
+        "runtime": _json_value(run.runtime, path=f"{path}.runtime"),
+        "scenario": _json_value(run.scenario, path=f"{path}.scenario"),
+        "measurements": list(run.measurements),
+        "treatments": [
+            {
+                "name": treatment.name,
+                "kind": treatment.kind.value,
+                "config": _json_value(
+                    treatment.config,
+                    path=f"{path}.treatment.config",
+                ),
+            }
+            for treatment in run.treatments
+        ],
+        "trial_policy": _json_value(
+            run.trial_policy,
+            path=f"{path}.trial_policy",
+        ),
+        "environment_selector": _json_value(
+            run.environment_selector,
+            path=f"{path}.environment_selector",
+        ),
+    }
+
+
 def study_recipe_to_data(recipe: StudyRecipe) -> dict[str, Any]:
     """Return the canonical schema shape as JSON-compatible Python values."""
 
     study = recipe.study
-    runs: list[dict[str, Any]] = []
-    for run in study.runs:
-        runs.append(
-            {
-                "model": _json_value(run.model, path="study.run.model"),
-                "runtime": _json_value(run.runtime, path="study.run.runtime"),
-                "scenario": _json_value(run.scenario, path="study.run.scenario"),
-                "measurements": list(run.measurements),
-                "treatments": [
-                    {
-                        "name": treatment.name,
-                        "kind": treatment.kind.value,
-                        "config": _json_value(
-                            treatment.config,
-                            path="study.run.treatment.config",
-                        ),
-                    }
-                    for treatment in run.treatments
-                ],
-                "trial_policy": _json_value(
-                    run.trial_policy,
-                    path="study.run.trial_policy",
-                ),
-                "environment_selector": _json_value(
-                    run.environment_selector,
-                    path="study.run.environment_selector",
-                ),
-            }
-        )
+    runs = [
+        run_spec_to_data(run, path=f"study.runs[{index}]")
+        for index, run in enumerate(study.runs)
+    ]
     return {
         "schema": STUDY_RECIPE_SCHEMA,
         "study": {
