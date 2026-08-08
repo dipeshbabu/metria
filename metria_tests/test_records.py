@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -98,18 +99,16 @@ def test_run_record_v1_round_trip_preserves_typed_evidence() -> None:
 
 def test_run_record_json_and_digest_are_deterministic() -> None:
     left = _record()
-    right = RunRecord(
-        **{
-            **left.__dict__,
-            "resolved": {
-                "model": {"revision": "abc123", "id": "example/model"},
-                "runtime": {"version": "1.2.3", "name": "vllm"},
-            },
-            "provenance": {
-                "executor": {"version": "1", "name": "metria.execute_run"},
-                "recipe_digest": "b" * 64,
-            },
-        }
+    right = replace(
+        left,
+        resolved={
+            "model": {"revision": "abc123", "id": "example/model"},
+            "runtime": {"version": "1.2.3", "name": "vllm"},
+        },
+        provenance={
+            "executor": {"version": "1", "name": "metria.execute_run"},
+            "recipe_digest": "b" * 64,
+        },
     )
 
     assert run_record_to_json(left) == run_record_to_json(right)
