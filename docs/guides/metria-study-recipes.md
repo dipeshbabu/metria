@@ -88,9 +88,10 @@ The digest identifies the serialized request. It is **not** a result hash, model
 hash, runtime hash, or proof that the requested configuration was actually
 applied. Requested, resolved, and observed state remain separate.
 
-Automatic attachment of the recipe digest to execution provenance is a later
-orchestration step; the current recipe API exposes the digest without claiming
-that linkage already exists.
+`metria run` attaches the recipe schema/digest to every produced run's
+`provenance.invocation` and to the `metria.study_result.v1` manifest. That
+linkage identifies which serialized request produced the evidence; it still
+does not prove that every requested runtime setting was applied.
 
 ## Shared RunSpec schema
 
@@ -168,21 +169,32 @@ and:
 }
 ```
 
-Execution must supply registries containing implementations with exactly those
-names. This keeps recipes data-only and avoids turning a recipe file into an
-arbitrary code-loading mechanism.
+The first `metria run` implementation resolves these names only through the
+explicit built-in registry shown by `metria plugins`. This keeps recipes
+data-only and avoids turning a recipe file into an arbitrary code-loading
+mechanism.
+
+## Execute a recipe
+
+```bash
+metria plugins
+metria run study.json --output-dir results/experiment-a
+```
+
+The output directory must be new or empty. The runner writes one
+`metria.run_record.v1` file per run plus a `metria.study_result.v1` manifest.
+See [execution and registries](metria-execution.md).
 
 ## Current limits
 
-The recipe/result layer still does not provide:
+The recipe/execution layer still does not provide:
 
 - YAML parsing;
-- plugin auto-discovery;
+- arbitrary third-party plugin auto-discovery;
+- automatic runtime installation;
 - environment placement across multiple hosts;
 - recipe locking against downloaded model artifacts;
-- automatic recipe-digest attachment to every `RunRecord`;
-- a public `metria run` command.
+- distributed execution.
 
-The CLI does provide recipe validation/digest/normalization, capability
-inspection, and comparison of already-saved versioned run records. The next
-execution CLI should build on these schemas rather than bypassing them.
+Those features should extend the same versioned recipe/evidence contracts rather
+than create parallel schemas or hidden loading behavior.
