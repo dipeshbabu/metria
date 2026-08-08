@@ -111,9 +111,7 @@ def _metric_summary_from_data(value: Any, *, key: str) -> MetricSummary:
     }
     coverage_raw = mapping.get("coverage")
     coverage = (
-        None
-        if coverage_raw is None
-        else _number(coverage_raw, name=f"{name}.coverage")
+        None if coverage_raw is None else _number(coverage_raw, name=f"{name}.coverage")
     )
     return MetricSummary(
         definition=definition,
