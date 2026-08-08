@@ -109,7 +109,9 @@ def test_compare_cli_uses_explicit_recipe_plan(tmp_path: Path) -> None:
     assert len(payload["records"][0]["evidence_digest"]) == 64
 
 
-def test_compare_cli_reports_metric_method_mismatch_as_incompatible(tmp_path: Path) -> None:
+def test_compare_cli_reports_metric_method_mismatch_as_incompatible(
+    tmp_path: Path,
+) -> None:
     recipe_path, left_spec, right_spec = _recipe(tmp_path)
     left_path = tmp_path / "left.json"
     right_path = tmp_path / "right.json"
