@@ -12,10 +12,12 @@ from typing import Any
 
 from .identity import HardwareFingerprint
 
+_HOSTNAME_HASH_DOMAIN = b"metria.hardware.hostname.v1\x00"
+
 
 def _hostname_hash() -> str:
-    hostname = socket.gethostname()
-    return hashlib.sha256(hostname.encode("utf-8")).hexdigest()
+    hostname = socket.gethostname().encode("utf-8")
+    return hashlib.sha256(_HOSTNAME_HASH_DOMAIN + hostname).hexdigest()
 
 
 def capture_hardware_fingerprint(
@@ -26,9 +28,9 @@ def capture_hardware_fingerprint(
 
     Accelerator probing is intentionally not guessed from model/runtime names or
     environment variables. Runtimes may add authoritative accelerator evidence
-    later through their observed state. The host name is retained only as a
-    SHA-256 fingerprint so two records can identify the same host without
-    publishing the machine name.
+    later through their observed state. The domain-separated hostname digest is
+    a stable correlation identifier, not a confidentiality guarantee for a
+    guessable machine name.
     """
 
     uname = platform.uname()
