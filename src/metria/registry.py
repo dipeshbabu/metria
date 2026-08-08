@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
 
+from ._freeze import freeze_typed_mapping
 from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
 from .models import StudySpec
 from .protocols import MeasurementProtocol, PairwiseAnalysis, RuntimeAdapter
@@ -67,6 +68,20 @@ class RegistryBundle:
     measurements: Mapping[str, MeasurementProtocol]
     analyses: Mapping[str, PairwiseAnalysis]
     descriptors: tuple[PluginDescriptor, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "runtimes", freeze_typed_mapping(self.runtimes))
+        object.__setattr__(
+            self,
+            "measurements",
+            freeze_typed_mapping(self.measurements),
+        )
+        object.__setattr__(self, "analyses", freeze_typed_mapping(self.analyses))
+        object.__setattr__(self, "descriptors", tuple(self.descriptors))
+
+        identities = [(item.kind, item.name) for item in self.descriptors]
+        if len(identities) != len(set(identities)):
+            raise ValueError("registry descriptors must have unique kind/name identities")
 
     def descriptor(self, kind: PluginKind, name: str) -> PluginDescriptor | None:
         """Return one descriptor by exact kind/name identity."""
