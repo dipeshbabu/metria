@@ -45,6 +45,16 @@ def _assert_supported(report: SupportReport) -> None:
     assert all(isinstance(reason, str) and reason.strip() for reason in report.reasons)
 
 
+def _assert_runtime_identity(observed: Mapping[str, Any], expected: str) -> None:
+    """Accept a compact runtime name or richer observed runtime identity mapping."""
+
+    runtime = observed.get("runtime")
+    if isinstance(runtime, Mapping):
+        assert runtime.get("name") == expected
+        return
+    assert runtime == expected
+
+
 def exercise_runtime_contract(case: RuntimeContractCase) -> None:
     """Exercise the lifecycle/evidence contract shared by supported adapters.
 
@@ -75,13 +85,13 @@ def exercise_runtime_contract(case: RuntimeContractCase) -> None:
 
         observed_before_reset = adapter.observe(session)
         assert isinstance(observed_before_reset, Mapping)
-        assert observed_before_reset.get("runtime") == adapter.name
+        _assert_runtime_identity(observed_before_reset, adapter.name)
         _assert_no_sensitive_text(observed_before_reset, case.privacy_terms)
 
         session.reset("contract")
         observed_after_reset = adapter.observe(session)
         assert isinstance(observed_after_reset, Mapping)
-        assert observed_after_reset.get("runtime") == adapter.name
+        _assert_runtime_identity(observed_after_reset, adapter.name)
         _assert_no_sensitive_text(observed_after_reset, case.privacy_terms)
     finally:
         session.close()
