@@ -61,6 +61,19 @@ from .records import (
     run_record_to_data,
     run_record_to_json,
 )
+from .registry import (
+    PluginAvailability,
+    PluginDescriptor,
+    PluginKind,
+    RegistryBundle,
+    builtin_registry,
+    validate_study_availability,
+)
+from .runner import (
+    STUDY_RESULT_SCHEMA,
+    PersistedStudyResult,
+    execute_recipe_to_directory,
+)
 from .study_execution import (
     PairwiseAnalysisStatus,
     StudyExecutionResult,
@@ -73,6 +86,7 @@ __version__ = "0.1.0.dev0"
 
 __all__ = [
     "RUN_RECORD_SCHEMA",
+    "STUDY_RESULT_SCHEMA",
     "ArtifactManifest",
     "Capability",
     "CapabilitySet",
@@ -89,7 +103,12 @@ __all__ = [
     "ModelGeometry",
     "ModelRef",
     "PairwiseAnalysisStatus",
+    "PersistedStudyResult",
+    "PluginAvailability",
+    "PluginDescriptor",
+    "PluginKind",
     "PreflightCapabilityResult",
+    "RegistryBundle",
     "RunRecord",
     "RunSpec",
     "RunStatus",
@@ -103,12 +122,14 @@ __all__ = [
     "TreatmentSpec",
     "TreatmentType",
     "WorkloadSpec",
+    "builtin_registry",
     "capability_inspection_to_mapping",
     "capture_hardware_fingerprint",
     "compare_runs",
     "dump_run_record",
     "dump_study_recipe",
     "evaluate_turboquant_kv_capability",
+    "execute_recipe_to_directory",
     "execute_run",
     "execute_study",
     "inspect_model_geometry",
@@ -126,4 +147,5 @@ __all__ = [
     "study_recipe_from_data",
     "study_recipe_to_data",
     "study_recipe_to_json",
+    "validate_study_availability",
 ]
