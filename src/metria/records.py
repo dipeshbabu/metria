@@ -129,41 +129,55 @@ def _metric_summary_from_data(value: Any, *, key: str) -> MetricSummary:
 
 
 def _metric_summary_to_data(summary: MetricSummary, *, key: str) -> dict[str, Any]:
-    if summary.definition.name != key:
+    name = f"record.metrics.{key}"
+    definition_name = _string(
+        summary.definition.name,
+        name=f"{name}.definition.name",
+    )
+    if definition_name != key:
         raise ValueError(
             f"record metric key {key!r} does not match definition name "
-            f"{summary.definition.name!r}"
+            f"{definition_name!r}"
         )
+    try:
+        direction = MetricDirection(summary.definition.direction).value
+    except ValueError as exc:
+        raise ValueError(f"{name}.definition.direction is invalid") from exc
+    uncertainty = {
+        field: _number(item, name=f"{name}.uncertainty.{field}")
+        for field, item in summary.uncertainty.items()
+    }
     return {
         "definition": {
-            "name": summary.definition.name,
-            "unit": summary.definition.unit,
-            "direction": summary.definition.direction.value,
-            "method": summary.definition.method,
-            "version": summary.definition.version,
+            "name": definition_name,
+            "unit": _string(summary.definition.unit, name=f"{name}.definition.unit"),
+            "direction": direction,
+            "method": _string(
+                summary.definition.method,
+                name=f"{name}.definition.method",
+            ),
+            "version": _string(
+                summary.definition.version,
+                name=f"{name}.definition.version",
+            ),
         },
-        "value": _json_value(summary.value, path=f"record.metrics.{key}.value"),
+        "value": _number(summary.value, name=f"{name}.value"),
         "samples": [
             {
-                "value": _json_value(
-                    sample.value,
-                    path=f"record.metrics.{key}.samples[{index}].value",
-                ),
+                "value": _number(sample.value, name=f"{name}.samples[{index}].value"),
                 "metadata": _json_value(
                     sample.metadata,
-                    path=f"record.metrics.{key}.samples[{index}].metadata",
+                    path=f"{name}.samples[{index}].metadata",
                 ),
             }
             for index, sample in enumerate(summary.samples)
         ],
-        "aggregation": summary.aggregation,
-        "uncertainty": _json_value(
-            summary.uncertainty,
-            path=f"record.metrics.{key}.uncertainty",
-        ),
-        "coverage": _json_value(
-            summary.coverage,
-            path=f"record.metrics.{key}.coverage",
+        "aggregation": _string(summary.aggregation, name=f"{name}.aggregation"),
+        "uncertainty": uncertainty,
+        "coverage": (
+            None
+            if summary.coverage is None
+            else _number(summary.coverage, name=f"{name}.coverage")
         ),
     }
 
@@ -175,15 +189,19 @@ def run_record_to_data(record: RunRecord) -> dict[str, Any]:
         key: _metric_summary_to_data(summary, key=key)
         for key, summary in record.metrics.items()
     }
+    try:
+        status = RunStatus(record.status).value
+    except ValueError as exc:
+        raise ValueError("record.status is invalid") from exc
     return {
         "schema": RUN_RECORD_SCHEMA,
         "record": {
-            "study_name": record.study_name,
-            "run_id": record.run_id,
+            "study_name": _string(record.study_name, name="record.study_name"),
+            "run_id": _string(record.run_id, name="record.run_id"),
             "requested": run_spec_to_data(record.requested, path="record.requested"),
             "resolved": _json_value(record.resolved, path="record.resolved"),
             "observed": _json_value(record.observed, path="record.observed"),
-            "status": record.status.value,
+            "status": status,
             "metrics": metrics,
             "evidence": _json_value(record.evidence, path="record.evidence"),
             "events": _json_value(record.events, path="record.events"),
