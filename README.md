@@ -59,7 +59,8 @@ Metria is being built around four principles:
 | Measurements | Decode-time token trajectory capture with retained prompt fingerprints |
 | Pairwise analysis | KV Fidelity-compatible trajectory agreement analysis |
 | Recipes | Versioned `metria.study_recipe.v1` JSON with deterministic SHA-256 digesting |
-| CLI | Recipe `validate` / `digest` / `normalize` plus data-only `metria inspect` |
+| Run records | Versioned `metria.run_record.v1` JSON with typed metrics plus full-record/evidence digests |
+| CLI | Recipe `validate` / `digest` / `normalize`, `metria inspect`, and study-plan-driven `metria compare` |
 | Packaging | Root `metria` package installable from source; focused components stay independent |
 
 The standalone [KV Fidelity](components/kv-fidelity/README.md) package also
@@ -153,11 +154,30 @@ and an accelerator is not claimed present merely because an environment
 variable mentions it. See the
 [capability inspection guide](docs/guides/metria-inspection.md).
 
-The CLI does **not** expose `metria run` yet. Study execution is available
-through the Python APIs while durable result serialization, explicit registries,
-and execution-output provenance are being stabilized.
+### 3. Persist and compare run evidence
 
-See the [recipe CLI guide](docs/guides/metria-recipe-cli.md) for recipe commands.
+The Python execution APIs return `RunRecord` values. Persist them with the
+versioned record API:
+
+```python
+from metria import dump_run_record
+
+dump_run_record("run-0001.json", record)
+```
+
+Then compare saved records under the recipe's explicit `ComparisonPlan`:
+
+```bash
+metria compare run-0001.json run-0002.json --recipe study.json
+metria compare run-0001.json run-0002.json --recipe study.json --json
+```
+
+The CLI does **not** expose `metria run` yet. Study execution is available
+through the Python APIs while explicit registries and execution-output
+orchestration are being stabilized.
+
+See the [CLI guide](docs/guides/metria-recipe-cli.md) and
+[run-record guide](docs/guides/metria-run-records.md).
 
 ## Core model
 
@@ -213,6 +233,28 @@ Metria therefore does **not** use one universal "same fingerprint = comparable"
 rule. Missing controlled evidence is not equality, and methodologically
 different metrics require an explicit analysis that defines how they may be
 combined.
+
+Saved-record comparison deliberately requires the study recipe that supplies the
+comparison plan. Record/evidence digests identify serialized evidence; they do
+not replace study semantics.
+
+## Versioned run evidence
+
+`metria.run_record.v1` stores one executed run as strict JSON while preserving:
+
+- requested `RunSpec` using the same schema as study recipes;
+- resolved and observed runtime state;
+- lifecycle status;
+- metric identity, raw samples, aggregation, uncertainty, and coverage;
+- measurement evidence and artifact references;
+- lifecycle events and execution provenance.
+
+`run_record_digest()` covers the full record, including requested intent and
+local run identity. `run_evidence_digest()` covers produced evidence while
+excluding study/run IDs and requested intent. Neither digest is a universal
+comparability proof.
+
+See [run records and comparison](docs/guides/metria-run-records.md).
 
 ## Runtime adapters
 
@@ -310,12 +352,12 @@ Near-term work is focused on:
 
 1. **Observed runtime identity** — stronger served model/tokenizer/applied-config
    evidence.
-2. **Versioned result serialization** — portable `RunRecord` bundles, stable
-   evidence digests, and `metria compare`.
-3. **Execution CLI and explicit registries** — built-in registry inspection
-   before exposing `metria run`.
-4. **Runtime qualification** — exercise the shared contract against first-party
+2. **Execution CLI and explicit registries** — built-in registry inspection,
+   recipe/hardware provenance attachment, and durable `metria run` output.
+3. **Runtime qualification** — exercise the shared contract against first-party
    adapters and add hardware-qualified evidence lanes.
+4. **Artifact provenance** — immutable model/data verification and manifest
+   identity.
 5. **Shared systems APIs** — move benchmark, timeout, diagnostics, and reusable
    KV Fidelity logic behind Metria protocols rather than adding more standalone
    scripts.
