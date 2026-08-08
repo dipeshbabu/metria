@@ -220,9 +220,9 @@ def test_fixed_inputs_produce_deterministic_study_manifest(tmp_path: Path) -> No
         hardware=_hardware(),
     )
 
-    assert first.manifest_path.read_text(encoding="utf-8") == second.manifest_path.read_text(
+    assert first.manifest_path.read_text(
         encoding="utf-8"
-    )
+    ) == second.manifest_path.read_text(encoding="utf-8")
 
 
 def test_unavailable_runtime_fails_before_output_directory_is_created(
