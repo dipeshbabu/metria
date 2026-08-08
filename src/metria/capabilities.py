@@ -83,7 +83,11 @@ class ModelGeometry:
             if self.hidden_size is not None and self.num_attention_heads is not None
             else None
         )
-        if self.head_dim is not None and derived is not None and self.head_dim != derived:
+        if (
+            self.head_dim is not None
+            and derived is not None
+            and self.head_dim != derived
+        ):
             raise ValueError(
                 "head_dim contradicts hidden_size / num_attention_heads "
                 f"({self.head_dim} != {derived})"
