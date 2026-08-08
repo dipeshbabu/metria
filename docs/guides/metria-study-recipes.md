@@ -92,6 +92,16 @@ Automatic attachment of the recipe digest to execution provenance is a later
 orchestration step; the current recipe API exposes the digest without claiming
 that linkage already exists.
 
+## Shared RunSpec schema
+
+The requested run representation is shared with `metria.run_record.v1` through
+`run_spec_to_data()` and `run_spec_from_data()`. A saved run record therefore
+retains the exact same requested RunSpec semantics as the study recipe that
+planned it; result serialization does not invent a parallel request schema.
+
+See [run records and comparison](metria-run-records.md) for durable result
+serialization and `metria compare`.
+
 ## Strict validation
 
 The v1 parser fails on:
@@ -164,14 +174,15 @@ arbitrary code-loading mechanism.
 
 ## Current limits
 
-The first recipe layer does not yet provide:
+The recipe/result layer still does not provide:
 
 - YAML parsing;
-- a `metria` CLI;
 - plugin auto-discovery;
 - environment placement across multiple hosts;
 - recipe locking against downloaded model artifacts;
 - automatic recipe-digest attachment to every `RunRecord`;
-- result serialization.
+- a public `metria run` command.
 
-Those should build on the v1 schema rather than bypassing it.
+The CLI does provide recipe validation/digest/normalization, capability
+inspection, and comparison of already-saved versioned run records. The next
+execution CLI should build on these schemas rather than bypassing them.
