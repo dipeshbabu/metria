@@ -1,4 +1,4 @@
-"""Command-line interface for versioned Metria recipes, records, and inspection."""
+"""Command-line interface for versioned Metria recipes, records, and execution."""
 
 from __future__ import annotations
 
@@ -24,9 +24,12 @@ from .recipes import (
     study_recipe_to_json,
 )
 from .records import load_run_record, run_evidence_digest, run_record_digest
+from .registry import RegistryBundle, builtin_registry
+from .runner import execute_recipe_to_directory
 
 INSPECTION_SCHEMA = "metria.inspection.v1"
 COMPARISON_REPORT_SCHEMA = "metria.comparison_report.v1"
+PLUGIN_REPORT_SCHEMA = "metria.plugin_report.v1"
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -112,6 +115,35 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="json_output",
         help="emit a machine-readable pairwise comparison report",
+    )
+
+    plugins = subparsers.add_parser(
+        "plugins",
+        help="list explicitly built-in runtimes, measurements, and analyses",
+    )
+    plugins.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="emit machine-readable registry metadata",
+    )
+
+    run = subparsers.add_parser(
+        "run",
+        help="execute a study recipe through the explicit built-in registry",
+    )
+    run.add_argument("path", type=Path, help="validated study recipe to execute")
+    run.add_argument(
+        "--output-dir",
+        type=Path,
+        required=True,
+        help="new or empty directory for run records and study-result.json",
+    )
+    run.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="emit machine-readable execution summary",
     )
     return parser
 
@@ -367,11 +399,75 @@ def _write_comparison_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
             stdout.write(f"  metric {name}: {incompatible[name]}\n")
 
 
+def _plugin_payload(registry: RegistryBundle) -> dict[str, Any]:
+    """Return deterministic data-only built-in registry metadata."""
+
+    descriptors = sorted(
+        registry.descriptors,
+        key=lambda item: (item.kind.value, item.name),
+    )
+    return {
+        "schema": PLUGIN_REPORT_SCHEMA,
+        "plugins": [dict(descriptor.to_mapping()) for descriptor in descriptors],
+    }
+
+
+def _write_plugins_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
+    plugins = payload["plugins"]
+    assert isinstance(plugins, Sequence)
+    for plugin in plugins:
+        assert isinstance(plugin, Mapping)
+        version = f" version={plugin['version']}" if plugin.get("version") else ""
+        stdout.write(
+            f"{plugin['kind']} {plugin['name']} "
+            f"availability={plugin['availability']}{version}\n"
+        )
+        if plugin.get("reason"):
+            stdout.write(f"  {plugin['reason']}\n")
+
+
+def _run_payload(persisted: Any) -> dict[str, Any]:
+    """Return a compact execution summary; full evidence remains in output files."""
+
+    return {
+        "study": persisted.result.study.name,
+        "successful": persisted.successful,
+        "output_dir": str(persisted.output_dir),
+        "manifest": str(persisted.manifest_path),
+        "records": [
+            {
+                "run_id": record.run_id,
+                "status": record.status.value,
+                "path": str(path),
+            }
+            for record, path in zip(
+                persisted.result.records,
+                persisted.run_paths,
+                strict=True,
+            )
+        ],
+    }
+
+
+def _write_run_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
+    stdout.write(
+        f"study {payload['study']} successful="
+        f"{str(bool(payload['successful'])).lower()}\n"
+        f"manifest {payload['manifest']}\n"
+    )
+    records = payload["records"]
+    assert isinstance(records, Sequence)
+    for record in records:
+        assert isinstance(record, Mapping)
+        stdout.write(f"  {record['run_id']}: {record['status']} {record['path']}\n")
+
+
 def main(
     argv: Sequence[str] | None = None,
     *,
     stdout: TextIO | None = None,
     stderr: TextIO | None = None,
+    registry: RegistryBundle | None = None,
 ) -> int:
     """Run the provisional CLI and return a process-style exit status."""
 
@@ -388,6 +484,15 @@ def main(
         return 2
 
     try:
+        if args.command == "plugins":
+            active_registry = registry or builtin_registry()
+            payload = _plugin_payload(active_registry)
+            if args.json_output:
+                out.write(json.dumps(_jsonable(payload), sort_keys=True) + "\n")
+            else:
+                _write_plugins_human(payload, out)
+            return 0
+
         if args.command == "compare":
             if len(args.records) < 2:
                 raise ValueError("compare requires at least two run record files")
@@ -402,6 +507,19 @@ def main(
 
         path: Path = args.path
         recipe = _load(path)
+        if args.command == "run":
+            active_registry = registry or builtin_registry()
+            persisted = execute_recipe_to_directory(
+                recipe,
+                output_dir=args.output_dir,
+                registry=active_registry,
+            )
+            payload = _run_payload(persisted)
+            if args.json_output:
+                out.write(json.dumps(_jsonable(payload), sort_keys=True) + "\n")
+            else:
+                _write_run_human(payload, out)
+            return 0 if persisted.successful else 1
         if args.command == "inspect":
             payload = _inspection_payload(recipe, path)
             if args.json_output:
