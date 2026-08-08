@@ -1,19 +1,22 @@
-# Metria recipe CLI
+# Metria CLI
 
-Metria's first command-line surface is deliberately limited to versioned recipe
-inspection. It does not execute studies, auto-load plugins, or make optimization
-recommendations.
+Metria's current command line is deliberately data/evidence oriented. It can
+validate versioned study recipes, inspect requested capabilities/hardware, and
+compare already-saved run records. It does not yet execute studies, auto-load
+plugins, or make optimization recommendations.
 
-The initial commands are:
+Current commands include:
 
 ```text
 metria recipe validate <study.json>
 metria recipe digest <study.json>
 metria recipe normalize <study.json>
+metria inspect <study.json>
+metria compare <run.json> <run.json> [...] --recipe <study.json>
 ```
 
-The implementation uses only the standard library and the existing
-`metria.study_recipe.v1` schema.
+The implementation uses only the standard library and the versioned Metria JSON
+schemas.
 
 ## Install from a source checkout
 
@@ -102,16 +105,46 @@ other sensitive inputs, normalized output contains them too.
 Do not pipe normalized private recipes into public logs or publish them under
 `artifacts/` unless those inputs are intentionally public.
 
+## Inspect
+
+```bash
+metria inspect study.json
+metria inspect study.json --json
+```
+
+Inspection evaluates data-only capability rules before execution and captures a
+privacy-conscious local hardware/software fingerprint. It does not infer model
+geometry from a model name and does not treat an environment variable as proof
+that an accelerator exists.
+
+See [capability inspection](metria-inspection.md).
+
+## Compare saved records
+
+```bash
+metria compare run-0001.json run-0002.json --recipe study.json
+```
+
+Use `--json` for machine-readable pairwise output. The recipe is mandatory
+because comparability is study-specific; the command does not invent a global
+fingerprint rule.
+
+The records must belong to the recipe supplying the `ComparisonPlan`. A valid
+but incompatible comparison returns exit status `1`; malformed input or a
+record/recipe binding error returns `2`.
+
+See [run records and comparison](metria-run-records.md).
+
 ## Why execution is not here yet
 
 Study execution requires explicit runtime, measurement, and pairwise-analysis
-registries. Installing the root CLI does not change that execution policy and
-does not auto-import arbitrary plugins.
+registries plus durable output/provenance policy. Installing the root CLI does
+not auto-import arbitrary plugins or install inference engines.
 
-The safer sequence remains:
+The remaining sequence is:
 
-1. stabilize recipe parsing and digesting;
-2. stabilize the non-executing CLI surface;
-3. package the root Metria core;
-4. add explicit built-in registry selection;
-5. add `metria run` only after its execution/provenance semantics are clear.
+1. keep recipe, inspection, and run-record schemas versioned and strict;
+2. add explicit built-in registry selection/listing;
+3. attach recipe/hardware identities to execution provenance;
+4. add `metria run` with durable `metria.run_record.v1` output;
+5. keep third-party plugin loading separate from the first execution CLI.
