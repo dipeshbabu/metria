@@ -58,7 +58,7 @@ claim that Metria independently queried the upstream model repository.
 The first enforced geometry rule covers the documented TurboQuant KV-cache
 head-dimension boundary.
 
-For a KV treatment whose key or value dtype starts with `turbo`:
+For a KV treatment whose key or value dtype starts with `turbo`, ignoring case:
 
 | Geometry evidence | Capability result |
 |---|---|
@@ -97,6 +97,10 @@ to continue. The override remains present in the retained capability evidence.
 Missing or contradictory geometry remains `unknown` even when an override name
 is present; Metria does not turn absent evidence into a supported claim.
 
+Override names are validated for every run, even when no matching treatment is
+active. Unrecognized names are retained as `metria.capability_overrides`
+evidence and block preflight so a typo cannot silently disable a guardrail.
+
 ## Hardware fingerprint
 
 `metria inspect` also captures a portable stdlib-only hardware/software
@@ -104,9 +108,13 @@ fingerprint. The initial fingerprint includes:
 
 - operating-system and machine architecture;
 - processor string when the platform exposes it;
-- CPU count;
-- a SHA-256 fingerprint of the host name, not the raw host name;
+- CPU count when the platform exposes it;
+- a domain-separated SHA-256 correlation identifier derived from the host name;
 - Python version and implementation.
+
+The hostname digest supports correlation between run records without storing the
+raw host name. It is **not** a confidentiality guarantee: an attacker who can
+guess likely host names may still recover a matching name by enumeration.
 
 Accelerator identity is deliberately left to runtime/adapter evidence until an
 authoritative accelerator probe is implemented. Environment variables such as
