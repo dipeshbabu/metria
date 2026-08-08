@@ -18,9 +18,7 @@ from metria.cli import INSPECTION_SCHEMA, main
 
 def _inspection_recipe(tmp_path: Path, *, override: bool = False) -> Path:
     trial_policy = (
-        {"capability_overrides": ("turboquant.kv_cache.geometry",)}
-        if override
-        else {}
+        {"capability_overrides": ("turboquant.kv_cache.geometry",)} if override else {}
     )
     recipe = StudyRecipe(
         study=StudySpec(
@@ -84,8 +82,7 @@ def test_inspect_json_reports_fail_closed_capabilities(tmp_path: Path) -> None:
     assert run["allowed"] is False
     assert run["blocking"] == ["turboquant.kv_cache.geometry"]
     assert (
-        run["capabilities"]["turboquant.kv_cache.geometry"]["status"]
-        == "unsupported"
+        run["capabilities"]["turboquant.kv_cache.geometry"]["status"] == "unsupported"
     )
 
 
@@ -99,9 +96,7 @@ def test_inspect_json_records_explicit_experimental_override(tmp_path: Path) -> 
         stderr=io.StringIO(),
     )
     payload = json.loads(stdout.getvalue())
-    capability = payload["runs"][0]["capabilities"][
-        "turboquant.kv_cache.geometry"
-    ]
+    capability = payload["runs"][0]["capabilities"]["turboquant.kv_cache.geometry"]
 
     assert status == 0
     assert payload["runs"][0]["allowed"] is True
