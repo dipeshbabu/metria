@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+import pytest
+
 from metria import RunSpec, RunStatus, TreatmentSpec, TreatmentType, execute_run
 from metria.capabilities import (
     ModelGeometry,
@@ -41,6 +43,16 @@ def _turbo_spec(
                 config={"key_dtype": "q8_0", "value_dtype": "turbo3"},
             ),
         ),
+        trial_policy=trial_policy,
+    )
+
+
+def _plain_spec(*, trial_policy: Mapping[str, Any]) -> RunSpec:
+    return RunSpec(
+        model={"id": "example/model"},
+        runtime={"name": "llamacpp"},
+        scenario={"max_tokens": 4},
+        measurements=("test.measurement",),
         trial_policy=trial_policy,
     )
 
@@ -120,11 +132,10 @@ def test_turboquant_head_dim_64_explicit_override_is_experimental_and_allowed() 
 def test_unvalidated_consistent_head_dim_requires_explicit_override() -> None:
     blocked = inspect_run_capabilities(_turbo_spec(head_dim=96))
     allowed = inspect_run_capabilities(_turbo_spec(head_dim=96, override=True))
+    capability = blocked.capabilities.get("turboquant.kv_cache.geometry")
 
-    assert (
-        blocked.capabilities.get("turboquant.kv_cache.geometry").status
-        is SupportLevel.EXPERIMENTAL
-    )
+    assert capability is not None
+    assert capability.status is SupportLevel.EXPERIMENTAL
     assert blocked.blocking
     assert allowed.blocking == ()
 
@@ -146,6 +157,29 @@ def test_non_turbo_kv_configuration_does_not_require_geometry() -> None:
 
     assert capability.status is SupportLevel.SUPPORTED
     assert capability.evidence["active"] is False
+
+
+def test_override_shape_is_validated_without_matching_treatment() -> None:
+    spec = _plain_spec(
+        trial_policy={"capability_overrides": "turboquant.kv_cache.geometry"}
+    )
+
+    with pytest.raises(TypeError, match="must be a sequence"):
+        inspect_run_capabilities(spec)
+
+
+def test_unrecognized_override_is_retained_as_blocking_evidence() -> None:
+    spec = _plain_spec(
+        trial_policy={"capability_overrides": ("turboquant.kv_cache",)}
+    )
+
+    result = inspect_run_capabilities(spec)
+    capability = result.capabilities.get("metria.capability_overrides")
+
+    assert capability is not None
+    assert capability.status is SupportLevel.UNKNOWN
+    assert capability.evidence["unrecognized"] == ("turboquant.kv_cache",)
+    assert result.blocking == (capability,)
 
 
 class _CountingSession:
