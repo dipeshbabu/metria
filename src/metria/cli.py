@@ -25,7 +25,7 @@ from .recipes import (
 )
 from .records import load_run_record, run_evidence_digest, run_record_digest
 from .registry import RegistryBundle, builtin_registry
-from .runner import execute_recipe_to_directory
+from .runner import PersistedStudyResult, execute_recipe_to_directory
 
 INSPECTION_SCHEMA = "metria.inspection.v1"
 COMPARISON_REPORT_SCHEMA = "metria.comparison_report.v1"
@@ -417,7 +417,9 @@ def _write_plugins_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
     assert isinstance(plugins, Sequence)
     for plugin in plugins:
         assert isinstance(plugin, Mapping)
-        version = f" version={plugin['version']}" if plugin.get("version") else ""
+        version = (
+            f" version={plugin['version']}" if plugin.get("version") else ""
+        )
         stdout.write(
             f"{plugin['kind']} {plugin['name']} "
             f"availability={plugin['availability']}{version}\n"
@@ -426,7 +428,7 @@ def _write_plugins_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
             stdout.write(f"  {plugin['reason']}\n")
 
 
-def _run_payload(persisted: Any) -> dict[str, Any]:
+def _run_payload(persisted: PersistedStudyResult) -> dict[str, Any]:
     """Return a compact execution summary; full evidence remains in output files."""
 
     return {
