@@ -44,7 +44,9 @@ def _kv_treatment(spec: RunSpec) -> TreatmentSpec | None:
     if not matches:
         return None
     if len(matches) > 1:
-        raise ValueError("only one KV-cache runtime treatment may be capability-checked")
+        raise ValueError(
+            "only one KV-cache runtime treatment may be capability-checked"
+        )
     return matches[0]
 
 
