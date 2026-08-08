@@ -7,8 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ._freeze import freeze_mapping
-from .identity import Capability, CapabilitySet, SupportLevel
-from .models import RunSpec, TreatmentSpec, TreatmentType
+from .identity import Capability, SupportLevel
 
 _GEOMETRY_ALIASES: Mapping[str, tuple[str, ...]] = {
     "hidden_size": ("hidden_size", "n_embd"),
@@ -19,9 +18,6 @@ _GEOMETRY_ALIASES: Mapping[str, tuple[str, ...]] = {
     "context_length": ("context_length", "max_position_embeddings", "n_ctx"),
 }
 _VALIDATED_TURBO_HEAD_DIMS = frozenset({128, 256})
-_TURBO_KV_TREATMENT_NAMES = frozenset(
-    {"kv_cache", "llamacpp.kv_cache", "turboquant.kv_cache"}
-)
 
 
 def _positive_int(value: Any, *, name: str) -> int:
@@ -99,9 +95,7 @@ class ModelGeometry:
             and self.num_attention_heads is not None
             and self.num_key_value_heads > self.num_attention_heads
         ):
-            raise ValueError(
-                "num_key_value_heads cannot exceed num_attention_heads"
-            )
+            raise ValueError("num_key_value_heads cannot exceed num_attention_heads")
         object.__setattr__(self, "evidence", freeze_mapping(self.evidence))
 
     def to_mapping(self) -> Mapping[str, Any]:
@@ -205,7 +199,8 @@ def inspect_model_geometry(model: Mapping[str, Any]) -> GeometryInspection:
             ),
         )
 
-    if not geometry.to_mapping() or set(geometry.to_mapping()) == {"evidence"}:
+    normalized = geometry.to_mapping()
+    if not normalized or set(normalized) == {"evidence"}:
         return GeometryInspection(
             geometry=None,
             capability=Capability(
@@ -225,7 +220,7 @@ def inspect_model_geometry(model: Mapping[str, Any]) -> GeometryInspection:
             name="model.geometry",
             status=SupportLevel.SUPPORTED,
             reasons=("geometry metadata is internally consistent",),
-            evidence=geometry.to_mapping(),
+            evidence=normalized,
         ),
     )
 
@@ -271,7 +266,7 @@ def evaluate_turboquant_kv_capability(
                     if inspection.geometry is not None
                     else None
                 ),
-                "geometry_status": inspection.capability.status.value,
+                "geometry_status": SupportLevel(inspection.capability.status).value,
             },
         )
 
@@ -319,39 +314,3 @@ def evaluate_turboquant_kv_capability(
         ),
         evidence=evidence,
     )
-
-
-def _kv_treatment_from_run(spec: RunSpec) -> TreatmentSpec | None:
-    for treatment in spec.treatments:
-        if treatment.name in _TURBO_KV_TREATMENT_NAMES:
-            if treatment.kind is TreatmentType.RUNTIME_FEATURE:
-                return treatment
-    return None
-
-
-def evaluate_run_capabilities(spec: RunSpec) -> CapabilitySet:
-    """Evaluate data-only capability rules that do not require launching a runtime."""
-
-    inspection = inspect_model_geometry(spec.model)
-    capabilities: list[Capability] = [inspection.capability]
-    treatment = _kv_treatment_from_run(spec)
-    if treatment is not None:
-        override = treatment.config.get("geometry_override", False)
-        if not isinstance(override, bool):
-            capabilities.append(
-                Capability(
-                    name="turboquant.kv_cache.geometry",
-                    status=SupportLevel.UNKNOWN,
-                    reasons=("geometry_override must be boolean",),
-                    evidence={"active": True},
-                )
-            )
-        else:
-            capabilities.append(
-                evaluate_turboquant_kv_capability(
-                    spec.model,
-                    treatment.config,
-                    experimental_override=override,
-                )
-            )
-    return CapabilitySet(tuple(capabilities))
