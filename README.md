@@ -55,12 +55,14 @@ Metria is being built around four principles:
 | Hardware evidence | Privacy-conscious stdlib host/software fingerprinting; accelerator identity remains runtime-observed |
 | Runtime lifecycle | `RuntimeAdapter` / `RuntimeSession` plus reusable runtime contract tests |
 | First-party runtimes | llama.cpp and vLLM adapters |
-| Execution | Failure-aware `execute_run()` and `execute_study()` Python APIs |
+| Execution | Failure-aware `execute_run()`, `execute_study()`, and durable `metria run` |
 | Measurements | Decode-time token trajectory capture with retained prompt fingerprints |
 | Pairwise analysis | KV Fidelity-compatible trajectory agreement analysis |
 | Recipes | Versioned `metria.study_recipe.v1` JSON with deterministic SHA-256 digesting |
 | Run records | Versioned `metria.run_record.v1` JSON with typed metrics plus full-record/evidence digests |
-| CLI | Recipe `validate` / `digest` / `normalize`, `metria inspect`, and study-plan-driven `metria compare` |
+| Study results | `metria.study_result.v1` manifests with run digests, compatibility, analyses, recipe and hardware identity |
+| Registries | Explicit built-ins via `metria plugins`; no arbitrary entry-point loading |
+| CLI | Recipe tools, `inspect`, `compare`, `plugins`, and durable `run` |
 | Packaging | Root `metria` package installable from source; focused components stay independent |
 
 The standalone [KV Fidelity](components/kv-fidelity/README.md) package also
@@ -125,56 +127,62 @@ example:
 }
 ```
 
-Validate and fingerprint it:
+Validate, fingerprint, and inspect it:
 
 ```bash
 metria recipe validate study.json
 metria recipe digest study.json
-```
-
-Normalize a validated recipe to deterministic JSON with:
-
-```bash
-metria recipe normalize study.json --output normalized-study.json
-```
-
-`normalize` reproduces the complete recipe, including prompt text or other
-sensitive input. Do not treat normalized private recipes as safe-to-publish
-artifacts.
-
-Inspect data-only geometry/capability and local hardware evidence before a run:
-
-```bash
 metria inspect study.json
-metria inspect study.json --json
+metria plugins
 ```
 
-Inspection is conservative: it does not infer model geometry from a model name,
-and an accelerator is not claimed present merely because an environment
-variable mentions it. See the
-[capability inspection guide](docs/guides/metria-inspection.md).
+`metria plugins` lists only explicit built-ins. It does not scan arbitrary
+Python entry points or install missing inference engines. vLLM can therefore be
+reported unavailable when the optional package is absent, while llama.cpp is
+recipe-dependent because the current adapter uses recipe-local binary/model
+paths.
 
-### 3. Persist and compare run evidence
+### 3. Execute into a durable evidence bundle
 
-The Python execution APIs return `RunRecord` values. Persist them with the
-versioned record API:
+Use a new or empty output directory:
 
-```python
-from metria import dump_run_record
-
-dump_run_record("run-0001.json", record)
+```bash
+metria run study.json --output-dir results/experiment-a
 ```
 
-Then compare saved records under the recipe's explicit `ComparisonPlan`:
+A completed invocation writes:
+
+```text
+results/experiment-a/
+  run-0000.json
+  run-0001.json
+  ...
+  study-result.json
+```
+
+Each run file uses `metria.run_record.v1`. The manifest uses
+`metria.study_result.v1` and retains recipe identity, hardware evidence, run
+record/evidence digests, compatibility reports, and requested pairwise-analysis
+outcomes.
+
+Experimental failures are not silently dropped. If durable evidence is written
+but the study contains failed/partial/timed-out runs, incompatible pairs, or
+failed/skipped analyses, `metria run` exits `1`; invalid configuration or an
+unavailable/unregistered implementation exits `2`.
+
+See the [execution guide](docs/guides/metria-execution.md).
+
+### 4. Compare saved run evidence
+
+Compare persisted runs under the study's explicit `ComparisonPlan`:
 
 ```bash
 metria compare run-0001.json run-0002.json --recipe study.json
 metria compare run-0001.json run-0002.json --recipe study.json --json
 ```
 
-The CLI does **not** expose `metria run` yet. Study execution is available
-through the Python APIs while explicit registries and execution-output
-orchestration are being stabilized.
+Saved-record comparison deliberately requires the recipe. Record/evidence
+digests identify serialized evidence; they do not replace study semantics.
 
 See the [CLI guide](docs/guides/metria-recipe-cli.md) and
 [run-record guide](docs/guides/metria-run-records.md).
@@ -226,35 +234,10 @@ control   dimensions that must match
 block_by  dimensions used to form comparable groups
 ```
 
-For example, a study may intentionally vary runtime and KV-cache treatment,
-control model/workload/measurement method, and block by hardware class.
-
 Metria therefore does **not** use one universal "same fingerprint = comparable"
 rule. Missing controlled evidence is not equality, and methodologically
 different metrics require an explicit analysis that defines how they may be
 combined.
-
-Saved-record comparison deliberately requires the study recipe that supplies the
-comparison plan. Record/evidence digests identify serialized evidence; they do
-not replace study semantics.
-
-## Versioned run evidence
-
-`metria.run_record.v1` stores one executed run as strict JSON while preserving:
-
-- requested `RunSpec` using the same schema as study recipes;
-- resolved and observed runtime state;
-- lifecycle status;
-- metric identity, raw samples, aggregation, uncertainty, and coverage;
-- measurement evidence and artifact references;
-- lifecycle events and execution provenance.
-
-`run_record_digest()` covers the full record, including requested intent and
-local run identity. `run_evidence_digest()` covers produced evidence while
-excluding study/run IDs and requested intent. Neither digest is a universal
-comparability proof.
-
-See [run records and comparison](docs/guides/metria-run-records.md).
 
 ## Runtime adapters
 
@@ -280,25 +263,6 @@ See the [vLLM runtime guide](docs/guides/metria-vllm-runtime.md).
 Runtime support is intentionally narrow while the common adapter contract is
 being hardened. Metria should prefer adapters over reimplementing upstream
 runtimes.
-
-## Measurement and fidelity
-
-The first Metria measurement bridge is decode-time token trajectory capture.
-Each run retains its own token-ID trajectory evidence and prompt fingerprints;
-the trajectory agreement score is derived only when a valid reference/candidate
-pair is compared.
-
-This keeps two concepts separate:
-
-```text
-run-local evidence != pairwise fidelity metric
-```
-
-The pairwise trajectory analysis is compatible with the current KV Fidelity
-trajectory methodology while avoiding KV Fidelity's legacy module-global
-backend dispatch.
-
-See the [trajectory measurement guide](docs/guides/metria-trajectory-measurement.md).
 
 ## Focused components
 
@@ -350,17 +314,18 @@ The current design roadmap is tracked in
 
 Near-term work is focused on:
 
-1. **Observed runtime identity** — stronger served model/tokenizer/applied-config
+1. **Runtime qualification** — exercise the shared contract against first-party
+   adapters and add hardware-qualified evidence lanes where infrastructure is
+   available.
+2. **Observed runtime identity** — stronger served model/tokenizer/applied-config
    evidence.
-2. **Execution CLI and explicit registries** — built-in registry inspection,
-   recipe/hardware provenance attachment, and durable `metria run` output.
-3. **Runtime qualification** — exercise the shared contract against first-party
-   adapters and add hardware-qualified evidence lanes.
-4. **Artifact provenance** — immutable model/data verification and manifest
+3. **Artifact provenance** — immutable model/data verification and manifest
    identity.
-5. **Shared systems APIs** — move benchmark, timeout, diagnostics, and reusable
-   KV Fidelity logic behind Metria protocols rather than adding more standalone
-   scripts.
+4. **KV Fidelity migration** — route its comparison/reporting through shared
+   Metria comparison semantics without breaking the focused package.
+5. **Shared systems APIs** — move subprocess timeouts, benchmark orchestration,
+   diagnostics, and reusable tooling behind Metria APIs rather than adding more
+   standalone scripts.
 
 Later phases can add broader evaluation suites, more runtime/optimization
 adapters, experiment matrices, Pareto visualization, and constrained search.
@@ -380,11 +345,6 @@ research/                   Dated studies and investigations
 artifacts/                  Retained experiment evidence
 tools/                      Existing diagnostics and benchmark utilities
 ```
-
-Current guidance belongs in `docs/`. Dated research conclusions and negative
-results belong in `research/`. Generated evidence belongs in `artifacts/`.
-Historical evidence should remain historical rather than being silently
-rewritten to match newer conclusions.
 
 ## Development
 
@@ -406,14 +366,6 @@ uv run ruff check src/metria metria_tests
 uv run ruff format --check src/metria metria_tests
 ```
 
-Build the workspace distributions independently:
-
-```bash
-uv run python -m build .
-uv run python -m build components/kv-fidelity
-uv run python -m build components/turboquant-reference
-```
-
 Backend-specific inference dependencies remain optional. Install only the stack
 needed for the runtime under test.
 
@@ -422,16 +374,13 @@ needed for the runtime under test.
 See [CONTRIBUTING.md](CONTRIBUTING.md), [GOVERNANCE.md](GOVERNANCE.md), and
 [SUPPORT.md](SUPPORT.md).
 
-Changes to experiment semantics, metric methodology, comparison rules,
-packaging, or release policy should be discussed before those contracts are
-stabilized. New runtime, evaluator, benchmark, or optimization work should plug
-into the common Metria contracts rather than creating a parallel architecture.
+New runtime, evaluator, benchmark, or optimization work should plug into the
+common Metria contracts rather than creating a parallel architecture.
 
 ## Citation
 
 Use [CITATION.cff](CITATION.cff) when Metria supports your work. When relying on
-a specific result under `research/`, cite that report as well so readers can
-recover its model, runtime, hardware, configuration, and date.
+a specific result under `research/`, cite that report as well.
 
 ## License
 
