@@ -71,6 +71,7 @@ def execute_run(
     measurement: MeasurementProtocol,
     measurement_config: Mapping[str, Any],
     environment: Mapping[str, Any],
+    invocation_provenance: Mapping[str, Any] | None = None,
 ) -> RunRecord:
     """Execute one requested run and return evidence even when execution fails.
 
@@ -79,6 +80,11 @@ def execute_run(
     one named measurement protocol, observe applied runtime state, and close the
     session. Failures are represented in the returned ``RunRecord`` rather than
     silently discarded.
+
+    ``invocation_provenance`` carries execution-orchestrator identity such as a
+    recipe digest or observed host fingerprint. It is retained separately from
+    the requested ``environment`` so requested placement does not become
+    observed/provenance evidence by implication.
 
     Exception messages are not retained verbatim in lifecycle events because a
     third-party runtime or measurement may include prompt text or other
@@ -112,6 +118,8 @@ def execute_run(
         "measurement": {"name": measurement_name, "version": measurement_version},
         "environment": environment,
     }
+    if invocation_provenance is not None:
+        provenance["invocation"] = invocation_provenance
 
     if measurement_name not in spec.measurements:
         events.append(
