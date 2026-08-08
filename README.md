@@ -1,120 +1,336 @@
 # Metria
 
-Metria is an open-source evidence and experimentation layer for LLM inference
-systems.
+[![CI](https://github.com/dipeshbabu/metria/actions/workflows/ci.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/ci.yml)
+[![Metria core](https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml)
+[![Root package](https://github.com/dipeshbabu/metria/actions/workflows/root-package.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/root-package.yml)
 
-It is designed to help researchers define inference-system studies, verify what
-actually ran, measure systems and behavioral effects under explicit protocols,
-and determine when results can or cannot be validly compared.
+**Run, measure, and compare LLM inference systems with reproducible evidence.**
 
-Metria is **not** another serving engine or universal quantization library.
-Production runtimes and optimization implementations should normally stay in
-projects such as vLLM, SGLang, llama.cpp, MLX, TensorRT-LLM, torchao, LLM
-Compressor, or custom research code. Metria provides the experiment and evidence
-layer around them.
+Metria is an open-source experiment and evidence layer for LLM inference
+systems. It helps researchers answer a question that raw benchmark numbers do
+not:
 
-## Direction
+> For this model, runtime, workload, hardware, and treatment, what did we ask
+> for, what actually ran, what changed, and are the resulting measurements
+> valid to compare?
 
-The core model is deliberately study-oriented:
+Metria sits **above** inference runtimes and optimization libraries. It is not a
+serving engine, scheduler, kernel library, or universal quantizer. Systems such
+as vLLM, llama.cpp, SGLang, MLX, TensorRT-LLM, torchao, LLM Compressor, and
+custom research code remain responsible for execution; Metria provides the
+study, provenance, measurement, and comparison layer around them.
 
-```text
-Study = factors + controls + comparison plan
+> **Status:** Metria is under active development (`0.1.0.dev0`). The root
+> package is installable from source, but it is not published to a package
+> index yet. Public APIs should still be considered provisional.
 
-Run = system under test
-    × scenario
-    × measurement protocol
-    @ observed environment
-```
+## Why Metria
 
-A run record keeps three states separate:
+Inference research is easy to benchmark and surprisingly hard to compare well.
+A result can look reproducible while hiding differences in model revisions,
+tokenizers, runtime settings, cache formats, hardware, measurement methods, or
+what the runtime actually applied.
 
-1. **Requested** — what the recipe asked for.
-2. **Resolved** — the exact configuration and artifacts selected before launch.
-3. **Observed** — what the runtime and environment report as having actually run.
+Metria is being built around four principles:
 
-This distinction matters for inference research: requesting a cache dtype,
-model revision, attention backend, or kernel path is not evidence that the
-launched system actually used it.
+1. **Requested is not observed.** Asking for FP8 KV cache is not proof that the
+   runtime used FP8 KV cache.
+2. **Comparability is study-specific.** A runtime or hardware change may be the
+   variable under study rather than something that makes two runs globally
+   incompatible.
+3. **Measurements carry method identity.** Values with different methods or
+   versions are not silently treated as the same metric.
+4. **Failed and partial runs are evidence too.** Missing observation, timeout,
+   unsupported configuration, or failed cleanup should not be converted into an
+   apparently successful result.
 
-See [Metria core architecture](docs/architecture/metria-core.md) for the
-provisional study, run, metric, treatment, and comparison contracts.
+## What works today
 
-## First milestone
+| Capability | Current state |
+|---|---|
+| Study design | `StudySpec`, `RunSpec`, `ComparisonPlan`, treatments, controls, blocking dimensions |
+| Evidence model | Requested → resolved → observed state with immutable run evidence |
+| Typed identity | `ModelRef`, `RuntimeConfig`, `WorkloadSpec`, `CapabilitySet`, `HardwareFingerprint`, `ArtifactManifest` |
+| Runtime lifecycle | `RuntimeAdapter` / `RuntimeSession` plus reusable runtime contract tests |
+| First-party runtimes | llama.cpp and vLLM adapters |
+| Execution | Failure-aware `execute_run()` and `execute_study()` Python APIs |
+| Measurements | Decode-time token trajectory capture with retained prompt fingerprints |
+| Pairwise analysis | KV Fidelity-compatible trajectory agreement analysis |
+| Recipes | Versioned `metria.study_recipe.v1` JSON with deterministic SHA-256 digesting |
+| CLI | `metria recipe validate`, `digest`, and `normalize` |
+| Packaging | Root `metria` package installable from source; focused components stay independent |
 
-The initial stable target is intentionally narrow:
+The standalone [KV Fidelity](components/kv-fidelity/README.md) package also
+supports llama.cpp, MLX, vLLM, and SGLang for its focused KV-cache evaluation
+workflow. Those component backends should not be confused with the smaller set
+of first-party runtime adapters already exposed by the Metria core.
 
-> Metria can reproducibly run, record, and validly compare a defined
-> inference-systems study across at least two runtimes.
+## Quick start
 
-Automated recommendation, active search, a universal fidelity score, production
-serving, and a universal all-runtime dependency environment are explicitly
-outside the first milestone.
-
-## Current repository
-
-Metria is a research monorepo with components at different maturity levels.
-
-| Area | Purpose | Status |
-|---|---|---|
-| `src/metria/` | Shared study, run, metric, comparison, runtime, and measurement contracts | Provisional foundation |
-| [KV Fidelity](components/kv-fidelity/README.md) | Reference-anchored KV-cache behavioral evaluation across llama.cpp, MLX, vLLM, and SGLang | Beta; independent focused distribution |
-| [TurboQuant Reference](components/turboquant-reference/README.md) | NumPy/SciPy reference implementation of PolarQuant, QJL, and TurboQuant KV-cache compression | Research reference; independent focused distribution |
-| [Tools](tools/README.md) | Existing diagnostics, validation, benchmarking, and conversion utilities | Mixed; being migrated into reusable protocols over time |
-| [Research](research/README.md) | Dated studies, investigations, negative results, and archived plans | Evidence record |
-| [Artifacts](artifacts/README.md) | Retained benchmark output and experiment evidence | Evidence; provenance varies for historical artifacts |
-
-KV Fidelity and TurboQuant Reference keep their own package names and release
-lifecycles while the shared Metria layer matures.
-
-## What Metria should own
-
-Metria's differentiated responsibilities are:
-
-- explicit study design: what varies, what is controlled, and what is blocked;
-- requested, resolved, and observed configuration provenance;
-- runtime lifecycle and applied-configuration evidence;
-- measurement protocols with typed units, methods, samples, aggregation, and
-  uncertainty;
-- comparison semantics that prevent invalid cross-system conclusions;
-- behavioral and systems metrics under one evidence model;
-- hardware-aware capability discovery;
-- reproducibility bundles for research results.
-
-Metria should generally **not** own inference kernels, schedulers, serving
-engines, or duplicate every upstream quantizer.
-
-## Install Metria from a checkout
-
-The root Metria framework is buildable and installable from source, but this
-repository does **not** publish a root `metria` distribution to a package index
-at this stage. Do not infer public package-name ownership from the local
-distribution metadata.
-
-From a checkout:
+### 1. Install from source
 
 ```bash
 git clone https://github.com/dipeshbabu/metria.git
 cd metria
 python -m pip install .
+
 metria --version
 metria --help
 ```
 
-The installed root framework provides the recipe CLI without installing any
-inference engine:
+The root package deliberately does **not** install vLLM, llama.cpp, or other
+inference engines. Runtime stacks remain optional and user-managed.
+
+### 2. Define a study recipe
+
+Metria recipes describe requested experiment intent as versioned data. For
+example:
+
+```json
+{
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "name": "runtime-comparison",
+    "runs": [
+      {
+        "model": {"id": "example/model"},
+        "runtime": {"name": "llamacpp"},
+        "scenario": {"name": "decode"},
+        "measurements": ["kv_fidelity.decode_time_trajectory"]
+      },
+      {
+        "model": {"id": "example/model"},
+        "runtime": {"name": "vllm"},
+        "scenario": {"name": "decode"},
+        "measurements": ["kv_fidelity.decode_time_trajectory"]
+      }
+    ],
+    "comparison": {
+      "vary": ["runtime"],
+      "control": ["model", "scenario", "measurements"],
+      "analyses": ["kv_fidelity.trajectory_match"]
+    }
+  },
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "prompts": [
+        {"id": "p1", "prompt": "The capital of France is"}
+      ]
+    }
+  },
+  "environment": {}
+}
+```
+
+Validate and fingerprint it:
 
 ```bash
 metria recipe validate study.json
 metria recipe digest study.json
-metria recipe normalize study.json
 ```
 
-Inference runtimes remain optional and user-managed. The focused
-`kv-fidelity` and `turboquant-reference` distributions remain independent.
+Normalize a validated recipe to deterministic JSON with:
 
-## Development setup
+```bash
+metria recipe normalize study.json --output normalized-study.json
+```
 
-Clone the repository and synchronize the workspace:
+`normalize` reproduces the complete recipe, including prompt text or other
+sensitive input. Do not treat normalized private recipes as safe-to-publish
+artifacts.
+
+The CLI currently handles **recipe inspection only**. `metria run` is not yet a
+public command; study execution is available through the Python APIs while the
+registry, result-serialization, and provenance contracts are being stabilized.
+
+See the [recipe CLI guide](docs/guides/metria-recipe-cli.md) for details.
+
+## Core model
+
+Metria does not model an experiment as a fixed list of six peer objects. The
+study decides what varies and what must stay fixed:
+
+```text
+Study = factors + controls + comparison plan
+
+Run = system under test
+    × scenario / workload
+    × measurement protocol
+    @ observed environment
+```
+
+Every run then separates:
+
+```text
+requested
+    ↓
+resolved
+    ↓
+observed
+    ↓
+evidence + metrics + artifacts + lifecycle events
+```
+
+- **Requested** — what the user or recipe asked for.
+- **Resolved** — exact settings, revisions, artifacts, and choices selected
+  before launch.
+- **Observed** — what the runtime and environment report actually ran.
+
+That distinction is central to Metria. A configuration request is experiment
+intent; observed state is evidence.
+
+See [Metria core architecture](docs/architecture/metria-core.md) for the full
+provisional contract.
+
+## Comparison semantics
+
+A `ComparisonPlan` declares the role of experiment dimensions:
+
+```text
+vary      dimensions intentionally changed
+control   dimensions that must match
+block_by  dimensions used to form comparable groups
+```
+
+For example, a study may intentionally vary runtime and KV-cache treatment,
+control model/workload/measurement method, and block by hardware class.
+
+Metria therefore does **not** use one universal "same fingerprint = comparable"
+rule. Missing controlled evidence is not equality, and methodologically
+different metrics require an explicit analysis that defines how they may be
+combined.
+
+## Runtime adapters
+
+The Metria core currently includes two first-party runtime adapters:
+
+### llama.cpp
+
+The current adapter supports local llama.cpp command-line execution, GGUF model
+paths, explicit runtime settings, KV-cache treatments, binary identity hashing,
+requested/resolved/observed evidence, and optional decode-time token-ID capture
+with a compatible patched binary.
+
+See the [llama.cpp runtime guide](docs/guides/metria-llamacpp-runtime.md).
+
+### vLLM
+
+The current adapter uses the offline `vllm.LLM` API, keeps vLLM as an optional
+lazy dependency, supports native token-ID capture, and separates configured
+runtime state from introspected applied engine state.
+
+See the [vLLM runtime guide](docs/guides/metria-vllm-runtime.md).
+
+Runtime support is intentionally narrow while the common adapter contract is
+being hardened. Metria should prefer adapters over reimplementing upstream
+runtimes.
+
+## Measurement and fidelity
+
+The first Metria measurement bridge is decode-time token trajectory capture.
+Each run retains its own token-ID trajectory evidence and prompt fingerprints;
+the trajectory agreement score is derived only when a valid reference/candidate
+pair is compared.
+
+This keeps two concepts separate:
+
+```text
+run-local evidence != pairwise fidelity metric
+```
+
+The pairwise trajectory analysis is compatible with the current KV Fidelity
+trajectory methodology while avoiding KV Fidelity's legacy module-global
+backend dispatch.
+
+See the [trajectory measurement guide](docs/guides/metria-trajectory-measurement.md).
+
+## Focused components
+
+Metria remains a monorepo with focused components that keep their own package
+identities and release lifecycles.
+
+### KV Fidelity
+
+Reference-anchored behavioral evaluation for KV-cache compression and runtime
+changes.
+
+```bash
+python -m pip install "./components/kv-fidelity"
+kv-fidelity --help
+```
+
+See [KV Fidelity](components/kv-fidelity/README.md) and its
+[quick start](components/kv-fidelity/QUICKSTART.md).
+
+### TurboQuant Reference
+
+Portable NumPy/SciPy reference implementations of PolarQuant, QJL, and
+TurboQuant KV-cache compression.
+
+```bash
+python -m pip install "./components/turboquant-reference"
+python components/turboquant-reference/benchmarks/examples/demo.py
+```
+
+See [TurboQuant Reference](components/turboquant-reference/README.md).
+
+## What Metria is not
+
+Metria is not intended to become:
+
+- another inference server;
+- a replacement for vLLM, llama.cpp, SGLang, MLX, or TensorRT-LLM;
+- a reimplementation of every quantization algorithm;
+- a universal scalar fidelity score;
+- an automatic recommendation engine before measurement uncertainty and
+  failure semantics are mature;
+- a single environment containing every inference runtime;
+- a training-optimization framework.
+
+## Roadmap
+
+The current design roadmap is tracked in
+[issue #50](https://github.com/dipeshbabu/metria/issues/50).
+
+Near-term work is focused on:
+
+1. **Capability and hardware inspection** — model/runtime capability discovery,
+   geometry guardrails, and standardized hardware fingerprints.
+2. **Observed runtime identity** — stronger served model/tokenizer/applied-config
+   evidence.
+3. **Versioned result serialization** — portable `RunRecord` bundles, stable
+   evidence digests, and `metria compare`.
+4. **Execution CLI and explicit registries** — built-in registry inspection
+   before exposing `metria run`.
+5. **Shared systems APIs** — move benchmark, timeout, diagnostics, and reusable
+   KV Fidelity logic behind Metria protocols rather than adding more standalone
+   scripts.
+
+Later phases can add broader evaluation suites, more runtime/optimization
+adapters, experiment matrices, Pareto visualization, and constrained search.
+Automatic recommendation should come only after the evidence layer is mature
+enough to support it.
+
+## Repository layout
+
+```text
+src/metria/                 Shared Metria core
+metria_tests/               Core contract tests
+components/
+  kv-fidelity/              Focused fidelity evaluator
+  turboquant-reference/     Portable algorithm reference
+docs/                       Current guidance and architecture
+research/                   Dated studies and investigations
+artifacts/                  Retained experiment evidence
+tools/                      Existing diagnostics and benchmark utilities
+```
+
+Current guidance belongs in `docs/`. Dated research conclusions and negative
+results belong in `research/`. Generated evidence belongs in `artifacts/`.
+Historical evidence should remain historical rather than being silently
+rewritten to match newer conclusions.
+
+## Development
 
 ```bash
 git clone https://github.com/dipeshbabu/metria.git
@@ -125,9 +341,7 @@ uv run pre-commit install
 uv run pytest
 ```
 
-The workspace sync installs the provisional root Metria package together with
-the focused workspace members for development. Run the core checks directly
-with:
+Core-only checks:
 
 ```bash
 uv run pytest metria_tests -v
@@ -136,71 +350,7 @@ uv run ruff check src/metria metria_tests
 uv run ruff format --check src/metria metria_tests
 ```
 
-Backend-specific KV Fidelity dependencies remain optional. Add only the stack
-needed for the backend under test; do not assume all inference runtimes can
-share one Python environment.
-
-## Existing focused workflows
-
-### Evaluate KV-cache fidelity
-
-Install the focused component from a checkout:
-
-```bash
-python -m pip install "./components/kv-fidelity"
-kv-fidelity --help
-```
-
-Continue with the [KV Fidelity quick start](components/kv-fidelity/QUICKSTART.md).
-
-### Reproduce TurboQuant algorithms
-
-```bash
-python -m pip install "./components/turboquant-reference"
-python components/turboquant-reference/benchmarks/examples/demo.py
-```
-
-See the [TurboQuant Reference README](components/turboquant-reference/README.md)
-for its public Python API and benchmark extras.
-
-### Inspect existing diagnostic tools
-
-```bash
-python tools/diagnostics/turbo_hardware_diag.py --help
-```
-
-The current scripts contain useful operational knowledge but are not yet the
-stable Metria benchmark protocol. See [tools/README.md](tools/README.md) for
-requirements and limitations.
-
-## Repository organization
-
-```text
-src/metria/                 Provisional shared Metria core
-metria_tests/               Core contract tests
-components/
-  kv-fidelity/              Focused fidelity evaluator
-  turboquant-reference/     Portable algorithm reference
-docs/                       Current guidance and architecture
-research/                   Dated research and investigations
-artifacts/                  Retained experiment evidence
-tools/                      Existing diagnostics and benchmark utilities
-```
-
-Current guidance belongs in `docs/`. Dated claims and negative results belong
-in `research/`. Generated evidence belongs in `artifacts/`. Historical evidence
-is preserved rather than rewritten to match newer conclusions.
-
-## Verification
-
-Run the complete repository gate:
-
-```bash
-uv run pre-commit run --all-files
-uv run pytest
-```
-
-All three workspace distributions can be built independently:
+Build the workspace distributions independently:
 
 ```bash
 uv run python -m build .
@@ -208,24 +358,24 @@ uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
 ```
 
-The root Metria distribution remains provisional and is **not published** by
-this repository. Public package-index identity, release controls, recovery
-ownership, and versioning policy must be reviewed separately before any first
-public root release.
+Backend-specific inference dependencies remain optional. Install only the stack
+needed for the runtime under test.
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [GOVERNANCE.md](GOVERNANCE.md), and
-[SUPPORT.md](SUPPORT.md). Changes to public experiment semantics, metric
-methodology, comparison rules, packaging, or release policy should be discussed
-before being stabilized.
+[SUPPORT.md](SUPPORT.md).
 
-## Citing this work
+Changes to experiment semantics, metric methodology, comparison rules,
+packaging, or release policy should be discussed before those contracts are
+stabilized. New runtime, evaluator, benchmark, or optimization work should plug
+into the common Metria contracts rather than creating a parallel architecture.
 
-Use [CITATION.cff](CITATION.cff) when the repository as a whole supports your
-work. When relying on a specific result under `research/`, cite that report as
-well so readers can recover its model, runtime, hardware, configuration, and
-date.
+## Citation
+
+Use [CITATION.cff](CITATION.cff) when Metria supports your work. When relying on
+a specific result under `research/`, cite that report as well so readers can
+recover its model, runtime, hardware, configuration, and date.
 
 ## License
 
