@@ -92,12 +92,21 @@ class RegistryBundle:
         return None
 
 
+def _module_available(name: str) -> bool:
+    """Probe a top-level optional module without importing it or raising on bad specs."""
+
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, ModuleNotFoundError, ValueError):
+        return False
+
+
 def builtin_registry() -> RegistryBundle:
     """Return only first-party implementations shipped by the Metria package."""
 
     trajectory = TokenTrajectoryProtocol()
     trajectory_analysis = TrajectoryAgreementAnalysis()
-    vllm_available = importlib.util.find_spec("vllm") is not None
+    vllm_available = _module_available("vllm")
     descriptors = (
         PluginDescriptor(
             name="llamacpp",
