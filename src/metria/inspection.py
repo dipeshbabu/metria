@@ -11,6 +11,7 @@ from .identity import Capability, CapabilitySet, SupportLevel
 from .models import RunSpec, TreatmentSpec, TreatmentType
 
 _TURBO_CAPABILITY = "turboquant.kv_cache.geometry"
+_SUPPORTED_OVERRIDES = frozenset({_TURBO_CAPABILITY})
 _KV_TREATMENT_NAMES = frozenset(
     {"kv_cache", "llamacpp.kv_cache", "turboquant.kv_cache"}
 )
@@ -50,6 +51,22 @@ def _kv_treatment(spec: RunSpec) -> TreatmentSpec | None:
     return matches[0]
 
 
+def _unknown_override_capability(overrides: frozenset[str]) -> Capability | None:
+    unknown = tuple(sorted(overrides - _SUPPORTED_OVERRIDES))
+    if not unknown:
+        return None
+    return Capability(
+        name="metria.capability_overrides",
+        status=SupportLevel.UNKNOWN,
+        reasons=("unrecognized capability override names: " + ", ".join(unknown),),
+        evidence={
+            "requested": tuple(sorted(overrides)),
+            "recognized": tuple(sorted(overrides & _SUPPORTED_OVERRIDES)),
+            "unrecognized": unknown,
+        },
+    )
+
+
 def inspect_run_capabilities(spec: RunSpec) -> PreflightCapabilityResult:
     """Inspect a run without launching a runtime and return fail-closed blockers."""
 
@@ -57,11 +74,19 @@ def inspect_run_capabilities(spec: RunSpec) -> PreflightCapabilityResult:
     capabilities: list[Capability] = [geometry.capability]
     blocking: list[Capability] = []
 
+    overrides = _override_names(spec)
+    unknown_override = _unknown_override_capability(overrides)
+    if unknown_override is not None:
+        capabilities.append(unknown_override)
+        blocking.append(unknown_override)
+
     treatment = _kv_treatment(spec)
     if treatment is None:
-        return PreflightCapabilityResult(CapabilitySet(tuple(capabilities)))
+        return PreflightCapabilityResult(
+            capabilities=CapabilitySet(tuple(capabilities)),
+            blocking=tuple(blocking),
+        )
 
-    overrides = _override_names(spec)
     override = _TURBO_CAPABILITY in overrides
     turbo = evaluate_turboquant_kv_capability(
         spec.model,
