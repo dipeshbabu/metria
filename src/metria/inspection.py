@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from .capabilities import inspect_model_geometry, evaluate_turboquant_kv_capability
+from .capabilities import evaluate_turboquant_kv_capability, inspect_model_geometry
 from .identity import Capability, CapabilitySet, SupportLevel
 from .models import RunSpec, TreatmentSpec, TreatmentType
 
