@@ -121,9 +121,10 @@ def test_unvalidated_consistent_head_dim_requires_explicit_override() -> None:
     blocked = inspect_run_capabilities(_turbo_spec(head_dim=96))
     allowed = inspect_run_capabilities(_turbo_spec(head_dim=96, override=True))
 
-    assert blocked.capabilities.get(
-        "turboquant.kv_cache.geometry"
-    ).status is SupportLevel.EXPERIMENTAL
+    assert (
+        blocked.capabilities.get("turboquant.kv_cache.geometry").status
+        is SupportLevel.EXPERIMENTAL
+    )
     assert blocked.blocking
     assert allowed.blocking == ()
 
