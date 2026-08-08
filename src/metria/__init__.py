@@ -1,7 +1,14 @@
 """Metria core models for reproducible inference-systems studies."""
 
+from .capabilities import (
+    GeometryInspection,
+    ModelGeometry,
+    evaluate_turboquant_kv_capability,
+    inspect_model_geometry,
+)
 from .comparison import compare_runs
 from .execution import execute_run
+from .hardware import capture_hardware_fingerprint
 from .identity import (
     ArtifactManifest,
     Capability,
@@ -11,6 +18,11 @@ from .identity import (
     RuntimeConfig,
     SupportLevel,
     WorkloadSpec,
+)
+from .inspection import (
+    PreflightCapabilityResult,
+    capability_inspection_to_mapping,
+    inspect_run_capabilities,
 )
 from .models import (
     ComparisonPlan,
@@ -54,14 +66,17 @@ __all__ = [
     "ComparisonPlan",
     "CompatibilityIssue",
     "CompatibilityReport",
+    "GeometryInspection",
     "HardwareFingerprint",
     "MeasurementResult",
     "MetricDefinition",
     "MetricDirection",
     "MetricSample",
     "MetricSummary",
+    "ModelGeometry",
     "ModelRef",
     "PairwiseAnalysisStatus",
+    "PreflightCapabilityResult",
     "RunRecord",
     "RunSpec",
     "RunStatus",
@@ -75,10 +90,15 @@ __all__ = [
     "TreatmentSpec",
     "TreatmentType",
     "WorkloadSpec",
+    "capability_inspection_to_mapping",
+    "capture_hardware_fingerprint",
     "compare_runs",
     "dump_study_recipe",
+    "evaluate_turboquant_kv_capability",
     "execute_run",
     "execute_study",
+    "inspect_model_geometry",
+    "inspect_run_capabilities",
     "load_study_recipe",
     "study_recipe_digest",
     "study_recipe_from_data",

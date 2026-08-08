@@ -51,13 +51,15 @@ Metria is being built around four principles:
 | Study design | `StudySpec`, `RunSpec`, `ComparisonPlan`, treatments, controls, blocking dimensions |
 | Evidence model | Requested → resolved → observed state with immutable run evidence |
 | Typed identity | `ModelRef`, `RuntimeConfig`, `WorkloadSpec`, `CapabilitySet`, `HardwareFingerprint`, `ArtifactManifest` |
+| Capability inspection | Conservative model-geometry normalization, TurboQuant KV guardrails, and `metria inspect` |
+| Hardware evidence | Privacy-conscious stdlib host/software fingerprinting; accelerator identity remains runtime-observed |
 | Runtime lifecycle | `RuntimeAdapter` / `RuntimeSession` plus reusable runtime contract tests |
 | First-party runtimes | llama.cpp and vLLM adapters |
 | Execution | Failure-aware `execute_run()` and `execute_study()` Python APIs |
 | Measurements | Decode-time token trajectory capture with retained prompt fingerprints |
 | Pairwise analysis | KV Fidelity-compatible trajectory agreement analysis |
 | Recipes | Versioned `metria.study_recipe.v1` JSON with deterministic SHA-256 digesting |
-| CLI | `metria recipe validate`, `digest`, and `normalize` |
+| CLI | Recipe `validate` / `digest` / `normalize` plus data-only `metria inspect` |
 | Packaging | Root `metria` package installable from source; focused components stay independent |
 
 The standalone [KV Fidelity](components/kv-fidelity/README.md) package also
@@ -139,11 +141,23 @@ metria recipe normalize study.json --output normalized-study.json
 sensitive input. Do not treat normalized private recipes as safe-to-publish
 artifacts.
 
-The CLI currently handles **recipe inspection only**. `metria run` is not yet a
-public command; study execution is available through the Python APIs while the
-registry, result-serialization, and provenance contracts are being stabilized.
+Inspect data-only geometry/capability and local hardware evidence before a run:
 
-See the [recipe CLI guide](docs/guides/metria-recipe-cli.md) for details.
+```bash
+metria inspect study.json
+metria inspect study.json --json
+```
+
+Inspection is conservative: it does not infer model geometry from a model name,
+and an accelerator is not claimed present merely because an environment
+variable mentions it. See the
+[capability inspection guide](docs/guides/metria-inspection.md).
+
+The CLI does **not** expose `metria run` yet. Study execution is available
+through the Python APIs while durable result serialization, explicit registries,
+and execution-output provenance are being stabilized.
+
+See the [recipe CLI guide](docs/guides/metria-recipe-cli.md) for recipe commands.
 
 ## Core model
 
@@ -294,14 +308,14 @@ The current design roadmap is tracked in
 
 Near-term work is focused on:
 
-1. **Capability and hardware inspection** — model/runtime capability discovery,
-   geometry guardrails, and standardized hardware fingerprints.
-2. **Observed runtime identity** — stronger served model/tokenizer/applied-config
+1. **Observed runtime identity** — stronger served model/tokenizer/applied-config
    evidence.
-3. **Versioned result serialization** — portable `RunRecord` bundles, stable
+2. **Versioned result serialization** — portable `RunRecord` bundles, stable
    evidence digests, and `metria compare`.
-4. **Execution CLI and explicit registries** — built-in registry inspection
+3. **Execution CLI and explicit registries** — built-in registry inspection
    before exposing `metria run`.
+4. **Runtime qualification** — exercise the shared contract against first-party
+   adapters and add hardware-qualified evidence lanes.
 5. **Shared systems APIs** — move benchmark, timeout, diagnostics, and reusable
    KV Fidelity logic behind Metria protocols rather than adding more standalone
    scripts.

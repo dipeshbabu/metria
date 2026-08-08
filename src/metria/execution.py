@@ -6,6 +6,7 @@ import hashlib
 from collections.abc import Mapping
 from typing import Any
 
+from .inspection import capability_inspection_to_mapping, inspect_run_capabilities
 from .models import MetricSummary, RunRecord, RunSpec, RunStatus
 from .protocols import MeasurementProtocol, RuntimeAdapter, RuntimeSession
 
@@ -73,10 +74,11 @@ def execute_run(
 ) -> RunRecord:
     """Execute one requested run and return evidence even when execution fails.
 
-    The lifecycle is deliberately narrow: probe support, resolve exact runtime
-    state, launch a session, execute one named measurement protocol, observe
-    applied runtime state, and close the session. Failures are represented in
-    the returned ``RunRecord`` rather than silently discarded.
+    The lifecycle is deliberately narrow: inspect shared capability guardrails,
+    probe adapter support, resolve exact runtime state, launch a session, execute
+    one named measurement protocol, observe applied runtime state, and close the
+    session. Failures are represented in the returned ``RunRecord`` rather than
+    silently discarded.
 
     Exception messages are not retained verbatim in lifecycle events because a
     third-party runtime or measurement may include prompt text or other
@@ -117,6 +119,49 @@ def execute_run(
                 "stage": "preflight",
                 "kind": "measurement_not_requested",
                 "measurement": measurement_name,
+            }
+        )
+        return _record(
+            study_name=study_name,
+            run_id=run_id,
+            spec=spec,
+            status=RunStatus.PREFLIGHT_FAILED,
+            resolved=resolved,
+            observed=observed,
+            metrics=metrics,
+            evidence=evidence,
+            events=events,
+            artifacts=artifacts,
+            provenance=provenance,
+        )
+
+    try:
+        capability_result = inspect_run_capabilities(spec)
+    except Exception as exc:
+        events.append(_error_event("capability_inspection", exc))
+        return _record(
+            study_name=study_name,
+            run_id=run_id,
+            spec=spec,
+            status=RunStatus.PREFLIGHT_FAILED,
+            resolved=resolved,
+            observed=observed,
+            metrics=metrics,
+            evidence=evidence,
+            events=events,
+            artifacts=artifacts,
+            provenance=provenance,
+        )
+
+    provenance["capabilities"] = capability_inspection_to_mapping(capability_result)
+    if capability_result.blocking:
+        events.append(
+            {
+                "stage": "preflight",
+                "kind": "capability_blocked",
+                "capabilities": tuple(
+                    capability.name for capability in capability_result.blocking
+                ),
             }
         )
         return _record(
