@@ -7,13 +7,13 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from runtime_contract import RuntimeContractCase, exercise_runtime_contract
 
 import metria.runtimes.llamacpp as llamacpp_runtime
 import metria.runtimes.vllm as vllm_runtime
 from metria import RunSpec
 from metria.protocols import InferenceRequest
 from metria.runtimes import LlamaCppAdapter, VLLMAdapter
-from runtime_contract import RuntimeContractCase, exercise_runtime_contract
 
 
 def _write_executable(path: Path) -> None:
