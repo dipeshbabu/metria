@@ -230,6 +230,7 @@ def execute_study(
     measurement_configs: Mapping[str, Mapping[str, Any]],
     environment: Mapping[str, Any],
     analyses: Mapping[str, PairwiseAnalysis] | None = None,
+    invocation_provenance: Mapping[str, Any] | None = None,
 ) -> StudyExecutionResult:
     """Execute every run, validate pair compatibility, and derive analyses.
 
@@ -237,6 +238,10 @@ def execute_study(
     a programming error does not create a half-executed study. Once execution
     begins, experimental failures are preserved as ``RunRecord`` values and do
     not abort later runs.
+
+    ``invocation_provenance`` is copied into every produced run record so a
+    higher-level recipe runner can retain shared recipe/hardware/orchestrator
+    identity without mixing it into requested environment configuration.
 
     Pairwise analyzers are declared by ``study.comparison.analyses`` and run only
     after ``compare_runs`` reports the pair directly compatible. Analyzer
@@ -276,6 +281,7 @@ def execute_study(
             measurement=measurements[measurement_name],
             measurement_config=measurement_configs.get(measurement_name, {}),
             environment=environment,
+            invocation_provenance=invocation_provenance,
         )
         records.append(record)
 
