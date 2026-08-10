@@ -49,12 +49,12 @@ metria = "metria.cli:main"
 # Grouped maintenance-tool bumps are reviewed together with the workspace lockfile.
 dev = [
     "build>=1.0",
-    "coverage>=7.15.3",
+    "coverage>=7.15.4",
     "mypy==2.3.0",
     "pre-commit>=4.6.1",
     "pytest>=9.0.3",
     "pytest-cov>=4.0",
-    "ruff>=0.16.1",
+    "ruff>=0.16.2",
     "tomli>=2.0; python_version < '3.11'",
     "twine>=7.0.0",
     "types-requests>=2.28",
