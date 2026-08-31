@@ -6,19 +6,153 @@ Metria separates **comparison validity** from **derived pairwise analysis**.
 comparable under the study's `ComparisonPlan`. Only after that gate passes can a
 registered pairwise analyzer derive metrics from the two run records.
 
-This avoids two common mistakes:
+This avoids three common mistakes:
 
 1. computing a fidelity/effect metric for runs that violate the study controls;
-2. hiding an analysis failure by treating it as if no analysis had been
+2. silently accepting an undeclared model, tokenizer, runtime, generation, or
+   applied-configuration difference;
+3. hiding an analysis failure by treating it as if no analysis had been
    requested.
+
+## Fail-closed comparison
+
+Comparison is closed-world with respect to differences.
+
+A comparison-relevant difference is valid only when it is covered by one of
+these roles:
+
+- `vary`: the difference is an intentional treatment/change;
+- `control`: the value must match;
+- `block_by`: the value must match within a direct comparison block;
+- `waivers`: the difference may be ignored only with an explicit retained
+  reason.
+
+A difference that is not covered by one of these roles makes the pair
+incompatible. Missing required evidence is distinct from an explicit `null`
+value and fails closed.
+
+For example:
+
+```python
+from metria import ComparisonPlan
+
+plan = ComparisonPlan(
+    vary=frozenset(
+        {
+            "treatments",
+            "resolved.kv_cache",
+            "observed.configured.kv_cache",
+            "observed.applied.fields.cache.cache_dtype",
+        }
+    ),
+    control=frozenset(
+        {
+            "model",
+            "runtime",
+            "scenario",
+            "measurements",
+            "trial_policy",
+        }
+    ),
+    block_by=frozenset({"observed.hardware_class"}),
+    analyses=("kv_fidelity.trajectory_match",),
+)
+```
+
+This says that the KV-cache treatment and the corresponding resolved,
+configured, and observed applied state are intentional differences. Model,
+runtime, workload/generation request, and measurement identity stay controlled.
+
+## Nested evidence paths
+
+Comparison paths may address nested requested, resolved, and observed evidence.
+
+Examples include:
+
+```text
+model.revision
+model.tokenizer_revision
+runtime.version
+scenario.temperature
+resolved.model.revision
+resolved.runtime.version
+resolved.kv_cache.dtype
+observed.runtime.version
+observed.configured.kv_cache.dtype
+observed.applied.fields.cache.cache_dtype
+observed.hardware.accelerator
+```
+
+Runtime introspection sometimes stores a key containing dots, such as
+`"cache.cache_dtype"`. Metria resolves the natural dotted comparison path
+without requiring callers to know that storage detail.
+
+A top-level requested declaration for `model`, `runtime`, or `scenario` also
+governs the corresponding direct resolved/observed lifecycle evidence unless a
+more specific resolved/observed declaration is present. Treatment-specific
+downstream evidence is intentionally not guessed. If a KV-cache setting is the
+change under test, declare the requested treatment and the relevant
+resolved/observed KV-cache paths explicitly.
+
+## Default comparison-relevant evidence
+
+Metria examines all requested run dimensions:
+
+```text
+model
+runtime
+scenario
+measurements
+treatments
+trial_policy
+environment_selector
+```
+
+It also examines resolved and observed evidence by default. Known bookkeeping
+that is not configuration identity, such as cleanup state and reset counts, is
+excluded.
+
+Invocation evidence is projected down to comparison-relevant identity fields
+rather than comparing output-dependent values. The current projection includes
+prompt fingerprints, rendered-prompt fingerprints, system-prompt fingerprints,
+and generation settings. Output token count and request duration do not make a
+pair invalid merely because the model behaved differently.
+
+Runtime probe/support diagnostics under `resolved.support` are also not treated
+as configuration identity. Support diagnostics may differ without changing the
+system under test.
+
+## Waivers
+
+A waiver is an explicit exception with a required human-readable reason:
+
+```python
+plan = ComparisonPlan(
+    waivers={
+        "observed.environment.zone": "cross-zone qualification",
+    }
+)
+```
+
+When the waived value differs, the reason is retained in
+`CompatibilityReport.waived_differences` and in machine-readable `metria
+compare` output.
+
+Waivers are deliberately narrow:
+
+- the path must resolve on both runs;
+- a missing waived value is still insufficient evidence;
+- waiver paths cannot overlap a `vary`, `control`, or `block_by` subtree;
+- a waiver never turns method-incompatible raw metrics into compatible metrics.
+
+Use a waiver only when the difference is understood and intentionally accepted.
+Do not use it to compensate for missing provenance.
 
 ## Declaring analyses
 
 Pairwise analyses are part of the comparison plan:
 
 ```python
-from metria import ComparisonPlan
-
 plan = ComparisonPlan(
     vary=frozenset({"runtime"}),
     control=frozenset({"model", "scenario", "measurements"}),
@@ -71,8 +205,9 @@ becomes `left` and the later run becomes `right`.
 
 This matters for directional analyses. A study that interprets the left side as
 a baseline/reference should therefore place the baseline earlier in the study.
-Future explicit reference/candidate selectors may replace this convention, but
-Metria does not infer a baseline from runtime names or treatment labels today.
+The planned `metria verify` workflow will make reference/candidate roles a
+first-class user concept, but basic comparison does not infer a baseline from
+runtime names or treatment labels.
 
 ## Built-in trajectory agreement
 
@@ -123,11 +258,10 @@ outcome, not on either individual run.
 
 The first pairwise-analysis layer intentionally does not yet provide:
 
-- explicit baseline/reference selectors beyond study order;
 - analyses spanning more than two runs;
 - statistical pooling across repeated trials;
 - automatic analyzer selection from evidence types;
-- persistence or report rendering;
+- a universal comparability fingerprint;
 - Pareto/recommendation logic.
 
 Those should build on retained run and pair evidence rather than being folded

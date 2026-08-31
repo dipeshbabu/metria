@@ -23,7 +23,11 @@ from metria import (
 from metria.recipes import STUDY_RECIPE_SCHEMA
 
 
-def _recipe(*, environment: dict[str, Any] | None = None) -> StudyRecipe:
+def _recipe(
+    *,
+    environment: dict[str, Any] | None = None,
+    waivers: dict[str, str] | None = None,
+) -> StudyRecipe:
     measurement = "kv_fidelity.decode_time_trajectory"
     study = StudySpec(
         name="recipe-study",
@@ -48,6 +52,7 @@ def _recipe(*, environment: dict[str, Any] | None = None) -> StudyRecipe:
             vary=frozenset({"runtime", "treatments"}),
             control=frozenset({"model", "scenario", "measurements"}),
             block_by=frozenset({"observed.hardware_class"}),
+            waivers=waivers or {},
             analyses=("kv_fidelity.trajectory_match",),
         ),
         constants={"suite": "trajectory-v1"},
@@ -69,7 +74,11 @@ def _recipe(*, environment: dict[str, Any] | None = None) -> StudyRecipe:
 
 
 def test_recipe_round_trip_preserves_requested_study_semantics() -> None:
-    recipe = _recipe()
+    recipe = _recipe(
+        waivers={
+            "observed.environment.zone": "cross-zone qualification",
+        }
+    )
 
     data = study_recipe_to_data(recipe)
     parsed = study_recipe_from_data(data)
@@ -78,7 +87,52 @@ def test_recipe_round_trip_preserves_requested_study_semantics() -> None:
     assert data["schema"] == STUDY_RECIPE_SCHEMA
     assert data["study"]["comparison"]["vary"] == ["runtime", "treatments"]
     assert data["study"]["comparison"]["analyses"] == ["kv_fidelity.trajectory_match"]
+    assert data["study"]["comparison"]["waivers"] == {
+        "observed.environment.zone": "cross-zone qualification",
+    }
     assert data["study"]["runs"][0]["treatments"][0]["kind"] == "runtime_feature"
+
+
+def test_recipe_without_waivers_keeps_existing_canonical_shape() -> None:
+    data = study_recipe_to_data(_recipe())
+
+    assert "waivers" not in data["study"]["comparison"]
+
+
+def test_recipe_serializes_waivers_deterministically() -> None:
+    first = _recipe(
+        waivers={
+            "observed.environment.zone": "cross-zone qualification",
+            "resolved.runtime.version": "mixed runtime qualification",
+        }
+    )
+    second = _recipe(
+        waivers={
+            "resolved.runtime.version": "mixed runtime qualification",
+            "observed.environment.zone": "cross-zone qualification",
+        }
+    )
+
+    assert study_recipe_to_json(first) == study_recipe_to_json(second)
+    assert study_recipe_digest(first) == study_recipe_digest(second)
+
+
+def test_recipe_rejects_invalid_waiver_mapping() -> None:
+    data = study_recipe_to_data(_recipe())
+    data["study"]["comparison"]["waivers"] = {
+        "observed.environment.zone": "",
+    }
+
+    with pytest.raises(TypeError, match="values must be non-empty strings"):
+        study_recipe_from_data(data)
+
+    data = study_recipe_to_data(_recipe())
+    data["study"]["comparison"]["waivers"] = {
+        "": "reason",
+    }
+
+    with pytest.raises(TypeError, match="keys must be non-empty strings"):
+        study_recipe_from_data(data)
 
 
 def test_recipe_json_is_deterministic_and_digest_ignores_mapping_insertion_order() -> (

@@ -92,6 +92,20 @@ def _string_sequence(value: Any, *, name: str) -> tuple[str, ...]:
     return result
 
 
+def _string_mapping(value: Any, *, name: str) -> dict[str, str]:
+    """Parse a JSON object whose keys and values are non-empty strings."""
+
+    mapping = _mapping(value, name=name)
+    result: dict[str, str] = {}
+    for key, item in mapping.items():
+        if not key.strip():
+            raise TypeError(f"{name} keys must be non-empty strings")
+        if not isinstance(item, str) or not item.strip():
+            raise TypeError(f"{name} values must be non-empty strings")
+        result[key] = item
+    return result
+
+
 def _treatment_from_data(value: Any, *, index: int) -> TreatmentSpec:
     """Parse one versioned treatment object."""
 
@@ -159,14 +173,14 @@ def run_spec_from_data(value: Any, *, index: int = 0) -> RunSpec:
 
 
 def _comparison_from_data(value: Any) -> ComparisonPlan:
-    """Parse study comparison roles and ordered pairwise analyses."""
+    """Parse study comparison roles, waivers, and ordered pairwise analyses."""
 
     mapping = _mapping(value, name="study.comparison")
     _keys(
         mapping,
         name="study.comparison",
         required=frozenset(),
-        optional=frozenset({"vary", "control", "block_by", "analyses"}),
+        optional=frozenset({"vary", "control", "block_by", "waivers", "analyses"}),
     )
     return ComparisonPlan(
         vary=frozenset(
@@ -183,6 +197,10 @@ def _comparison_from_data(value: Any) -> ComparisonPlan:
                 mapping.get("block_by", ()),
                 name="study.comparison.block_by",
             )
+        ),
+        waivers=_string_mapping(
+            mapping.get("waivers", {}),
+            name="study.comparison.waivers",
         ),
         analyses=_string_sequence(
             mapping.get("analyses", ()),
@@ -313,17 +331,23 @@ def study_recipe_to_data(recipe: StudyRecipe) -> dict[str, Any]:
         run_spec_to_data(run, path=f"study.runs[{index}]")
         for index, run in enumerate(study.runs)
     ]
+    comparison: dict[str, Any] = {
+        "vary": sorted(study.comparison.vary),
+        "control": sorted(study.comparison.control),
+        "block_by": sorted(study.comparison.block_by),
+        "analyses": list(study.comparison.analyses),
+    }
+    if study.comparison.waivers:
+        comparison["waivers"] = {
+            dimension: study.comparison.waivers[dimension]
+            for dimension in sorted(study.comparison.waivers)
+        }
     return {
         "schema": STUDY_RECIPE_SCHEMA,
         "study": {
             "name": study.name,
             "runs": runs,
-            "comparison": {
-                "vary": sorted(study.comparison.vary),
-                "control": sorted(study.comparison.control),
-                "block_by": sorted(study.comparison.block_by),
-                "analyses": list(study.comparison.analyses),
-            },
+            "comparison": comparison,
             "constants": _json_value(study.constants, path="study.constants"),
             "metadata": _json_value(study.metadata, path="study.metadata"),
         },
@@ -331,7 +355,10 @@ def study_recipe_to_data(recipe: StudyRecipe) -> dict[str, Any]:
             recipe.measurement_configs,
             path="measurement_configs",
         ),
-        "environment": _json_value(recipe.environment, path="environment"),
+        "environment": _json_value(
+            recipe.environment,
+            path="environment",
+        ),
     }
 
 
