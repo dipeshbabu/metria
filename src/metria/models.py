@@ -56,6 +56,34 @@ class TreatmentSpec:
         object.__setattr__(self, "config", freeze_mapping(self.config))
 
 
+def _normalize_comparison_dimensions(
+    values: Any,
+    *,
+    role: str,
+) -> frozenset[str]:
+    """Normalize one comparison role into validated dotted paths."""
+
+    if isinstance(values, (str, bytes)):
+        raise TypeError(f"comparison {role} dimensions must be a collection of strings")
+    normalized: set[str] = set()
+    for value in values:
+        if not isinstance(value, str):
+            raise TypeError(f"comparison {role} dimensions must be strings")
+        dimension = value.strip()
+        if not dimension or any(not segment for segment in dimension.split(".")):
+            raise ValueError(
+                f"comparison {role} dimensions must be non-empty dotted paths"
+            )
+        normalized.add(dimension)
+    return frozenset(normalized)
+
+
+def _comparison_paths_overlap(left: str, right: str) -> bool:
+    """Return whether two declarations cover the same comparison subtree."""
+
+    return left == right or left.startswith(f"{right}.") or right.startswith(f"{left}.")
+
+
 @dataclass(frozen=True)
 class ComparisonPlan:
     """Declare study comparison dimensions and requested pairwise analyses."""
@@ -64,22 +92,60 @@ class ComparisonPlan:
     control: frozenset[str] = frozenset()
     block_by: frozenset[str] = frozenset()
     analyses: tuple[str, ...] = ()
+    waivers: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Normalize comparison roles and reject contradictory declarations."""
 
-        object.__setattr__(self, "vary", frozenset(self.vary))
-        object.__setattr__(self, "control", frozenset(self.control))
-        object.__setattr__(self, "block_by", frozenset(self.block_by))
+        vary = _normalize_comparison_dimensions(self.vary, role="vary")
+        control = _normalize_comparison_dimensions(self.control, role="control")
+        block_by = _normalize_comparison_dimensions(self.block_by, role="block_by")
+
+        if not isinstance(self.waivers, Mapping):
+            raise TypeError("comparison waivers must be a mapping")
+
+        waivers: dict[str, str] = {}
+        for raw_dimension, raw_reason in self.waivers.items():
+            dimensions = _normalize_comparison_dimensions(
+                (raw_dimension,),
+                role="waiver",
+            )
+            dimension = next(iter(dimensions))
+            if not isinstance(raw_reason, str) or not raw_reason.strip():
+                raise ValueError("comparison waiver reasons must be non-empty strings")
+            waivers[dimension] = raw_reason.strip()
+
+        object.__setattr__(self, "vary", vary)
+        object.__setattr__(self, "control", control)
+        object.__setattr__(self, "block_by", block_by)
+        object.__setattr__(self, "waivers", freeze_mapping(waivers))
         object.__setattr__(self, "analyses", tuple(self.analyses))
-        overlap = (
-            (self.vary & self.control)
-            | (self.vary & self.block_by)
-            | (self.control & self.block_by)
+
+        role_dimensions: tuple[tuple[str, frozenset[str]], ...] = (
+            ("vary", vary),
+            ("control", control),
+            ("block_by", block_by),
+            ("waiver", frozenset(waivers)),
         )
-        if overlap:
-            names = ", ".join(sorted(overlap))
-            raise ValueError(f"comparison dimensions cannot overlap: {names}")
+        conflicts: list[str] = []
+        for index, (left_role, left_dimensions) in enumerate(role_dimensions):
+            for right_role, right_dimensions in role_dimensions[index + 1 :]:
+                for left_dimension in left_dimensions:
+                    for right_dimension in right_dimensions:
+                        if _comparison_paths_overlap(
+                            left_dimension,
+                            right_dimension,
+                        ):
+                            conflicts.append(
+                                f"{left_role}:{left_dimension} / "
+                                f"{right_role}:{right_dimension}"
+                            )
+        if conflicts:
+            raise ValueError(
+                "comparison dimensions cannot overlap across roles: "
+                + ", ".join(sorted(conflicts))
+            )
+
         if any(not isinstance(name, str) or not name.strip() for name in self.analyses):
             raise ValueError("comparison analyses must be non-empty strings")
         if len(set(self.analyses)) != len(self.analyses):
@@ -250,6 +316,7 @@ class CompatibilityReport:
     issues: tuple[CompatibilityIssue, ...] = ()
     comparable_metrics: tuple[str, ...] = ()
     incompatible_metrics: Mapping[str, str] = field(default_factory=dict)
+    waived_differences: tuple[CompatibilityIssue, ...] = ()
 
     def __post_init__(self) -> None:
         """Normalize report collections into immutable values."""
@@ -261,6 +328,7 @@ class CompatibilityReport:
             "incompatible_metrics",
             freeze_mapping(self.incompatible_metrics),
         )
+        object.__setattr__(self, "waived_differences", tuple(self.waived_differences))
 
 
 def freeze_treatments(items: Sequence[TreatmentSpec]) -> tuple[TreatmentSpec, ...]:

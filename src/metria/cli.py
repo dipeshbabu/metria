@@ -15,7 +15,7 @@ from .capabilities import inspect_model_geometry
 from .comparison import compare_runs
 from .hardware import capture_hardware_fingerprint
 from .inspection import capability_inspection_to_mapping, inspect_run_capabilities
-from .models import CompatibilityReport, RunRecord
+from .models import CompatibilityIssue, CompatibilityReport, RunRecord
 from .recipes import (
     STUDY_RECIPE_SCHEMA,
     StudyRecipe,
@@ -274,20 +274,26 @@ def _validate_record_plan_binding(
         )
 
 
+def _compatibility_issue_to_data(issue: CompatibilityIssue) -> dict[str, Any]:
+    """Serialize one compatibility issue or retained waived difference."""
+
+    return {
+        "dimension": issue.dimension,
+        "left": _jsonable(issue.left),
+        "right": _jsonable(issue.right),
+        "reason": issue.reason,
+    }
+
+
 def _compatibility_to_data(report: CompatibilityReport) -> dict[str, Any]:
     return {
         "compatible": report.compatible,
-        "issues": [
-            {
-                "dimension": issue.dimension,
-                "left": _jsonable(issue.left),
-                "right": _jsonable(issue.right),
-                "reason": issue.reason,
-            }
-            for issue in report.issues
-        ],
+        "issues": [_compatibility_issue_to_data(issue) for issue in report.issues],
         "comparable_metrics": list(report.comparable_metrics),
         "incompatible_metrics": dict(report.incompatible_metrics),
+        "waived_differences": [
+            _compatibility_issue_to_data(issue) for issue in report.waived_differences
+        ],
     }
 
 
@@ -361,6 +367,11 @@ def _write_comparison_human(payload: Mapping[str, Any], stdout: TextIO) -> None:
         for issue in issues:
             assert isinstance(issue, Mapping)
             stdout.write(f"  issue {issue['dimension']}: {issue['reason']}\n")
+        waived = report["waived_differences"]
+        assert isinstance(waived, Sequence)
+        for issue in waived:
+            assert isinstance(issue, Mapping)
+            stdout.write(f"  waived {issue['dimension']}: {issue['reason']}\n")
         incompatible = report["incompatible_metrics"]
         assert isinstance(incompatible, Mapping)
         for name in sorted(incompatible):

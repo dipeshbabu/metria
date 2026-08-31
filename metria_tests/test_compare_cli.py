@@ -29,7 +29,11 @@ def _run(runtime: str) -> RunSpec:
     )
 
 
-def _recipe(tmp_path: Path) -> tuple[Path, RunSpec, RunSpec]:
+def _recipe(
+    tmp_path: Path,
+    *,
+    waivers: dict[str, str] | None = None,
+) -> tuple[Path, RunSpec, RunSpec]:
     left = _run("llamacpp")
     right = _run("vllm")
     recipe = StudyRecipe(
@@ -39,6 +43,7 @@ def _recipe(tmp_path: Path) -> tuple[Path, RunSpec, RunSpec]:
             comparison=ComparisonPlan(
                 vary=frozenset({"runtime"}),
                 control=frozenset({"model", "scenario", "measurements"}),
+                waivers=waivers or {},
             ),
         ),
         measurement_configs={"latency": {}},
@@ -54,13 +59,18 @@ def _record(
     run_id: str,
     *,
     method: str = "wall_clock",
+    zone: str = "a",
 ) -> RunRecord:
     return RunRecord(
         study_name="compare-study",
         run_id=run_id,
         requested=spec,
         resolved={"runtime": dict(spec.runtime)},
-        observed={"runtime": spec.runtime["name"], "hardware_class": "same"},
+        observed={
+            "runtime": spec.runtime["name"],
+            "hardware_class": "same",
+            "environment": {"zone": zone},
+        },
         status=RunStatus.COMPLETED,
         metrics={
             "latency_ms": MetricSummary(
@@ -105,8 +115,78 @@ def test_compare_cli_uses_explicit_recipe_plan(tmp_path: Path) -> None:
     assert payload["schema"] == COMPARISON_REPORT_SCHEMA
     assert payload["compatible"] is True
     assert payload["pairs"][0]["report"]["comparable_metrics"] == ["latency_ms"]
+    assert payload["pairs"][0]["report"]["waived_differences"] == []
     assert len(payload["records"][0]["record_digest"]) == 64
     assert len(payload["records"][0]["evidence_digest"]) == 64
+
+
+def test_compare_cli_reports_retained_waiver_in_json(tmp_path: Path) -> None:
+    reason = "cross-zone qualification"
+    recipe_path, left_spec, right_spec = _recipe(
+        tmp_path,
+        waivers={"observed.environment.zone": reason},
+    )
+    left_path = tmp_path / "left.json"
+    right_path = tmp_path / "right.json"
+    dump_run_record(left_path, _record(left_spec, "left", zone="a"))
+    dump_run_record(right_path, _record(right_spec, "right", zone="b"))
+    stdout = io.StringIO()
+
+    status = main(
+        [
+            "compare",
+            str(left_path),
+            str(right_path),
+            "--recipe",
+            str(recipe_path),
+            "--json",
+        ],
+        stdout=stdout,
+        stderr=io.StringIO(),
+    )
+    payload = json.loads(stdout.getvalue())
+    waived = payload["pairs"][0]["report"]["waived_differences"]
+
+    assert status == 0
+    assert payload["compatible"] is True
+    assert waived == [
+        {
+            "dimension": "observed.environment.zone",
+            "left": "a",
+            "right": "b",
+            "reason": reason,
+        }
+    ]
+
+
+def test_compare_cli_renders_waiver_reason_for_humans(tmp_path: Path) -> None:
+    reason = "cross-zone qualification"
+    recipe_path, left_spec, right_spec = _recipe(
+        tmp_path,
+        waivers={"observed.environment.zone": reason},
+    )
+    left_path = tmp_path / "left.json"
+    right_path = tmp_path / "right.json"
+    dump_run_record(left_path, _record(left_spec, "left", zone="a"))
+    dump_run_record(right_path, _record(right_spec, "right", zone="b"))
+    stdout = io.StringIO()
+
+    status = main(
+        [
+            "compare",
+            str(left_path),
+            str(right_path),
+            "--recipe",
+            str(recipe_path),
+        ],
+        stdout=stdout,
+        stderr=io.StringIO(),
+    )
+
+    assert status == 0
+    assert "waived observed.environment.zone: cross-zone qualification" in (
+        stdout.getvalue()
+    )
 
 
 def test_compare_cli_reports_metric_method_mismatch_as_incompatible(
