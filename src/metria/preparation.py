@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
+from .measurements.verification_impact import VerificationImpactAnalysis
 from .models import ComparisonPlan, RunSpec, StudySpec
 from .recipes import StudyRecipe
 from .runtimes.vllm_artifacts import installed_runtime_identity, verify_model_files
@@ -77,7 +78,10 @@ def prepare_vllm_prefix_recipe(
                 control=frozenset(
                     {"model", "scenario", "measurements", "trial_policy"}
                 ),
-                analyses=(TrajectoryAgreementAnalysis.name,),
+                analyses=(
+                    TrajectoryAgreementAnalysis.name,
+                    VerificationImpactAnalysis.name,
+                ),
             ),
         ),
         measurement_configs={TokenTrajectoryProtocol.name: config},

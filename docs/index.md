@@ -16,6 +16,7 @@ generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
 ## Guides
 
+- [Task checks, repeatability and decision policies](guides/verification-decisions.md)
 - [Unified fidelity methods and source migration](guides/unified-fidelity.md)
 
 - [Verified model and data artifacts](guides/artifact-resolution.md)

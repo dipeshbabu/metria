@@ -65,7 +65,7 @@ _BAND_PROSE: dict[str, str] = {
     "EXCELLENT": "No material drift detected on the measured surfaces.",
     "PASS": "Minor measured drift; validate on the target workload.",
     "DEGRADED": "Visible drift. Audit on your workload before deploying.",
-    "FAIL": "Material quality loss. Treat as broken.",
+    "FAIL": "Large measured drift; investigate task-specific checks before deciding.",
 }
 
 

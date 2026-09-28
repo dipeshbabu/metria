@@ -21,6 +21,7 @@ from .measurements.performance import (
     compare_performance,
     measure_invocation_performance,
 )
+from .measurements.verification_impact import VerificationImpactAnalysis
 from .models import CompatibilityReport, RunRecord, RunStatus
 from .policies import PolicyDecision, evaluate_policy
 from .protocols import (
@@ -109,7 +110,10 @@ def _builtin_registries() -> _Registries:
     return _Registries(
         {"llamacpp": LlamaCppAdapter()},
         {measurement.name: measurement},
-        {analysis.name: analysis},
+        {
+            analysis.name: analysis,
+            VerificationImpactAnalysis.name: VerificationImpactAnalysis(),
+        },
     )
 
 
@@ -132,7 +136,10 @@ def _validate_comparison(recipe: StudyRecipe) -> None:
 
 def _validate(recipe: StudyRecipe, registries: _Registries) -> None:
     _validate_comparison(recipe)
-    if recipe.study.comparison.analyses != (TrajectoryAgreementAnalysis.name,):
+    if recipe.study.comparison.analyses not in {
+        (TrajectoryAgreementAnalysis.name,),
+        (TrajectoryAgreementAnalysis.name, VerificationImpactAnalysis.name),
+    }:
         raise ValueError(
             "local verify requires the kv_fidelity.trajectory_match analysis"
         )

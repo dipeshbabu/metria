@@ -40,7 +40,10 @@
     "src/metria/runtimes/vllm_hardware.py": 95,
     "src/metria/verification_route.py": 95,
     "src/metria/verification_vllm.py": 80,
-    "src/metria/verification_worker.py": 82
+    "src/metria/verification_worker.py": 82,
+    "src/metria/measurements/task_checks.py": 88,
+    "src/metria/measurements/verification_impact.py": 84,
+    "src/metria/measurements/impact_schema.py": 95
   },
   "components": {
     "src/metria/integrations/turboquant_diagnostics.py": 90,

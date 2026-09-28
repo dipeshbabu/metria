@@ -10,6 +10,10 @@ from types import MappingProxyType
 from typing import Any
 
 from ._freeze import freeze_mapping
+from .measurements.impact_schema import DEFINITIONS as IMPACT_DEFINITIONS
+from .measurements.impact_schema import NAME as IMPACT_ANALYSIS
+from .measurements.impact_schema import SCHEMA as IMPACT_SCHEMA
+from .measurements.impact_schema import VERSION as IMPACT_VERSION
 from .models import MetricDefinition, MetricDirection, MetricSummary
 from .study_execution import PairwiseAnalysisStatus, StudyPairAnalysis
 
@@ -35,10 +39,16 @@ class _Target:
     aggregation: str | None = None
     divisor: float = 1.0
     fact: str | None = None
+    version: str = _METHOD_VERSION
+    analysis: str = _ANALYSIS
+    analysis_version: str = _METHOD_VERSION
+    evidence_schema: str = "metria.trajectory_comparison.v1"
+    domain_min: float | None = 0.0
+    domain_max: float | None = 1.0
 
     def to_data(self) -> dict[str, Any]:
         source: dict[str, Any] = {
-            "analysis": {"name": _ANALYSIS, "version": _METHOD_VERSION}
+            "analysis": {"name": self.analysis, "version": self.analysis_version}
         }
         if self.metric is not None:
             source["metric"] = _metric_identity(self.metric)
@@ -48,7 +58,7 @@ class _Target:
             source["fact"] = self.fact
         return {
             "name": self.name,
-            "version": _METHOD_VERSION,
+            "version": self.version,
             "kind": self.kind,
             "unit": self.unit,
             "direction": self.metric.direction.value if self.metric else "descriptive",
@@ -112,15 +122,66 @@ _TARGETS = MappingProxyType(
 )
 
 
+def _impact_target(
+    name: str, metric_name: str, *, lower: float | None = 0.0, upper: float | None = 1.0
+) -> _Target:
+    definition = IMPACT_DEFINITIONS[metric_name]
+    return _Target(
+        name=name,
+        kind="number",
+        unit=definition.unit,
+        metric=definition,
+        aggregation="mean" if metric_name.endswith("pass_rate") else "derived",
+        version=IMPACT_VERSION,
+        analysis=IMPACT_ANALYSIS,
+        analysis_version=IMPACT_VERSION,
+        evidence_schema=IMPACT_SCHEMA,
+        domain_min=lower,
+        domain_max=upper,
+    )
+
+
+_TARGETS = MappingProxyType(
+    {
+        **_TARGETS,
+        **{
+            target.name: target
+            for target in (
+                _impact_target(
+                    "quality.candidate_pass_rate", "candidate_task_pass_rate"
+                ),
+                _impact_target(
+                    "quality.reference_pass_rate", "reference_task_pass_rate"
+                ),
+                _impact_target(
+                    "quality.pass_rate_delta", "task_pass_rate_delta", lower=-1
+                ),
+                _impact_target(
+                    "behavior.reference_repeatability", "reference_repeatability"
+                ),
+                _impact_target(
+                    "performance.candidate_latency_seconds",
+                    "candidate_latency_seconds",
+                    upper=None,
+                ),
+                _impact_target(
+                    "performance.latency_ratio", "latency_ratio", upper=None
+                ),
+            )
+        },
+    }
+)
+
+
 def _target(name: str, version: str) -> _Target:
     if not isinstance(name, str) or not isinstance(version, str):
         raise TypeError("policy target and version must be strings")
-    if name not in _TARGETS or version != _METHOD_VERSION:
+    if name not in _TARGETS or version != _TARGETS[name].version:
         raise ValueError(f"unknown policy target or version: {name!r}@{version!r}")
     return _TARGETS[name]
 
 
-def _threshold(value: Any, name: str) -> float:
+def _threshold(value: Any, name: str, target: _Target) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be numeric")
     try:
@@ -129,8 +190,10 @@ def _threshold(value: Any, name: str) -> float:
         raise ValueError(f"{name} must be finite") from None
     if not math.isfinite(number):
         raise ValueError(f"{name} must be finite")
-    if not 0 <= number <= 1:
-        raise ValueError(f"{name} must be within [0, 1] for a fraction target")
+    if (target.domain_min is not None and number < target.domain_min) or (
+        target.domain_max is not None and number > target.domain_max
+    ):
+        raise ValueError(f"{name} is outside the declared {target.unit} target domain")
     return number
 
 
@@ -162,7 +225,7 @@ class PolicyCriterion:
             for field in ("minimum", "maximum"):
                 value = getattr(self, field)
                 if value is not None:
-                    object.__setattr__(self, field, _threshold(value, field))
+                    object.__setattr__(self, field, _threshold(value, field, target))
             if (
                 self.minimum is not None
                 and self.maximum is not None
@@ -232,7 +295,10 @@ class VerificationPolicy:
 
     @property
     def required_analyses(self) -> frozenset[str]:
-        return frozenset({_ANALYSIS})
+        return frozenset(
+            _target(criterion.target, criterion.version).analysis
+            for criterion in self.criteria
+        )
 
 
 def _fields(
@@ -306,14 +372,14 @@ def _finite_observation(value: Any) -> float | None:
 def _observe(
     target: _Target, analyses: Sequence[StudyPairAnalysis]
 ) -> tuple[Any, dict[str, Any], str | None]:
-    matches = [analysis for analysis in analyses if analysis.name == _ANALYSIS]
+    matches = [analysis for analysis in analyses if analysis.name == target.analysis]
     if len(matches) != 1:
         return None, {}, "required analysis is missing or ambiguous"
     analysis = matches[0]
     identity: dict[str, Any] = {
         "analysis": {"name": analysis.name, "version": analysis.version}
     }
-    if analysis.version != _METHOD_VERSION:
+    if analysis.version != target.analysis_version:
         return None, identity, "analysis version does not match the policy target"
     if (
         analysis.status is not PairwiseAnalysisStatus.COMPLETED
@@ -327,7 +393,7 @@ def _observe(
         result.evidence.get("schema"),
         result.evidence.get("method"),
         result.evidence.get("method_version"),
-    ) != ("metria.trajectory_comparison.v1", _ANALYSIS, _METHOD_VERSION):
+    ) != (target.evidence_schema, target.analysis, target.analysis_version):
         return (
             None,
             identity,
@@ -374,7 +440,11 @@ def _observe(
             "policy metric value is missing, non-finite, or not numeric",
         )
     number = raw / target.divisor
-    if not math.isfinite(number) or not 0 <= number <= 1:
+    if (
+        not math.isfinite(number)
+        or (target.domain_min is not None and number < target.domain_min)
+        or (target.domain_max is not None and number > target.domain_max)
+    ):
         return None, identity, "policy metric value is non-finite or outside its domain"
     return number, identity, None
 

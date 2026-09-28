@@ -224,7 +224,9 @@ def test_json_report_band_summary_matches_band():
         kld=kld,
     )
     assert rep["band"] == "FAIL"
-    assert "broken" in rep["summary"].lower()
+    assert "measured drift" in rep["summary"].lower()
+    assert "task-specific checks" in rep["summary"].lower()
+    assert "quality loss" not in rep["summary"].lower()
 
 
 def test_json_report_axes_have_band_and_description():
