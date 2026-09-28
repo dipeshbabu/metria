@@ -94,11 +94,10 @@ matching `turboquant-reference-v*`. Both require review, prevent administrator
 bypass, and map to separate PyPI Trusted Publishers. The obsolete `pypi`
 environment must not be referenced by a workflow.
 
-The `pypi-kv-fidelity` environment was created on 2026-07-25 with
-`@dipeshbabu` as required reviewer and the expected tag policy. Its live
-`can_admins_bypass` setting remains `true`; change it to `false` in the GitHub
-environment settings before its first release. The root environment's bypass
-control was set through the REST API and verified by reading it back.
+The `pypi-kv-fidelity` environment has `@dipeshbabu` as required reviewer and a
+tag-only `kv-fidelity-v*` policy. Administrator bypass was disabled through the
+REST API and read back as `false` on 2026-09-28, preserving the existing reviewer
+and tag restriction. The root environment's bypass control is also disabled.
 
 ## Audit procedure
 

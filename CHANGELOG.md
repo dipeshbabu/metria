@@ -21,6 +21,10 @@ TurboQuant reference packages have independent versions and release notes.
   Official backend wheel build labels are retained separately from loaded module
   public versions; contradictory public versions or build labels still fail.
 
+- Hardened KV Fidelity release prerequisites: all tracked blockers and a compatible
+  stable public Metria dependency must exist before publishing. Its protected
+  environment now prevents administrator bypass.
+
 - Added verifier-native cold-process request-latency impact with explicit source,
   workload, warmup/trial and aggregation identity. Deltas require valid comparison
   and compatible methods; unsupported streaming/memory metrics remain unavailable.
