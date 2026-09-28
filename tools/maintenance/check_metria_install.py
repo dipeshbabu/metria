@@ -56,6 +56,7 @@ def main() -> int:
             (["fidelity", "compare", "--help"], "compare"),
             (["recipe", "--help"], "validate"),
             (["recipe", "prepare-vllm", "--help"], "--example"),
+            (["recipe", "prepare-llamacpp-build", "--help"], "--reference-bin-dir"),
             (["demo", "--help"], "not-comparable"),
             (["compare", "--help"], "compare"),
         ]:

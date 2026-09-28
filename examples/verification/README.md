@@ -73,7 +73,6 @@ their unsupported routes. They are planning templates, not runnable support clai
 | Runtime upgrade | pinned vLLM build A / pinned build B | Separate qualified environments, immutable model/tokenizer, matching generation/workload/hardware, and a verifier route that executes both builds. |
 | KV-cache precision | auto cache / FP8 cache | Qualified hardware/engine support plus authoritative applied-cache readback and compatible systems measurement. |
 | Quantization/inference treatment | reference configuration / declared candidate treatment | Qualified treatment application and unchanged unrelated controls; no guessed or relabeled precision. |
-| llama.cpp build regression | old qualified capture provider / new provider | Independent provider hashes/qualification and a verifier scope permitting the binary change. The runnable thread example above covers configuration changes today. |
 
 Do not enable a template merely because a fixture passes or a runtime imports.
 The public CLI stays narrow until the new route meets its evidence contract.
@@ -88,3 +87,12 @@ The 0.2 development verifier also supports a pinned local vLLM prefix-cache chan
 Use [vllm-prefix-workload.jsonl](vllm-prefix-workload.jsonl) and the
 [preparation/verification guide](../../docs/guides/vllm-prefix-verification.md).
 Runtime upgrades, FP8 KV precision and quantization examples remain staged.
+
+## llama.cpp build regression
+
+Use `metria recipe prepare-llamacpp-build` to qualify two native CPU capture
+providers independently and compare them while holding the model, workload,
+generation settings and thread counts fixed. The
+[build guide](../../docs/guides/llamacpp-build-verification.md) provides the installed
+commands. [Retained native evidence](../../artifacts/qualification/llamacpp-builds/README.md)
+includes both provider qualification records and a completed policy decision.

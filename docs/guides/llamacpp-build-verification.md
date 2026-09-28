@@ -45,3 +45,9 @@ one, Metria evaluates the declared criteria and reports `PASS` or `FAIL`.
 Compatible cold-process request latency includes process startup and model
 loading. It is not TTFT, loaded-engine serving throughput or a general speedup
 claim. Each native request has a deadline (`--timeout` during preparation).
+
+[Retained installed-wheel qualification](../../artifacts/qualification/llamacpp-builds/README.md)
+compares a retained O3 provider against an independently built O2 provider from
+the pinned llama.cpp source and capture patch. Both native qualification probes
+and the complete verification passed. The tiny workload establishes the command
+and evidence contract; it is not an external pilot or a production benchmark.

@@ -31,9 +31,8 @@
     },
     {
       "name": "llamacpp-build-regression",
-      "status": "staged",
-      "recipe": "staged/build-regression.json",
-      "blocker": "independent provider qualification and CLI scope allowing binary changes"
+      "status": "qualified-local",
+      "entry": "../../tools/qualification/prepare_llamacpp_build_verification.py"
     },
     {
       "name": "vllm-prefix-cache",

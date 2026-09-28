@@ -49,7 +49,9 @@ This delivery has explicit limits:
 - The 0.2 development line also qualifies a [local vLLM prefix-cache comparison](../guides/vllm-prefix-verification.md),
   backed by retained installed-wheel CPU/CUDA evidence. That scope does not
   qualify runtime upgrades, FP8 precision, or arbitrary vLLM recipes.
-- Runtime/build upgrades, KV precision changes, and quantization examples remain
+- Independently qualified [llama.cpp CPU builds](../guides/llamacpp-build-verification.md)
+  can be compared with the same model, generation, workload and thread controls.
+- Runtime upgrades, KV precision changes, and quantization examples remain
   [staged templates](../../examples/verification/README.md) until the full intended
   change, observed identity, workload, and comparison path are qualified.
 - TTFT, decode throughput, inter-token latency, and device/KV memory remain

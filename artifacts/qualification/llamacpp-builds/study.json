@@ -1,0 +1,142 @@
+{
+  "environment": {
+    "llama_cpp_capture_providers": {
+      "/var/tmp/metria-build-regression-163/candidate/bin": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+      "/var/tmp/metria-build-regression-163/reference": "5e17486285ea5ecf5bce1bfd7bafa172fe3e0b0fea0ede0eafa59fe5c998c9b6"
+    }
+  },
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "prompts": [
+        {
+          "checks": [
+            {
+              "id": "completion-present",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "story",
+          "prompt": "Once upon a time"
+        },
+        {
+          "checks": [
+            {
+              "id": "completion-present",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "dog",
+          "prompt": "The little dog"
+        },
+        {
+          "checks": [
+            {
+              "id": "completion-present",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "sun",
+          "prompt": "The sun was"
+        }
+      ]
+    }
+  },
+  "policy": {
+    "criteria": [
+      {
+        "min": 1.0,
+        "target": "quality.candidate_pass_rate",
+        "unit": "fraction",
+        "version": "1"
+      }
+    ],
+    "schema": "metria.verification_policy.v1"
+  },
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "comparison": {
+      "analyses": [
+        "kv_fidelity.trajectory_match",
+        "metria.verification_impact"
+      ],
+      "block_by": [],
+      "control": [
+        "measurements",
+        "model",
+        "scenario"
+      ],
+      "vary": [
+        "observed.identity.runtime.cli_sha256",
+        "observed.identity.runtime.completion_sha256",
+        "observed.runtime.bin_dir",
+        "observed.runtime.cli",
+        "observed.runtime.completion",
+        "resolved.runtime.bin_dir",
+        "resolved.runtime.cli",
+        "resolved.runtime.completion",
+        "runtime.bin_dir"
+      ]
+    },
+    "constants": {},
+    "metadata": {},
+    "name": "llamacpp-cpu-build-change",
+    "runs": [
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+          "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+        },
+        "runtime": {
+          "bin_dir": "/var/tmp/metria-build-regression-163/reference",
+          "flash_attention": false,
+          "n_gpu_layers": 0,
+          "name": "llamacpp",
+          "threads": 2,
+          "threads_batch": 1
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 256,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0,
+          "timeout": 300
+        },
+        "treatments": [],
+        "trial_policy": {}
+      },
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+          "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+        },
+        "runtime": {
+          "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+          "flash_attention": false,
+          "n_gpu_layers": 0,
+          "name": "llamacpp",
+          "threads": 2,
+          "threads_batch": 1
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 256,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0,
+          "timeout": 300
+        },
+        "treatments": [],
+        "trial_policy": {}
+      }
+    ]
+  }
+}
