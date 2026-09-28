@@ -1,0 +1,24 @@
+{
+  "limitations": [
+    "Synthetic contract checks: one nonempty-response check and one deliberately incorrect expectation. No production quality or performance claim.",
+    "CPU pinned environment uses documented setuptools84 override and Intel OpenMP preload."
+  ],
+  "metria_wheel_sha256": "d92842304fad325da6d8b5fa16c938a660ecc97e6e67d900b0f734f8fa57376d",
+  "outcomes": [
+    {
+      "case": "pass",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "verdict": "PASS"
+    },
+    {
+      "case": "fail",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "verdict": "FAIL"
+    }
+  ],
+  "runtime_version": "0.30.0+cpu",
+  "schema": "metria.decision_qualification.v1",
+  "source_revision": "a3e61f38e0251ad25f434b6459ca9e4183fff8b8"
+}
