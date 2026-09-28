@@ -592,7 +592,7 @@ After the diagnostic completes, you'll see:
 ```
 
 **How to share:** Open a GitHub issue at
-[Efficient LLM Systems](https://github.com/dipeshbabu/efficient-llm-systems/issues)
+[Metria](https://github.com/dipeshbabu/metria/issues)
 with the title "Diagnostic: [your hardware]" and attach the zip. GitHub
 supports attachments up to 25MB — the zip is typically under 100KB.
 
@@ -602,22 +602,12 @@ The zip is self-contained — everything we need is inside. No need to copy-past
 
 ## Privacy
 
-**No PII is collected.** The diagnostic is designed to be safe to share publicly.
+Review diagnostic bundles before sharing. The log can contain model or binary
+paths, local host details, and upstream runtime output. Remove private paths,
+credentials, and sensitive runtime output from a copy, while retaining hashes
+and a description of any redaction when the result is used as evidence.
 
-### What IS collected
-
-- Hardware specs: CPU model, core count, RAM size, GPU family, cache hierarchy
-- GPU capabilities: Metal/CUDA version, Tensor API support, VRAM/unified memory size
-- Benchmark numbers: tok/s for prefill, decode, combined, and perplexity
-- System load: load average, memory pressure, swap usage, CPU speed limit
-- Build info: llama.cpp commit hash
-- Model metadata: filename, file size, architecture, layer/head/expert counts
-
-### What is NOT collected
-
-- Usernames, home directory paths, or hostnames
-- Network configuration, IP addresses, or MAC addresses
-- File system contents or directory listings
-- Environment variables (except `TURBO_LAYER_ADAPTIVE` when explicitly set)
-- Model weights or prompt content
-- Any data that could identify you or your machine beyond hardware specs
+The diagnostic intentionally records hardware, runtime/build metadata, model
+metadata, system load, and benchmark measurements. It does not intentionally
+package model weights or user documents. That scope does not guarantee that
+upstream commands omit sensitive text from their logs.
