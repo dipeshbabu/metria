@@ -40,6 +40,10 @@ translation out of its large CLI; and keep report templates separate from numeri
 aggregation. Each stage must preserve characterized output or document a deliberate
 behavior correction. Lower/remove the corresponding baseline entry as debt is
 removed. Runtime/evaluator gates continue to apply to the new owning modules.
+The extracted renderer, KLD math, result contracts, and diagnostic modules have
+independent coverage floors. CI also retains the original component-only 86%
+aggregate, so moving well-tested diagnostics into a library cannot conceal a
+component regression.
 
 Benchmark lifecycle work uses the existing execution, process, evidence, and
 verification APIs tracked in #17/#14. It must not establish another service/runtime
