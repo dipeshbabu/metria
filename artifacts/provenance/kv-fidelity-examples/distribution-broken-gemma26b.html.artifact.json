@@ -1,0 +1,24 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-report",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:57:36.620573+00:00",
+      "license_status": "No new license asserted for model-derived material"
+    },
+    "name": "distribution-broken-gemma26b.html",
+    "path": "components/kv-fidelity/src/kv_fidelity/examples/distribution-broken-gemma26b.html",
+    "sha256": "ab2b0d988df7e67002465474a9d1dcd7b5bac0fc7afb1c6c435bd108f09ea148",
+    "size_bytes": 38013,
+    "source": {
+      "original_git_blob_sha256": "d0ac47f5a348dccc617401786ff9fd9c90abe84c7da67ed84d0cf10003222442",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; all other canonical Git-blob bytes unchanged.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical model/runtime immutable identity is incomplete; example illustrates report interpretation rather than current support"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}

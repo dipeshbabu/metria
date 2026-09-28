@@ -60,7 +60,7 @@ Our finding (preliminary, see §4) is that the *algorithmic* pattern transfers c
 
 The relevant cache surface in MLX-Swift is `BatchedKVCache`, which stores K and V as rectangular `[B, nKVHeads, T_max, dHead]` tensors with a per-slot `offset` array tracking how much of the rectangular region is populated. Decode at L=1 writes one new K row and one new V row per slot, advances `offset[b]`, and then runs SDPA over the populated prefix `[B, nKVHeads, ..<offset, dHead]`. This is the shape MLX `sdpa_vector_2pass` is tuned for.
 
-The sparse cache, `BatchedRetrievalAttentionKVCache` (file: `/Users/dipesh/dev/mlx-swift-lm/Libraries/MLXLMCommon/BatchedRetrievalAttentionKVCache.swift`), wraps a `BatchedKVCache` via composition rather than inheritance — the wrapper holds the inner cache (`let inner: BatchedKVCache`) plus the selector index (`let index: BatchedRetrievalAttentionIndexB`). All writes pass through the inner cache unchanged; the wrapper only adds index updates and a `sparseAttend(queries:scale:)` entry point that the model can call instead of running dense SDPA.
+The sparse cache, `BatchedRetrievalAttentionKVCache` (file: `mlx-swift-lm/Libraries/MLXLMCommon/BatchedRetrievalAttentionKVCache.swift`), wraps a `BatchedKVCache` via composition rather than inheritance — the wrapper holds the inner cache (`let inner: BatchedKVCache`) plus the selector index (`let index: BatchedRetrievalAttentionIndexB`). All writes pass through the inner cache unchanged; the wrapper only adds index updates and a `sparseAttend(queries:scale:)` entry point that the model can call instead of running dense SDPA.
 
 ### 2.3 TurboQuant+ rawKeyMode contract
 

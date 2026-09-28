@@ -1,0 +1,24 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-report",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:57:36.584362+00:00",
+      "license_status": "No new license asserted for model-derived material"
+    },
+    "name": "degraded-qwen7b.json",
+    "path": "components/kv-fidelity/src/kv_fidelity/examples/degraded-qwen7b.json",
+    "sha256": "2a0f3b4cb6a20a5c8347aa7e4b69e00d0cfc15a4a827509a0478e78e178f95eb",
+    "size_bytes": 92859,
+    "source": {
+      "original_git_blob_sha256": "5f1160f3b876e8261c16dd3cf46aa3ac20b8ccdf9b3b8453545b9c1745bd180a",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; all other canonical Git-blob bytes unchanged.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical model/runtime immutable identity is incomplete; example illustrates report interpretation rather than current support"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}

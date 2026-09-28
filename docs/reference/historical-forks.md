@@ -46,6 +46,11 @@ Current material is available in the [documentation index](../index.md), the
 
 ## Archived identifiers
 
+The [retained evidence/source mapping](../../artifacts/provenance/README.md)
+connects current headline and historical result families to their best available
+code, input, and environment evidence. Missing fork archives and model hashes
+remain explicit gaps; source lineage alone does not reproduce an experiment.
+
 References such as `PR #45`, issues `#32`, `#47`, `#87`, `#88`, and `#89`, or
 fork-specific commit hashes are historical identifiers. They remain useful for
 interpreting dated reports, but no live endpoint is asserted for them here.

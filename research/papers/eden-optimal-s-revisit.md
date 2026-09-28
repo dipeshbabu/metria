@@ -87,7 +87,7 @@ Before the numbers, the lockdown. Reviewer concern: am I comparing the same algo
 
 | Item | EDEN reference | TurboQuant+ |
 |---|---|---|
-| Code source | `/tmp/eden/torch/eden.py`, commit `5c7639a6af810e08d21827dd0ed55772b8113e99`, working tree clean (no modifications) | `/Users/dipesh/dev/turboquant/turboquant/` (Python prototype) and `llama-cpp-turboquant` / MLX (production) |
+| Code source | `/tmp/eden/torch/eden.py`, commit `5c7639a6af810e08d21827dd0ed55772b8113e99`, working tree clean (no modifications) | `turboquant/turboquant/ (historical checkout)` (Python prototype) and `llama-cpp-turboquant` / MLX (production) |
 | Bit budget | b=4 (also b=2,3 on real KV; b∈{4,6,8} for sweep) | same |
 | Rotation (paper / prototype) | Randomized Hadamard with Rademacher diagonal; fresh sign flips per encode (auto-seeded `torch.Generator`) | dense Haar via QR (`np.random.default_rng(seed=42)`) for some prototype paths |
 | Rotation (production, llama.cpp / MLX) | (not applicable) | random sign flips + FWHT (also seeded with `np.random.default_rng(seed=42)` in the Python prototype) |

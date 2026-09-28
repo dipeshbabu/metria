@@ -231,7 +231,7 @@ Methodology recommendations for cross-engine benches: (1) anchor scoring against
 
 ## 9. Reproducibility
 
-All scripts and orchestrators on the droplet at `/root/scripts/`:
+All scripts and orchestrators on the droplet at `${EXPERIMENT_WORKSPACE}/scripts/`:
 
 - `cross_engine_bench.sh` — BF16 baseline (load / PPL / prefill / decode / KV size for all 3 engines)
 - `kv_fidelity_llamacpp_full.sh` — KV Fidelity --full on llama.cpp

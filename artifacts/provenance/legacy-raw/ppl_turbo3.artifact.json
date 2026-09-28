@@ -1,0 +1,25 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-log",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:45:58.869178+00:00",
+      "license_status": "No new license asserted; original evidence and upstream rights remain separate"
+    },
+    "name": "ppl_turbo3",
+    "path": "artifacts/benchmarks/legacy-raw/ppl_turbo3.log",
+    "sha256": "b8b5f27cf03422c6c6c7a2f8d5827ce185694a226877f9f5870e7a2e7d3f2821",
+    "size_bytes": 15297,
+    "source": {
+      "original_git_blob_sha256": "63890f3dd34540fa192106402bf94dbba627d1af3b63d05dc8afccd2ec7534a6",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; model basenames, numerical measurements, and all other bytes preserved.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical experimental fork has no retained public source archive",
+        "model filenames are retained but immutable model hashes were not recorded"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}
