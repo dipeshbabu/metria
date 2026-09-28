@@ -8,7 +8,7 @@ repository's research record.
 
 ## Layout
 
-- `benchmarks/legacy-raw/` — immutable historical benchmark logs, including
+- `benchmarks/legacy-raw/` — retained historical benchmark logs, including
   negative and later-invalidated runs.
 - `niah/` — timestamped needle-in-a-haystack reports and machine-readable
   results.
@@ -23,3 +23,6 @@ Artifacts are evidence, not current recommendations. Consult
 New artifacts should include enough metadata to identify the model, engine
 version, configuration, hardware, command, and date. Do not commit downloaded
 models, corpora, caches, or temporary build output.
+
+The [retained evidence/source mapping](provenance/README.md) records known
+reproducibility gaps and path-only redactions using shared artifact manifests.
