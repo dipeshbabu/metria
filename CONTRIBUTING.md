@@ -1,6 +1,6 @@
 # Contributing to Metria
 
-Metria is an inference experimentation and evidence monorepo. Changes should keep the
+Metria verifies reference/candidate inference changes. Changes should keep the
 published components, reproducible research record, and generated evidence
 clearly separated.
 
