@@ -5,6 +5,12 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Assigned distinct verification exits for policy failure, invalid inputs,
+  non-comparable runs, insufficient evidence, and execution/preflight failure.
+  Added redacted machine-readable input errors and a GitHub Actions summary and
+  artifact example. CI integrations that matched only exit 1 must accept every
+  nonzero exit as failure.
+
 - Added canonical `verification.json` output and deterministic Markdown reports
   with separate lifecycle, comparison, and policy states. The original manifest
   filename remains a compatibility alias; incomplete evidence cannot appear as

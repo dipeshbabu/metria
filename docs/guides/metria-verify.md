@@ -106,8 +106,12 @@ instead of silently ignoring them.
 | `INSUFFICIENT_EVIDENCE` | Required model/provider identity, runtime readback, or token captures are absent or inconsistent with the request. |
 | `EXECUTION_FAILED` | Execution, timeout, interruption, or behavioral analysis prevented completion. |
 
-Exit status is `0` for `VERIFIED` or `PASS`, `1` for other verification outcomes, `2` for
-invalid input or filesystem errors, and `130` for interruption.
+In the development version, exit status is `0` for `VERIFIED` or `PASS`, `1` for
+policy `FAIL`, `2` for invalid input/configuration, `3` for `NOT_COMPARABLE`, `4`
+for `INSUFFICIENT_EVIDENCE`, `5` for execution/preflight or persistence failure,
+and `130` for interruption. See [CI integration](verification-ci.md) for
+machine-readable errors, migration from the earlier catch-all exit 1, job
+summaries, and artifact retention.
 
 `VERIFIED` is not a task-quality or deployment-acceptance verdict. Token prefix
 agreement and exact sequence matches describe behavioral change on the supplied
