@@ -137,6 +137,9 @@ repository-wide citation.
 
 ## Research and artifact policy
 
+Follow the [third-party material and provenance policy](docs/maintainers/third-party-material.md)
+for attribution, generated material, and newly designated headline artifacts.
+
 - Keep negative results; label them clearly instead of rewriting history.
 - Include hardware, model, engine version, configuration, and date with new
   benchmark evidence.

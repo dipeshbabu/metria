@@ -65,6 +65,13 @@ from .policies import (
 )
 from .processes import ProcessError, ProcessResult, run_process
 from .protocols import MeasurementResult
+from .provenance import (
+    ARTIFACT_MANIFEST_SCHEMA,
+    artifact_manifest_from_data,
+    artifact_manifest_to_data,
+    artifact_manifest_to_json,
+    validate_headline_manifest,
+)
 from .recipes import (
     StudyRecipe,
     dump_study_recipe,
@@ -99,6 +106,11 @@ __version__ = "0.1.1.dev0"
 from .verification import VerificationResult, VerificationVerdict, verify_recipe
 
 __all__ = [
+    "ARTIFACT_MANIFEST_SCHEMA",
+    "artifact_manifest_from_data",
+    "artifact_manifest_to_data",
+    "artifact_manifest_to_json",
+    "validate_headline_manifest",
     "RUN_RECORD_SCHEMA",
     "ArtifactManifest",
     "ArtifactIntegrityError",

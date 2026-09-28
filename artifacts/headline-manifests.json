@@ -1,0 +1,6 @@
+{
+  "schema": "metria.headline_index.v1",
+  "manifests": [
+    "artifacts/qualification/llamacpp-cpu-threads/headline-manifest.json"
+  ]
+}

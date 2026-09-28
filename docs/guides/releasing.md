@@ -1,5 +1,8 @@
 # Releasing Python packages
 
+Before publication, follow the [third-party material and provenance policy](../maintainers/third-party-material.md)
+and run `python tools/maintenance/check_provenance.py` from the repository root.
+
 Package publication is a maintainer-only operation. Build artifacts are created
 in a job without publishing credentials, then a separate protected job uploads
 the verified artifacts with PyPI Trusted Publishing. No PyPI token is stored in
