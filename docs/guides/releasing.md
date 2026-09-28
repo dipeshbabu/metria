@@ -12,6 +12,24 @@ For the root `metria` distribution, follow the separate
 [Metria release procedure](releasing-metria.md). The component identities and
 release blockers below apply to their respective packages.
 
+Before creating a KV Fidelity release tag, verify that its Metria dependency can
+be installed from the public index:
+
+```bash
+uv run --locked python tools/maintenance/check_public_dependencies.py components/kv-fidelity/pyproject.toml
+```
+
+As checked on 2026-09-28, the public Metria release is 0.1.0 while KV Fidelity
+requires `metria>=0.1.1.dev0,<0.2`. KV Fidelity publication is therefore blocked
+until a compatible stable Metria release is published and verified. A workspace
+install cannot substitute for that prerequisite. Keep the component development
+version until its release can be validated end to end.
+
+The publication workflow requires issues #8, #11, #12, and #40 to be closed and
+checks public dependency availability before building/uploading. Its clean-wheel
+install resolves dependencies from the public index. Do not bypass these guards
+or create a stable release tag merely to make a blocked publication proceed.
+
 ## KV Fidelity package identity
 
 This repository publishes KV Fidelity as `kv-fidelity`, with Python import

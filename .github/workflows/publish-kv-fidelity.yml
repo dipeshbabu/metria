@@ -48,7 +48,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for issue in 8 11 12; do
+          for issue in 8 11 12 40; do
             state="$(
               gh issue view "${issue}" \
                 --repo "${GITHUB_REPOSITORY}" \
@@ -114,6 +114,11 @@ jobs:
 
       - name: Sync locked workspace
         run: uv sync --locked --all-packages
+
+      - name: Require compatible published Metria dependency
+        run: >-
+          uv run --locked python tools/maintenance/check_public_dependencies.py
+          components/kv-fidelity/pyproject.toml
 
       - name: Test kv-fidelity
         run: uv run --locked pytest components/kv-fidelity/tests -v --tb=short
