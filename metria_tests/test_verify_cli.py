@@ -423,6 +423,50 @@ def test_invalid_run_count_is_rejected_before_output_or_execution(local_case, co
     assert not local_case["output"].exists() and not local_case["calls"]
 
 
+@pytest.mark.parametrize(
+    "vary",
+    [
+        frozenset({"runtime"}),
+        frozenset({"observed.identity"}),
+        frozenset({"runtime.threads"}),
+        frozenset({"runtime.typo"}),
+    ],
+)
+def test_local_verifier_rejects_broad_or_incomplete_change_scope_before_execution(
+    local_case, vary
+):
+    recipe = local_case["recipe"]
+    local_case["recipe"] = replace(
+        recipe,
+        study=replace(
+            recipe.study, comparison=replace(recipe.study.comparison, vary=vary)
+        ),
+    )
+    status, output, _ = _invoke(local_case)
+    assert status == 2
+    assert json.loads(output)["verdict"] == "INVALID_CONFIGURATION"
+    assert not local_case["calls"] and not local_case["output"].exists()
+
+
+def test_local_verifier_cannot_waive_unexpected_tokenizer_identity(local_case):
+    recipe = local_case["recipe"]
+    local_case["recipe"] = replace(
+        recipe,
+        study=replace(
+            recipe.study,
+            comparison=replace(
+                recipe.study.comparison,
+                waivers={
+                    "observed.identity.tokenizer.vocab_size": "ignore this mismatch"
+                },
+            ),
+        ),
+    )
+    status, output, _ = _invoke(local_case)
+    assert status == 2 and json.loads(output)["verdict"] == "INVALID_CONFIGURATION"
+    assert not local_case["calls"] and not local_case["output"].exists()
+
+
 @pytest.mark.parametrize("missing", ["adapters", "measurements", "analyses"])
 def test_missing_routes_fail_before_any_execution(local_case, monkeypatch, missing):
     registry = verification._builtin_registries()
