@@ -1,4 +1,4 @@
-# KV Fidelity 0.3.5 development
+# KV Fidelity in Metria
 
 > **BETA.** The Python package, CLI, prompts, reports, and four backends are
 > implemented and unit-tested. Backend-specific engine builds and model files
@@ -10,58 +10,23 @@ full-precision reference.
 
 ## Install
 
-### Installation status
+### Installation
 
-This repository has not published KV Fidelity to PyPI. The planned distribution is
-`kv-fidelity`, with import `kv_fidelity` and command `kv-fidelity`. Do not install the
-legacy `refract-llm` project as a substitute: its releases were not published
-from this repository and use different ownership and license metadata.
-
-Install from source until a verified `kv-fidelity` release exists. The
-[package-identity record](https://github.com/dipeshbabu/metria/blob/main/components/kv-fidelity/PACKAGE-IDENTITY.md)
-explains the rename and the legacy release boundary.
-
-After PyPI shows version 0.3.5 with provenance from this repository's
-`publish-kv-fidelity.yml` workflow, install it with:
-
-```bash
-pip install "kv-fidelity==0.3.5"          # base
-pip install "kv-fidelity[mlx]==0.3.5"     # Apple Silicon
-pip install "kv-fidelity[sglang]==0.3.5"  # SGLang client
-pip install "kv-fidelity[full]==0.3.5"    # managed backends
-```
-
-The vLLM adapter remains implemented, but the `vllm` dependency extra
-is temporarily unavailable. vLLM 0.25.1 pins PyTorch 2.11.0, which is affected
-by [GHSA-rrmf-rvhw-rf47](https://github.com/advisories/GHSA-rrmf-rvhw-rf47).
-Do not force a PyTorch override because vLLM's compiled extensions require a
-matching build. Use an existing audited environment or another backend until
-vLLM publishes support for PyTorch 2.13 or newer.
-
-After install, the `kv-fidelity` CLI is on your PATH and the prompt set plus
-example reports ship in the wheel. KV Fidelity does not ship inference engines or
-a version-sensitive llama.cpp source patch.
-
-### From source (for hacking / contributing)
+KV Fidelity ships through Metria's 0.2 development line. Until that root release
+is published, install the current repository checkout:
 
 ```bash
 git clone https://github.com/dipeshbabu/metria.git
 cd metria
-uv sync --all-packages              # root core + components + development tools
-uv run kv-fidelity --help
-# Add --extra mlx or --extra sglang to uv sync for the selected backend.
+uv sync --locked --all-packages
+uv run metria fidelity --help
 ```
 
-KV Fidelity uses the stdlib-only Metria core for shared artifact infrastructure.
-The current development checkout requires `metria>=0.1.1.dev0,<0.2`; the workspace
-resolves that dependency locally until the corresponding root release is
-published. Inference backend dependencies remain optional extras.
-
-Default WikiText-2 inputs use an immutable upstream revision and pinned
-archive/member hashes. `kv-fidelity fetch` verifies cached contents, enforces
-download/extraction limits, and rejects unsafe archive members. Scoring JSON
-retains source, revision, license metadata, and full input hashes under
-`extras.input_artifacts`. See [artifact resolution](../../docs/guides/artifact-resolution.md).
+Use `metria verify` for the qualified reference/candidate workflow and
+`metria fidelity score`, `compare`, `selftest`, or `repeatability` for expert
+method tools. See the [migration guide](../../docs/guides/unified-fidelity.md).
+Inference engines remain optional and must be installed/configured separately.
+The old `refract-llm` PyPI project is not an installation substitute.
 
 ## Platform support
 
@@ -115,7 +80,7 @@ Friend-tester input on Windows is welcome — open an issue with your
 | Avoid known setup / interpretation traps | [PITFALLS.md](PITFALLS.md) |
 | See what v0.3 explicitly does NOT do | [LIMITATIONS.md](LIMITATIONS.md) |
 | See what changed across versions | [CHANGELOG.md](CHANGELOG.md) |
-| Inspect historical example reports | [examples/](src/kv_fidelity/examples/) (4 sample JSONs + HTMLs) |
+| Inspect historical example reports | [examples/](../../src/metria/fidelity/examples) (4 sample JSONs + HTMLs) |
 | Check whether reports support direct comparison | [Comparison guide](../../docs/guides/kv-fidelity-comparison.md) |
 | See the methodology evolution data | [MATRIX-RESULTS.md](MATRIX-RESULTS.md) |
 
@@ -167,9 +132,9 @@ not full-vocabulary KL.
 ## Subcommands
 
 ```
-kv-fidelity score          # score a candidate KV config
+metria fidelity score          # score a candidate KV config
 kv-fidelity selftest       # 30s preflight: binaries, flags, model probe
-kv-fidelity compare        # shared Metria compatibility checks and score table
+metria fidelity compare        # shared Metria compatibility checks and score table
 kv-fidelity repeatability  # run N times, report spread (stdev/range)
 kv-fidelity fetch          # download wikitext-2-raw corpus to ~/.cache/kv-fidelity/
 ```
@@ -179,14 +144,14 @@ kv-fidelity fetch          # download wikitext-2-raw corpus to ~/.cache/kv-fidel
 Every `score` run can emit two formats via `--json-out` and `--html-out`:
 
 - **JSON** (`--json-out report.json`) — schema `kv_fidelity.report.v0.3.3`,
-  consumable by `kv-fidelity compare` or any JSON-aware tool.
+  consumable by `metria fidelity compare` or any JSON-aware tool.
 - **HTML** (`--html-out report.html`) — single **self-contained file**
   (~40 KB) with composite stats, diagnosis callout, per-axis bars,
   R-NIAH heatmap, PLAD per-perturbation table, run details (hardware +
   model + env), the sanitized repro command, and the raw JSON embedded
   in a collapsible section. Sun/moon toggle in the top-right for
   light/dark mode (follows OS by default). Pasteable in Discord/X.
-  See [`examples/`](src/kv_fidelity/examples/) for 4 real samples.
+  See [`examples/`](../../src/metria/fidelity/examples) for 4 real samples.
 
 The HTML uses `light-dark()` CSS (Chrome 123+ / Safari 17.5+ / Firefox
 120+) for dark mode and a native system-font stack. It contains no external
@@ -206,17 +171,17 @@ See [QUICKSTART.md](QUICKSTART.md) for full setup. Short version:
 
 ```bash
 # 1. Verify your setup
-python3 -m kv_fidelity.cli selftest --backend auto --model path/to/model.gguf
+metria fidelity selftest --backend auto --model path/to/model.gguf
 
 # 2. First quick score (~5-7 min on a 7B Q8)
-python3 -m kv_fidelity.cli score \
+metria fidelity score \
     --model path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --json-out report.json \
     --html-out report.html
 
 # 3. Full audit (~25-30 min on a 7B Q8)
-python3 -m kv_fidelity.cli score \
+metria fidelity score \
     --model path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --full \
@@ -224,7 +189,7 @@ python3 -m kv_fidelity.cli score \
     --json-out report.json --html-out report.html
 
 # 4. Verify reproducibility (4 runs, expect stdev ≤ 1.0)
-python3 -m kv_fidelity.cli repeatability \
+metria fidelity repeatability \
     --model path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --runs 4
@@ -248,7 +213,7 @@ execution, run `kv-fidelity fetch` first or pass explicit paths, then add
 | [LIMITATIONS.md](LIMITATIONS.md) | What v0.3 explicitly does NOT do |
 | [CHANGELOG.md](CHANGELOG.md) | Full history including the v0.2 / v0.3 discoveries |
 | [MATRIX-RESULTS.md](MATRIX-RESULTS.md) | Reference numbers from the 7-model 2026-04-30 matrix |
-| [examples/](src/kv_fidelity/examples/) | Sample JSONs + HTML reports (clean / degraded / distribution-broken / catastrophic) |
+| [examples/](../../src/metria/fidelity/examples) | Sample JSONs + HTML reports (clean / degraded / distribution-broken / catastrophic) |
 | [research/papers/attn-rotation-and-ppl-artifact.md](../../research/papers/attn-rotation-and-ppl-artifact.md) | Why this framework exists at all (the motivation paper) |
 
 ## File layout

@@ -7,7 +7,7 @@
       "license_status": "No new license asserted for model-derived material"
     },
     "name": "catastrophic-symturbo.json",
-    "path": "components/kv-fidelity/src/kv_fidelity/examples/catastrophic-symturbo.json",
+    "path": "src/metria/fidelity/examples/catastrophic-symturbo.json",
     "sha256": "f4498ab460bb3b6b91eade9ecb7b5debe47eeaf9c56a042fd2eceee017fe0c08",
     "size_bytes": 173617,
     "source": {

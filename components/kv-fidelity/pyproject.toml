@@ -40,7 +40,7 @@ classifiers = [
 
 # Shared artifact/comparison infrastructure comes from the stdlib-only Metria core.
 # Backend extras opt into the libraries needed by each inference engine.
-dependencies = ["metria>=0.1.1.dev0,<0.2"]
+dependencies = ["metria>=0.2.0.dev0,<0.3"]
 
 [project.optional-dependencies]
 mlx = [
@@ -91,15 +91,6 @@ kv-fidelity = "kv_fidelity.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["kv_fidelity*"]
-
-[tool.setuptools.package-data]
-kv_fidelity = [
-    "prompts/*.jsonl",
-    "prompts/*.md",
-    "examples/*.json",
-    "examples/*.html",
-    "examples/*.md",
-]
 
 [build-system]
 requires = ["setuptools>=83.0.0", "wheel"]

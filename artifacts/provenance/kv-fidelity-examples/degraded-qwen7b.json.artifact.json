@@ -7,7 +7,7 @@
       "license_status": "No new license asserted for model-derived material"
     },
     "name": "degraded-qwen7b.json",
-    "path": "components/kv-fidelity/src/kv_fidelity/examples/degraded-qwen7b.json",
+    "path": "src/metria/fidelity/examples/degraded-qwen7b.json",
     "sha256": "2a0f3b4cb6a20a5c8347aa7e4b69e00d0cfc15a4a827509a0478e78e178f95eb",
     "size_bytes": 92859,
     "source": {

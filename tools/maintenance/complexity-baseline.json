@@ -1,105 +1,5 @@
 {
   "exceptions": {
-    "components/kv-fidelity/src/kv_fidelity/axes/gtm.py": {
-      "function_lines": {
-        "run_gtm": 153
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/axes/kld.py": {
-      "function_lines": {
-        "run_kld": 132
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/axes/plad.py": {
-      "function_lines": {
-        "run_plad": 144
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/axes/rniah.py": {
-      "function_lines": {
-        "run_rniah": 141
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/axes/trajectory.py": {
-      "function_lines": {
-        "run_trajectory": 162
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/backends/mlx.py": {
-      "function_lines": {
-        "MLXBackend.run_kld": 108
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/backends/sglang.py": {
-      "function_lines": {
-        "SGLangBackend.run_kld": 107
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/cli.py": {
-      "complexity": {
-        "_run_repeatability": 16,
-        "_run_score": 35,
-        "_run_selftest": 30
-      },
-      "function_lines": {
-        "_add_score_parser": 174,
-        "_run_repeatability": 145,
-        "_run_score": 352,
-        "_run_selftest": 196
-      },
-      "module_lines": 1309
-    },
-    "components/kv-fidelity/src/kv_fidelity/comparison.py": {
-      "complexity": {
-        "report_to_run_record": 36
-      },
-      "function_lines": {
-        "report_to_run_record": 236
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/comparison_cli.py": {
-      "complexity": {
-        "run_report_comparison": 20
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/measurement_math.py": {
-      "function_lines": {
-        "aggregate_topk_kld": 116
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/provenance.py": {
-      "complexity": {
-        "begin_report_capture": 16
-      },
-      "function_lines": {
-        "begin_report_capture": 116
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/report.py": {
-      "complexity": {
-        "text_report": 33
-      },
-      "function_lines": {
-        "json_report": 172,
-        "text_report": 221
-      }
-    },
-    "components/kv-fidelity/src/kv_fidelity/report_html.py": {
-      "complexity": {
-        "_hardware_metadata": 17
-      },
-      "function_lines": {
-        "_run_details": 107,
-        "html_report": 235
-      },
-      "module_lines": 1267
-    },
-    "components/kv-fidelity/src/kv_fidelity/runner.py": {
-      "function_lines": {
-        "run_completion": 123,
-        "run_completion_trajectory": 137
-      }
-    },
     "components/turboquant-reference/src/turboquant/hw_replay.py": {
       "complexity": {
         "_parse_bench_table_row": 16,
@@ -119,7 +19,7 @@
     },
     "src/metria/cli.py": {
       "complexity": {
-        "main": 17
+        "_main": 17
       },
       "function_lines": {
         "_parser": 101
@@ -139,6 +39,106 @@
       },
       "function_lines": {
         "execute_run": 340
+      }
+    },
+    "src/metria/fidelity/axes/gtm.py": {
+      "function_lines": {
+        "run_gtm": 153
+      }
+    },
+    "src/metria/fidelity/axes/kld.py": {
+      "function_lines": {
+        "run_kld": 132
+      }
+    },
+    "src/metria/fidelity/axes/plad.py": {
+      "function_lines": {
+        "run_plad": 144
+      }
+    },
+    "src/metria/fidelity/axes/rniah.py": {
+      "function_lines": {
+        "run_rniah": 141
+      }
+    },
+    "src/metria/fidelity/axes/trajectory.py": {
+      "function_lines": {
+        "run_trajectory": 162
+      }
+    },
+    "src/metria/fidelity/backends/mlx.py": {
+      "function_lines": {
+        "MLXBackend.run_kld": 108
+      }
+    },
+    "src/metria/fidelity/backends/sglang.py": {
+      "function_lines": {
+        "SGLangBackend.run_kld": 107
+      }
+    },
+    "src/metria/fidelity/cli.py": {
+      "complexity": {
+        "_run_repeatability": 16,
+        "_run_score": 35,
+        "_run_selftest": 30
+      },
+      "function_lines": {
+        "_add_score_parser": 174,
+        "_run_repeatability": 145,
+        "_run_score": 352,
+        "_run_selftest": 196
+      },
+      "module_lines": 1309
+    },
+    "src/metria/fidelity/comparison.py": {
+      "complexity": {
+        "report_to_run_record": 36
+      },
+      "function_lines": {
+        "report_to_run_record": 236
+      }
+    },
+    "src/metria/fidelity/comparison_cli.py": {
+      "complexity": {
+        "run_report_comparison": 20
+      }
+    },
+    "src/metria/fidelity/measurement_math.py": {
+      "function_lines": {
+        "aggregate_topk_kld": 116
+      }
+    },
+    "src/metria/fidelity/provenance.py": {
+      "complexity": {
+        "begin_report_capture": 16
+      },
+      "function_lines": {
+        "begin_report_capture": 116
+      }
+    },
+    "src/metria/fidelity/report.py": {
+      "complexity": {
+        "text_report": 33
+      },
+      "function_lines": {
+        "json_report": 172,
+        "text_report": 221
+      }
+    },
+    "src/metria/fidelity/report_html.py": {
+      "complexity": {
+        "_hardware_metadata": 17
+      },
+      "function_lines": {
+        "_run_details": 107,
+        "html_report": 235
+      },
+      "module_lines": 1267
+    },
+    "src/metria/fidelity/runner.py": {
+      "function_lines": {
+        "run_completion": 123,
+        "run_completion_trajectory": 137
       }
     },
     "src/metria/integrations/turboquant_diagnostic_runner.py": {

@@ -149,7 +149,7 @@ jobs:
           components/turboquant-reference/tests
           components/kv-fidelity/tests
           --cov=turboquant
-          --cov=kv_fidelity
+          --cov=metria.fidelity
           --cov=metria.integrations.turboquant_diagnostics
           --cov=metria.integrations.turboquant_diagnostic_runner
           --cov-report=term-missing
@@ -158,7 +158,7 @@ jobs:
           -v --tb=short
 
       - name: Preserve the component-only aggregate floor after diagnostic extraction
-        run: uv run --locked coverage report --include='components/*' --fail-under=86
+        run: uv run --locked coverage report --include='components/turboquant-reference/*,src/metria/fidelity/*' --fail-under=86
 
       - name: Enforce per-runtime and evaluator coverage
         run: >-
@@ -213,9 +213,9 @@ jobs:
         run: |
           uv venv --clear .smoke-venv
           uv pip install --python .smoke-venv/bin/python --force-reinstall dist/metria/*.whl dist/kv-fidelity/*.whl dist/turboquant/*.whl
-          .smoke-venv/bin/kv-fidelity --version
-          .smoke-venv/bin/kv-fidelity --help
-          .smoke-venv/bin/python -c "import kv_fidelity, turboquant; print(kv_fidelity.__version__)"
+          .smoke-venv/bin/metria fidelity --version
+          .smoke-venv/bin/metria fidelity --help
+          .smoke-venv/bin/python -c "import metria.fidelity, turboquant; print(metria.fidelity.__version__)"
           .smoke-venv/bin/python components/turboquant-reference/benchmarks/examples/demo.py
           .smoke-venv/bin/python tools/diagnostics/turbo_hardware_diag.py --help
 

@@ -83,7 +83,7 @@ No adapter is added merely to increase the runtime count.
 | Area | Responsibility |
 |---|---|
 | Metria core | Verification, shared lifecycle, evidence, identity, capability/preflight, comparison, records, and result semantics. |
-| KV Fidelity | Independently versioned behavioral methodology; the verifier exposes its trajectory semantics through the shared analysis contract. |
+| KV Fidelity | Built-in Metria fidelity methods with preserved method identities; the verifier exposes trajectory semantics and expert commands use `metria fidelity`. |
 | TurboQuant Reference | Independently versioned source-only research implementation, pinned by immutable repository revision. |
 | Explicit integrations | Optimization-specific support knowledge; generic core retains common evidence and capability semantics. |
 | Research and artifacts | Dated conclusions and retained evidence with provenance and limitations. |

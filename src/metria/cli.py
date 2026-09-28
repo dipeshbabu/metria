@@ -7,6 +7,7 @@ import hashlib
 import json
 import sys
 from collections.abc import Mapping, Sequence
+from contextlib import redirect_stderr, redirect_stdout
 from enum import Enum
 from itertools import combinations
 from pathlib import Path
@@ -45,40 +46,11 @@ def _parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command")
 
-    recipe = subparsers.add_parser(
-        "recipe",
-        help="validate and normalize versioned study recipes",
-    )
-    recipe_subparsers = recipe.add_subparsers(dest="recipe_command", required=True)
-
-    validate = recipe_subparsers.add_parser(
-        "validate",
-        help="validate a recipe without executing it",
-    )
-    validate.add_argument("path", type=Path)
-    validate.add_argument(
-        "--json",
-        action="store_true",
-        dest="json_output",
-        help="emit machine-readable validation metadata",
-    )
-
-    digest = recipe_subparsers.add_parser(
-        "digest",
-        help="print the canonical SHA-256 recipe digest",
-    )
-    digest.add_argument("path", type=Path)
-
-    normalize = recipe_subparsers.add_parser(
-        "normalize",
-        help="write canonical human-readable JSON for a validated recipe",
-    )
-    normalize.add_argument("path", type=Path)
-    normalize.add_argument(
-        "-o",
-        "--output",
-        type=Path,
-        help="write normalized JSON to a file instead of stdout",
+    _add_recipe_parser(subparsers)
+    subparsers.add_parser(
+        "fidelity",
+        help="expert fidelity scoring and saved-report tools",
+        add_help=False,
     )
 
     inspect = subparsers.add_parser(
@@ -132,6 +104,44 @@ def _parser() -> argparse.ArgumentParser:
         help="emit the verification manifest as JSON",
     )
     return parser
+
+
+def _add_recipe_parser(subparsers: Any) -> None:
+    recipe = subparsers.add_parser(
+        "recipe",
+        help="validate and normalize versioned study recipes",
+    )
+    recipe_subparsers = recipe.add_subparsers(dest="recipe_command", required=True)
+
+    validate = recipe_subparsers.add_parser(
+        "validate",
+        help="validate a recipe without executing it",
+    )
+    validate.add_argument("path", type=Path)
+    validate.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="emit machine-readable validation metadata",
+    )
+
+    digest = recipe_subparsers.add_parser(
+        "digest",
+        help="print the canonical SHA-256 recipe digest",
+    )
+    digest.add_argument("path", type=Path)
+
+    normalize = recipe_subparsers.add_parser(
+        "normalize",
+        help="write canonical human-readable JSON for a validated recipe",
+    )
+    normalize.add_argument("path", type=Path)
+    normalize.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        help="write normalized JSON to a file instead of stdout",
+    )
 
 
 def _version() -> str:
@@ -406,6 +416,23 @@ def main(
 
     out = stdout or sys.stdout
     err = stderr or sys.stderr
+    arguments = list(argv) if argv is not None else sys.argv[1:]
+    if arguments[:1] == ["fidelity"]:
+        return _fidelity_command(arguments[1:], out, err)
+    return _main(arguments, out, err)
+
+
+def _fidelity_command(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
+    from .fidelity.cli import main as fidelity_main
+
+    with redirect_stdout(out), redirect_stderr(err):
+        try:
+            return fidelity_main(list(argv), prog="metria fidelity", version=_version())
+        except SystemExit as exc:
+            return int(exc.code or 0)
+
+
+def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
     parser = _parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
 

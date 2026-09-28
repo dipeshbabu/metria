@@ -7,7 +7,7 @@
       "license_status": "No new license asserted for model-derived material"
     },
     "name": "catastrophic-symturbo.html",
-    "path": "components/kv-fidelity/src/kv_fidelity/examples/catastrophic-symturbo.html",
+    "path": "src/metria/fidelity/examples/catastrophic-symturbo.html",
     "sha256": "ae72c2e695c31b52f410bdec375f002e100c9c628d87a676b0d3c15dda627610",
     "size_bytes": 219277,
     "source": {

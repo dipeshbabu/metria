@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-_EXAMPLES_DIR = Path(__file__).parents[1] / "src" / "kv_fidelity" / "examples"
+_EXAMPLES_DIR = Path(__file__).parents[3] / "src" / "metria" / "fidelity" / "examples"
 _JSON_EXAMPLES = sorted(_EXAMPLES_DIR.glob("*.json"))
 _HTML_EXAMPLES = sorted(_EXAMPLES_DIR.glob("*.html"))
 

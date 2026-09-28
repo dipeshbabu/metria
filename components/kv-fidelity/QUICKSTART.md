@@ -18,9 +18,8 @@
 >
 > The framework is packaged and all axes are implemented, but inference
 > engines and model files remain user-managed:
-> - Install an editable source checkout. This repository has not yet published
->   its planned `kv-fidelity` distribution to PyPI. The bundled prompt set
->   removes the need for a prompt path.
+> - Install the Metria source checkout for the unified fidelity commands. The
+>   bundled prompt set removes the need for a prompt path.
 > - **All four backends are implemented**: llama.cpp, MLX, vLLM,
 >   SGLang. vLLM and SGLang were verified on AMD MI300X / ROCm 7.2 in the
 >   cross-engine bench at `../../research/papers/cross-engine-mi300x.md`.
@@ -45,57 +44,29 @@ Metal, fail-loud (any single broken axis tanks the composite). Replaces
 
 ## Step 0 — install KV Fidelity
 
-### Package-index status
+### Unified installation
 
-There is no verified PyPI release from this repository yet. The selected
-distribution name is `kv-fidelity`; `refract-llm` is a legacy project under
-different ownership and must not be used as a substitute. Use the source
-installation below until a release is verified.
+KV Fidelity methods are part of Metria's 0.2 development line. Use the checkout
+instructions below until that Metria version is published, then use the single
+`metria` package. The root `metria fidelity` command provides the expert method
+tools; `metria verify` remains the qualified reference/candidate workflow.
+See the [migration guide](../../docs/guides/unified-fidelity.md).
 
-Once PyPI shows `kv-fidelity` 0.3.5 with provenance from
-`dipeshbabu/metria`, the package-index commands are:
-
-```bash
-# Apple Silicon
-pip install 'kv-fidelity[mlx]==0.3.5'
-
-# SGLang HTTP client
-pip install 'kv-fidelity[sglang]==0.3.5'
-
-# All currently managed backend dependencies
-pip install 'kv-fidelity[full]==0.3.5'
-```
-
-> **vLLM installs are temporarily paused.** The latest published vLLM release
-> pins PyTorch 2.11.0, which is affected by
-> [GHSA-rrmf-rvhw-rf47](https://github.com/advisories/GHSA-rrmf-rvhw-rf47).
-> The adapter remains implemented for existing audited environments, but do
-> not force a PyTorch override: vLLM's compiled extensions require a matching
-> build. Use another backend until vLLM supports PyTorch 2.13 or newer.
-
-After install, the `kv-fidelity` CLI is on your PATH and the v0.1 prompt set plus
-example reports ship inside the wheel. Inference engines and the
-version-sensitive llama.cpp trajectory extension are installed separately.
-
-> **macOS gotcha — use Python 3.10 or newer.** Older macOS installations may
-> provide `/usr/bin/python3` as 3.9, which this release no longer supports.
-> Use a newer Python (for example, `brew install python@3.13`, then create
-> a virtual environment with `python3.13 -m venv ...`)
-> for the framework and MLX backend.
+Inference engines remain optional. The managed vLLM extra is not enabled;
+[pinned adapter qualification](../../docs/guides/vllm-qualification.md) records
+the audited environments and limitations. That qualification does not establish
+every legacy scoring axis or historical TurboQuant fork as a supported CLI path.
 
 ### Source install
 
 ```bash
 git clone https://github.com/dipeshbabu/metria.git
-cd metria/components/kv-fidelity
-
-pip install -e .                   # editable install, base
-pip install -e .[mlx]      # editable + MLX backend
-pip install -e .[sglang]   # editable + SGLang backend
-pip install -e .[dev]              # editable + pytest + coverage + build tooling
+cd metria
+uv sync --locked --all-packages
+uv run metria fidelity --help
 ```
 
-Every later command (`python3 -m kv_fidelity.cli ...`) assumes you installed
+Every later command (`metria fidelity ...`) assumes you installed
 the component and are running from `components/kv-fidelity/`.
 
 The llamacpp backend needs compatible patched binaries on `PATH` /
@@ -143,7 +114,7 @@ Once KV Fidelity is installed and you're inside `components/kv-fidelity/`, you n
     `wiki.test.raw` for KLD + `wiki.train.raw` for R-NIAH unless you
     pass paths explicitly. Pre-fetch with:
     ```
-    python3 -m kv_fidelity.cli fetch
+    metria fidelity fetch
     ```
     Disable network access with `--no-auto-fetch`; already-cached files and
     explicit paths still work (CI-friendly).
@@ -162,7 +133,7 @@ Pass any extra llama.cpp flags via `KV_FIDELITY_LLAMA_EXTRA_FLAGS`:
 ```bash
 # 12 GB consumer GPU running Qwen3.6-35B-A3B with MoE offload
 export KV_FIDELITY_LLAMA_EXTRA_FLAGS="-ngl 28 -ncmoe 32"
-python3 -m kv_fidelity.cli score --backend llamacpp --model /path/to/model.gguf ...
+metria fidelity score --backend llamacpp --model /path/to/model.gguf ...
 ```
 
 The flags get appended to every `llama-cli`, `llama-completion`, and
@@ -183,13 +154,13 @@ open an issue with the failing command line and we'll plumb it.
 
 ```bash
 # llama.cpp model (.gguf)
-python3 -m kv_fidelity.cli selftest --backend auto --model /path/to/model.gguf
+metria fidelity selftest --backend auto --model /path/to/model.gguf
 
 # OR an MLX model (directory with config.json + model.safetensors)
-python3 -m kv_fidelity.cli selftest --backend auto --model /path/to/mlx-model-dir/
+metria fidelity selftest --backend auto --model /path/to/mlx-model-dir/
 
 # Without --model: static checks only (~1 second)
-python3 -m kv_fidelity.cli selftest
+metria fidelity selftest
 ```
 
 `--backend auto` infers from the path: `.gguf` → llamacpp; directory →
@@ -203,7 +174,7 @@ finding out your setup is broken.
 ## Step 3 — first quick score (5–7 min on a 7B Q8)
 
 ```
-python3 -m kv_fidelity.cli score \
+metria fidelity score \
     --model /path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --json-out my-first-report.json \
@@ -221,7 +192,7 @@ per-axis pattern means.
 Add `--full`. Both haystack file and corpus are auto-resolved from the cache.
 
 ```
-python3 -m kv_fidelity.cli score \
+metria fidelity score \
     --model /path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --full \
@@ -256,7 +227,7 @@ is a **single self-contained file** (~40 KB) you can email, paste into
 Discord, or open offline:
 
 ```bash
-python3 -m kv_fidelity.cli score \
+metria fidelity score \
     --model /path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --json-out report.json \
@@ -281,7 +252,7 @@ What's bundled vs external:
   Firefox 120+ (all 2024). Older browsers see the light theme cleanly;
   dark mode is progressive enhancement.
 
-Sample reports live in [`examples/`](src/kv_fidelity/examples/) (4 real reports from
+Sample reports live in [`examples/`](../../src/metria/fidelity/examples) (4 real reports from
 the 2026-04-30 matrix run). Open one to preview the format before
 running your own.
 
@@ -307,7 +278,7 @@ For deeper interpretation see [`INTERPRETATION.md`](INTERPRETATION.md).
 ## Step 6 — compare candidates side by side
 
 ```
-python3 -m kv_fidelity.cli compare \
+metria fidelity compare \
     report-q8q8.json report-q8turbo4.json report-q4q4.json
 ```
 
@@ -349,7 +320,7 @@ Override default with `--backend mlx` (or `KV_FIDELITY_BACKEND=mlx`).
 Run the same configuration repeatedly without restating the default inputs:
 
 ```
-python3 -m kv_fidelity.cli repeatability \
+metria fidelity repeatability \
     --model /path/to/model.gguf \
     --candidate "ctk=q8_0,ctv=q8_0" \
     --runs 4
