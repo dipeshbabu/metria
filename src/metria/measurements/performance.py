@@ -176,6 +176,24 @@ def compare_performance(
     reference: MeasurementResult, candidate: MeasurementResult, *, comparable: bool
 ) -> dict[str, Any]:
     """Calculate deltas only for complete, method-compatible verified evidence."""
+    return compare_latency_results(
+        reference,
+        candidate,
+        comparable=comparable,
+        definition=_DEFINITION,
+        limitations="One cold invocation per prompt; no statistical speedup claim.",
+    )
+
+
+def compare_latency_results(
+    reference: MeasurementResult,
+    candidate: MeasurementResult,
+    *,
+    comparable: bool,
+    definition: MetricDefinition,
+    limitations: str,
+) -> dict[str, Any]:
+    """Compare an explicitly selected latency method with matching workload evidence."""
     result: dict[str, Any] = {
         "schema": "metria.performance_impact.v1",
         "available": False,
@@ -195,8 +213,8 @@ def compare_performance(
         or methodology != candidate.evidence.get("methodology")
         or reference.evidence.get("schema") != "metria.invocation_performance.v1"
         or candidate.evidence.get("schema") != "metria.invocation_performance.v1"
-        or left.definition != _DEFINITION
-        or right.definition != _DEFINITION
+        or left.definition != definition
+        or right.definition != definition
         or left.aggregation != "mean"
         or right.aggregation != "mean"
         or left.coverage != 1.0
@@ -231,10 +249,10 @@ def compare_performance(
         "available": True,
         "metric": {
             "name": _NAME,
-            "unit": _DEFINITION.unit,
-            "direction": _DEFINITION.direction.value,
-            "method": _DEFINITION.method,
-            "version": _DEFINITION.version,
+            "unit": definition.unit,
+            "direction": definition.direction.value,
+            "method": definition.method,
+            "version": definition.version,
         },
         "methodology": _json_value(methodology, path="performance.methodology"),
         "reference": left.value,
@@ -248,5 +266,5 @@ def compare_performance(
         else "regressed"
         if delta > 0
         else "unchanged",
-        "limitations": "One cold invocation per prompt; no statistical speedup claim.",
+        "limitations": limitations,
     }

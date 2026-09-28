@@ -88,7 +88,7 @@ def _parser() -> argparse.ArgumentParser:
         help="emit a machine-readable pairwise comparison report",
     )
     verify = subparsers.add_parser(
-        "verify", help="execute and verify a pinned local llama.cpp CPU thread change"
+        "verify", help="execute a qualified reference/candidate inference change"
     )
     verify.add_argument("path", type=Path, help="reference/candidate study recipe")
     verify.add_argument(

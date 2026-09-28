@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from enum import Enum
 from pathlib import Path
@@ -45,6 +45,7 @@ from .runtimes.llamacpp import (
     _runtime_config,
 )
 from .study_execution import PairwiseAnalysisStatus, StudyPairAnalysis, execute_study
+from .verification_route import VerificationRoute
 from .verification_schema import VERIFICATION_ROLES as _ROLES
 from .verification_schema import VERIFICATION_SCHEMA, VERIFICATION_SCOPE
 
@@ -322,14 +323,16 @@ def _evidence_gaps(record: RunRecord, expected_provider: str) -> tuple[str, ...]
 
 
 class _CheckedAnalysis:
-    def __init__(self, analysis: PairwiseAnalysis, provider: str) -> None:
+    def __init__(
+        self,
+        analysis: PairwiseAnalysis,
+        evidence_gaps: Callable[[RunRecord], tuple[str, ...]],
+    ) -> None:
         self.name, self.version = analysis.name, analysis.version
-        self._analysis, self._provider = analysis, provider
+        self._analysis, self._gaps = analysis, evidence_gaps
 
     def analyze(self, left: RunRecord, right: RunRecord) -> MeasurementResult:
-        if _evidence_gaps(left, self._provider) or _evidence_gaps(
-            right, self._provider
-        ):
+        if self._gaps(left) or self._gaps(right):
             raise ValueError(
                 "verification evidence is insufficient for behavioral analysis"
             )
@@ -429,10 +432,81 @@ def _wall_time(record: RunRecord) -> dict[str, Any]:
     }
 
 
+def _implementation_identity(scope: str) -> dict[str, str]:
+    from . import __version__
+
+    implementation = {"name": "metria.verify", "version": __version__}
+    if scope != VERIFICATION_SCOPE:
+        from .verification_trials import _implementation_digest
+
+        implementation["source_sha256"] = _implementation_digest()
+    return implementation
+
+
+def _legacy_performance(
+    left: RunRecord, right: RunRecord, comparable: bool
+) -> dict[str, Any]:
+    return compare_performance(
+        measure_invocation_performance(left),
+        measure_invocation_performance(right),
+        comparable=comparable,
+    )
+
+
+def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
+    if recipe.study.runs and all(
+        run.runtime.get("name") == "vllm" for run in recipe.study.runs
+    ):
+        from .verification_vllm import build_route
+
+        return build_route(recipe)
+    registries = _builtin_registries()
+    _validate(recipe, registries)
+    provider = str(recipe.environment[_CAPTURE_KEY])
+    return VerificationRoute(
+        scope=VERIFICATION_SCOPE,
+        adapters=registries.adapters,
+        measurements=registries.measurements,
+        analyses=registries.analyses,
+        evidence_gaps=lambda record: _evidence_gaps(record, provider),
+        observed_facts=_observed_facts,
+        change={
+            "reference_threads": recipe.study.runs[0].runtime["threads"],
+            "candidate_threads": recipe.study.runs[1].runtime["threads"],
+        },
+        performance=_legacy_performance,
+    )
+
+
 def verify_recipe(
     recipe: StudyRecipe,
     output_dir: str | Path = "verification",
     *,
+    capability_checks: CapabilityCheckRegistry | None = None,
+) -> VerificationResult:
+    """Validate one qualified profile and retain its reference/candidate evidence."""
+    resolve_capability_checks(capability_checks)
+    route = _verification_route(recipe)
+    if route.scope != VERIFICATION_SCOPE:
+        if capability_checks is not None:
+            raise ValueError(
+                "qualified vLLM verification uses the built-in capability registry"
+            )
+        from .verification_worker import verify_isolated
+
+        return verify_isolated(recipe, output_dir, route)
+    return _verify_with_profile(
+        recipe, output_dir, route, capability_checks=capability_checks
+    )
+
+
+def _verify_with_profile(
+    recipe: StudyRecipe,
+    output_dir: str | Path,
+    route: VerificationRoute,
+    *,
+    reserved_output: bool = False,
+    defer_result: bool = False,
     capability_checks: CapabilityCheckRegistry | None = None,
 ) -> VerificationResult:
     """Execute the first local CPU verifier and persist each run immediately.
@@ -442,20 +516,19 @@ def verify_recipe(
     presented as complete when persistence failed.
     """
     resolve_capability_checks(capability_checks)
-    registries = _builtin_registries()
-    _validate(recipe, registries)
+    registries = route
     recipe_digest = study_recipe_digest(recipe)
     hardware = capture_hardware_fingerprint().to_mapping()
-    from . import __version__
-
+    implementation = _implementation_identity(route.scope)
     context = {
         "recipe_digest": recipe_digest,
-        "scope": VERIFICATION_SCOPE,
-        "implementation": {"name": "metria.verify", "version": __version__},
+        "scope": route.scope,
+        "implementation": implementation,
         "hardware": hardware,
     }
     output = Path(output_dir).expanduser()
-    output.mkdir(parents=True, exist_ok=False)
+    if not reserved_output:
+        output.mkdir(parents=True, exist_ok=False)
     saved: list[RunRecord] = []
 
     def save_record(record: RunRecord) -> None:
@@ -468,9 +541,8 @@ def verify_recipe(
         )
         saved.append(decorated)
 
-    provider = str(recipe.environment[_CAPTURE_KEY])
     analyses = {
-        name: _CheckedAnalysis(analysis, provider)
+        name: _CheckedAnalysis(analysis, route.evidence_gaps)
         for name, analysis in registries.analyses.items()
     }
     interrupted = False
@@ -508,7 +580,7 @@ def verify_recipe(
         outcomes = ()
 
     analysis_data = [_analysis_data(outcome) for outcome in outcomes]
-    gaps = [_evidence_gaps(record, provider) for record in saved]
+    gaps = [route.evidence_gaps(record) for record in saved]
     failed = {
         RunStatus.PREFLIGHT_FAILED,
         RunStatus.FAILED,
@@ -540,7 +612,7 @@ def verify_recipe(
     exit_code = 130 if interrupted else VERIFICATION_EXIT_CODES[verdict.value]
     manifest = {
         "schema": VERIFICATION_SCHEMA,
-        "scope": VERIFICATION_SCOPE,
+        "scope": route.scope,
         "study": recipe.study.name,
         "recipe_digest": recipe_digest,
         "implementation": context["implementation"],
@@ -577,10 +649,7 @@ def verify_recipe(
         "policy_status": policy_result.status.value
         if policy_result is not None
         else "NOT_CONFIGURED",
-        "change": {
-            "reference_threads": recipe.study.runs[0].runtime["threads"],
-            "candidate_threads": recipe.study.runs[1].runtime["threads"],
-        },
+        "change": route.change,
         "comparison_plan": {
             "vary": sorted(recipe.study.comparison.vary),
             "control": sorted(recipe.study.comparison.control),
@@ -594,7 +663,7 @@ def verify_recipe(
                 "record_digest": run_record_digest(record),
                 "evidence_digest": run_evidence_digest(record),
                 "evidence_gaps": list(gaps[index]),
-                "observed": _observed_facts(record),
+                "observed": route.observed_facts(record),
             }
             for index, (role, record) in enumerate(zip(_ROLES, saved, strict=True))
         },
@@ -622,16 +691,36 @@ def verify_recipe(
         "systems": {
             role: _wall_time(record) for role, record in zip(_ROLES, saved, strict=True)
         },
-        "performance": compare_performance(
-            measure_invocation_performance(saved[0]),
-            measure_invocation_performance(saved[1]),
-            comparable=comparison.compatible
+        "performance": route.performance(
+            saved[0],
+            saved[1],
+            comparison.compatible
             and not any(gaps)
             and all(record.status is RunStatus.COMPLETED for record in saved),
         ),
     }
     if policy_result is not None:
         manifest["policy"] = policy_result.to_data()
+    if defer_result:
+        _write_atomic(
+            output / "worker-result.json",
+            json.dumps(
+                _json_value(manifest, path="verification"),
+                sort_keys=True,
+                allow_nan=False,
+            )
+            + "\n",
+        )
+    else:
+        _persist_verification(output, manifest)
+    return VerificationResult(
+        output,
+        manifest,
+        exit_code,
+    )
+
+
+def _persist_verification(output: Path, manifest: Mapping[str, Any]) -> None:
     _write_atomic(output / "report.md", render_verification(manifest))
     serialized = (
         json.dumps(
@@ -646,8 +735,3 @@ def verify_recipe(
     # published last, so its presence denotes a fully persisted evidence bundle.
     _write_atomic(output / "manifest.json", serialized)
     _write_atomic(output / "verification.json", serialized)
-    return VerificationResult(
-        output,
-        manifest,
-        exit_code,
-    )

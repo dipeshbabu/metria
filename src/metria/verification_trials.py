@@ -12,6 +12,7 @@ from typing import Any
 
 from .recipes import StudyRecipe, _json_value, study_recipe_digest
 from .verification import VERIFICATION_SCOPE, _write_atomic, verify_recipe
+from .verification_schema import VLLM_VERIFICATION_SCOPE
 
 TRIALS_SCHEMA = "metria.verification_trials.v1"
 
@@ -63,7 +64,10 @@ def _implementation_digest() -> str:
 def _baseline_identity(
     result: Mapping[str, Any], policy: VerificationTrialPolicy
 ) -> dict[str, Any] | None:
-    if result.get("scope") != VERIFICATION_SCOPE or result.get("fixture_only"):
+    if result.get("scope") not in {
+        VERIFICATION_SCOPE,
+        VLLM_VERIFICATION_SCOPE,
+    } or result.get("fixture_only"):
         return None
     records = result.get("records", {})
     pins = {}
@@ -79,6 +83,14 @@ def _baseline_identity(
             for value in identity.values()
         ):
             return None
+        if result.get("scope") == VLLM_VERIFICATION_SCOPE:
+            hardware = observed.get("runtime_hardware")
+            if (
+                not isinstance(hardware, Mapping)
+                or hardware.get("status") != "observed"
+            ):
+                return None
+            identity["runtime_hardware"] = hardware
         pins[role] = identity
     performance = result.get("performance", {})
     return {
