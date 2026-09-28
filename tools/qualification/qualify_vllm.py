@@ -192,6 +192,7 @@ def main() -> int:
         "path_redactions": [
             "MODEL_SNAPSHOT",
             "MODEL_CACHE",
+            "HUB_CACHE",
             "RUNTIME_ENV",
             "RUNTIME_INSTALL",
             "METRIA_SOURCE",
@@ -212,6 +213,7 @@ def main() -> int:
         and model_root.parent.parent.name.startswith("models--")
     ):
         replacements[str(model_root.parent.parent)] = "${MODEL_CACHE}"
+        replacements[str(model_root.parents[2])] = "${HUB_CACHE}"
     data = _redact_paths(json.loads(run_record_to_json(record)), replacements)
     # Round-trip the public record so all schema/privacy transformations remain valid.
     normalized = run_record_from_data(data)

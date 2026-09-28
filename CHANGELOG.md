@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added a pinned real vLLM qualification tool and controlled manual workflow.
+  Official backend wheel build labels are retained separately from loaded module
+  public versions; contradictory public versions or build labels still fail.
+
 - Added versioned trajectory divergence diagnostics with sample counts, category
   rates, first-divergence distributions, deterministic prompt ranking, and length
   mismatches. Policies can bound `behavior.divergence_rate`; missing captures do
