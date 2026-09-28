@@ -20,6 +20,7 @@ from ..protocols import (
     MeasurementResult,
     RuntimeSession,
 )
+from .divergence import summarize_divergence
 
 _CAPTURE_SCHEMA = "metria.trajectory_capture.v1"
 _CAPTURE_METHOD = "kv_fidelity.decode_time_trajectory"
@@ -186,9 +187,17 @@ def _capture_rows(result: MeasurementResult) -> tuple[Mapping[str, Any], ...]:
         if prompt_id in seen:
             raise ValueError(f"duplicate trajectory evidence prompt id: {prompt_id!r}")
         seen.add(prompt_id)
-        if not isinstance(prompt_hash, str) or len(prompt_hash) != 64:
+        if (
+            not isinstance(prompt_hash, str)
+            or len(prompt_hash) != 64
+            or any(char not in "0123456789abcdef" for char in prompt_hash)
+        ):
             raise ValueError(
                 f"trajectory evidence prompt[{index}] has invalid prompt fingerprint"
+            )
+        if row.get("category") is not None and not isinstance(row["category"], str):
+            raise ValueError(
+                f"trajectory evidence prompt[{index}] has invalid category"
             )
         validated_tokens = _token_batches((tokens,), expected=1)[0]
         token_count = row.get("token_count")
@@ -348,6 +357,8 @@ def compare_trajectory_results(
             raise ValueError(
                 f"trajectory prompt fingerprint differs for prompt id {prompt_id!r}"
             )
+        if reference_row.get("category") != candidate_row.get("category"):
+            raise ValueError(f"trajectory category differs for prompt id {prompt_id!r}")
 
         reference_tokens = _token_batches(
             (reference_row["token_ids"],),
@@ -400,6 +411,7 @@ def compare_trajectory_results(
                 "id": prompt_id,
                 "prompt_sha256": reference_row["prompt_sha256"],
                 "first_divergence": first_divergence,
+                "category": reference_row.get("category"),
                 "prefix_agreement_steps": prefix_steps,
                 "reference_steps": reference_length,
                 "candidate_steps": candidate_length,
@@ -473,10 +485,29 @@ def compare_trajectory_results(
             coverage=1.0,
         ),
     }
+    diagnostics = summarize_divergence(comparison_rows)
+    if diagnostics["status"] == "complete":
+        metrics["trajectory_divergence_rate"] = MetricSummary(
+            definition=MetricDefinition(
+                name="trajectory_divergence_rate",
+                unit="fraction",
+                direction=MetricDirection.LOWER_IS_BETTER,
+                method=_COMPARISON_METHOD,
+                version=_COMPARISON_VERSION,
+            ),
+            value=diagnostics["divergence_rate"],
+            samples=tuple(
+                MetricSample(1.0 - sample.value, metadata=sample.metadata)
+                for sample in match_samples
+            ),
+            aggregation="mean",
+            coverage=1.0,
+        )
     return MeasurementResult(
         metrics=metrics,
         evidence={
             "schema": "metria.trajectory_comparison.v1",
+            "divergence": diagnostics,
             "method": _COMPARISON_METHOD,
             "method_version": _COMPARISON_VERSION,
             "n_prompts": n_prompts,

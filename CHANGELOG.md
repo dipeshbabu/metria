@@ -5,6 +5,11 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added versioned trajectory divergence diagnostics with sample counts, category
+  rates, first-divergence distributions, deterministic prompt ranking, and length
+  mismatches. Policies can bound `behavior.divergence_rate`; missing captures do
+  not produce a zero-divergence claim.
+
 - Added optional, versioned verification policies with typed numeric bounds and
   exact boolean/status checks. Policies are included in recipe identity and
   produce PASS/FAIL only after verifier correctness gates succeed. Missing or

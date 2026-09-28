@@ -208,3 +208,106 @@ def test_measurement_result_deeply_freezes_evidence() -> None:
     assert result.evidence["nested"]["values"] == (1, 2)
     with pytest.raises(TypeError):
         result.evidence["nested"]["new"] = "blocked"
+
+
+def test_divergence_summary_includes_categories_lengths_and_position_distribution():
+    config = {
+        "prompts": [
+            {"id": "exact", "prompt": "private exact", "category": "math"},
+            {"id": "early", "prompt": "private early", "category": "code"},
+            {"id": "late", "prompt": "private late", "category": "math"},
+            {"id": "short", "prompt": "private short"},
+        ]
+    }
+    protocol = TokenTrajectoryProtocol()
+    reference = protocol.execute(FakeTrajectorySession(((1, 2, 3),) * 4), {}, config)
+    candidate = protocol.execute(
+        FakeTrajectorySession(((1, 2, 3), (9, 2, 3), (1, 2, 9), (1,))), {}, config
+    )
+    result = compare_trajectory_results(reference, candidate)
+    summary = result.evidence["divergence"]
+    assert summary["schema"] == "metria.trajectory_divergence.v1"
+    assert summary["status"] == "complete"
+    assert summary["n_prompts"] == summary["compared_prompts"] == 4
+    assert summary["exact_matches"] == 1
+    assert summary["divergence_rate"] == 0.75
+    assert summary["median_first_divergence"] == 1
+    assert summary["earliest_first_divergence"] == 0
+    assert summary["first_divergence_positions"] == (
+        {"position": 0, "count": 1},
+        {"position": 1, "count": 1},
+        {"position": 2, "count": 1},
+    )
+    assert summary["length_mismatches"] == 1
+    assert summary["uncategorized_prompts"] == 1
+    assert summary["by_category"] == (
+        {
+            "category": "code",
+            "n_prompts": 1,
+            "diverged_prompts": 1,
+            "divergence_rate": 1,
+        },
+        {
+            "category": "math",
+            "n_prompts": 2,
+            "diverged_prompts": 1,
+            "divergence_rate": 0.5,
+        },
+    )
+    assert [row["id"] for row in summary["most_divergent"]] == [
+        "early",
+        "short",
+        "late",
+    ]
+    assert "private" not in repr(summary)
+    assert "token_ids" not in repr(summary)
+    assert result.metrics["trajectory_divergence_rate"].value == 0.75
+
+
+def test_divergence_ranking_is_bounded_and_independent_of_input_order():
+    rows = [(f"p{i:02d}", f"{i:064x}", (1, 2)) for i in range(15)]
+    reference = _capture_result(rows)
+    candidate_rows = [(name, fingerprint, (9, 2)) for name, fingerprint, _ in rows]
+    expected = compare_trajectory_results(reference, _capture_result(candidate_rows))
+    shuffled = compare_trajectory_results(
+        _capture_result(list(reversed(rows))),
+        _capture_result(list(reversed(candidate_rows))),
+    )
+    assert expected.evidence["divergence"] == shuffled.evidence["divergence"]
+    assert len(expected.evidence["divergence"]["most_divergent"]) == 10
+    assert expected.evidence["divergence"]["most_divergent"][0]["id"] == "p00"
+
+
+def test_exact_matches_and_missing_capture_have_distinct_diagnostics():
+    reference = _capture_result((("p1", "1" * 64, (1, 2)),))
+    identical = compare_trajectory_results(reference, reference)
+    summary = identical.evidence["divergence"]
+    assert summary["status"] == "complete"
+    assert summary["divergence_rate"] == 0
+    assert summary["median_first_divergence"] is None
+    assert summary["most_divergent"] == ()
+    assert summary["by_category"] == ()
+    missing = compare_trajectory_results(
+        reference, _capture_result((("p1", "1" * 64, ()),))
+    )
+    summary = missing.evidence["divergence"]
+    assert summary["status"] == "insufficient_evidence"
+    assert summary["unavailable_prompts"] == 1
+    assert summary["divergence_rate"] is None
+    assert "trajectory_divergence_rate" not in missing.metrics
+
+
+def test_divergence_rejects_conflicting_category_metadata():
+    config = {"prompts": [{"id": "one", "prompt": "secret", "category": "math"}]}
+    protocol = TokenTrajectoryProtocol()
+    reference = protocol.execute(FakeTrajectorySession(((1,),)), {}, config)
+    config["prompts"][0]["category"] = "code"
+    candidate = protocol.execute(FakeTrajectorySession(((2,),)), {}, config)
+    with pytest.raises(ValueError, match="category differs"):
+        compare_trajectory_results(reference, candidate)
+
+
+def test_divergence_rejects_non_hex_prompt_fingerprints():
+    capture = _capture_result((("one", "z" * 64, (1,)),))
+    with pytest.raises(ValueError, match="invalid prompt fingerprint"):
+        compare_trajectory_results(capture, capture)

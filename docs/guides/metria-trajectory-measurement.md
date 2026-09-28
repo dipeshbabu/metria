@@ -77,6 +77,30 @@ immediate stop from missing or incompatible instrumentation.
 
 ## Relationship to KV Fidelity
 
+### Behavioral divergence diagnostics
+
+The `kv_fidelity.trajectory_match@0.3.4` analysis also retains a
+`metria.trajectory_divergence.v1` summary under `evidence.divergence`.
+It includes compared/unavailable prompt counts, exact matches, divergence rates,
+mean prefix length, a first-divergence position histogram, earliest and median
+first divergence, category denominators/rates, and sequence-length mismatches.
+Positions are zero-based; a median of `null` means no observed divergence among
+complete captures. Check `status` and `unavailable_prompts` before interpreting it.
+Empty captures remain unavailable evidence, including unilateral empty captures.
+
+The ten most divergent prompts are ranked by ascending prefix fraction, then
+earliest divergence, then prompt ID. IDs and SHA-256 fingerprints identify the
+workload without displaying prompt text or token contents. Categories must agree
+across the paired captures; absent categories are counted as uncategorized and
+are not assigned an invented label. Choose non-sensitive IDs and category names.
+
+The verifier report includes the concise diagnostics; its JSON output retains
+the complete summary. A `behavior.divergence_rate@0.3.4` policy target can bound
+the fraction of prompts that diverged. This target is unavailable when any
+capture is empty. See [verification policies](verification-policies.md).
+
+### Component boundary
+
 The algorithm is intentionally compatible with the current KV Fidelity
 trajectory methodology, but the implementation does not call
 `kv_fidelity.runner` or its module-global backend selector. Runtime execution is
