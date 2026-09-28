@@ -29,13 +29,17 @@ def check_repository(root: Path) -> None:
         index.get("manifests"), list
     ):
         raise ValueError("invalid headline artifact index")
-    for relative in index["manifests"]:
-        manifest_path = (root / relative).resolve()
+    headline_paths = {(root / relative).resolve() for relative in index["manifests"]}
+    manifest_paths = headline_paths | {
+        path.resolve() for path in (root / "artifacts").rglob("*.artifact.json")
+    }
+    for manifest_path in sorted(manifest_paths):
         if not manifest_path.is_relative_to(root):
             raise ValueError("headline manifest escapes repository")
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest = artifact_manifest_from_data(data)
-        validate_headline_manifest(manifest)
+        if manifest_path in headline_paths:
+            validate_headline_manifest(manifest)
         if not isinstance(manifest.path, str) or Path(manifest.path).is_absolute():
             raise ValueError("headline artifact requires a repository-relative path")
         artifact_path = (root / manifest.path).resolve()

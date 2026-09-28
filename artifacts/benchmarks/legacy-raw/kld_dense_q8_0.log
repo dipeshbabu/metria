@@ -27,7 +27,7 @@ llama_params_fit_impl: will leave 82367 >= 1024 MiB of free device memory, no ch
 llama_params_fit: successfully fit params to free device memory
 llama_params_fit: fitting params to free memory took 0.30 seconds
 llama_model_load_from_file_impl: using device MTL0 (Apple M5 Max) (unknown id) - 110100 MiB free
-llama_model_loader: loaded meta data with 49 key-value pairs and 851 tensors from /Users/dipesh/local_llms/models/Qwen3.5-27B-Q8_0.gguf (version GGUF V3 (latest))
+llama_model_loader: loaded meta data with 49 key-value pairs and 851 tensors from ${HOME}/local_llms/models/Qwen3.5-27B-Q8_0.gguf (version GGUF V3 (latest))
 llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
 llama_model_loader: - kv   0:                       general.architecture str              = qwen35
 llama_model_loader: - kv   1:                               general.type str              = model

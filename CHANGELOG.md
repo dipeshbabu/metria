@@ -13,6 +13,10 @@ TurboQuant reference packages have independent versions and release notes.
   workload, warmup/trial and aggregation identity. Deltas require valid comparison
   and compatible methods; unsupported streaming/memory metrics remain unavailable.
 
+- Removed contributor-local home paths from archived logs and paper references,
+  retained original/redacted hashes in shared manifests, and added a portable-path
+  gate plus an evidence/source mapping without changing historical results.
+
 - Assigned distinct verification exits for policy failure, invalid inputs,
   non-comparable runs, insufficient evidence, and execution/preflight failure.
   Added redacted machine-readable input errors and a GitHub Actions summary and

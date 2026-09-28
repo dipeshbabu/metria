@@ -3,8 +3,8 @@
   "framework_version": "0.3.2",
   "environment": {
     "backend": "llamacpp",
-    "model": "/Users/dipesh/models/gemma-4-26B-A4B-it-Q8_0.gguf",
-    "llama_cpp_bin_dir": "/Users/dipesh/local_llms/llama.cpp/build-test/bin",
+    "model": "${HOME}/models/gemma-4-26B-A4B-it-Q8_0.gguf",
+    "llama_cpp_bin_dir": "${HOME}/local_llms/llama.cpp/build-test/bin",
     "llama_cpp_commit": "817e913ec"
   },
   "repro_command": "",
@@ -14,7 +14,7 @@
     0,
     100
   ],
-  "model": "/Users/dipesh/models/gemma-4-26B-A4B-it-Q8_0.gguf",
+  "model": "${HOME}/models/gemma-4-26B-A4B-it-Q8_0.gguf",
   "reference": "ctk=f16,ctv=f16",
   "candidate": "ctk=turbo4,ctv=turbo4",
   "composite": 11.030876948704718,
@@ -7494,7 +7494,7 @@
       "ctx": 512,
       "is_self_reference": false,
       "corpus": {
-        "path": "/Users/dipesh/.cache/kv-fidelity/wikitext-2-raw/wiki.test.raw",
+        "path": "${HOME}/.cache/kv-fidelity/wikitext-2-raw/wiki.test.raw",
         "size_bytes": 1290590,
         "sha256_head": "6cb1872543ff1f1b9c1b0ddce665aeb46322754d48d78dc5ecd631e7781c8729",
         "sha256_head_bytes": 1048576

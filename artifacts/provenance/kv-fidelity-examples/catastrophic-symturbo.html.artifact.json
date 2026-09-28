@@ -1,0 +1,24 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-report",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:57:36.381437+00:00",
+      "license_status": "No new license asserted for model-derived material"
+    },
+    "name": "catastrophic-symturbo.html",
+    "path": "components/kv-fidelity/src/kv_fidelity/examples/catastrophic-symturbo.html",
+    "sha256": "ae72c2e695c31b52f410bdec375f002e100c9c628d87a676b0d3c15dda627610",
+    "size_bytes": 219277,
+    "source": {
+      "original_git_blob_sha256": "eb68cff6e855bce24547161ddb957e2ee4ce6f23d7d78cbf56aa08a64d439652",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; all other canonical Git-blob bytes unchanged.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical model/runtime immutable identity is incomplete; example illustrates report interpretation rather than current support"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}
