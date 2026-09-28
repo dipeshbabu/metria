@@ -9,6 +9,10 @@ TurboQuant reference packages have independent versions and release notes.
   fixtures, qualified local configuration instructions, and explicitly staged
   runtime/KV/quantization/build templates with readiness checks.
 
+- Added a pinned real vLLM qualification tool and controlled manual workflow.
+  Official backend wheel build labels are retained separately from loaded module
+  public versions; contradictory public versions or build labels still fail.
+
 - Added verifier-native cold-process request-latency impact with explicit source,
   workload, warmup/trial and aggregation identity. Deltas require valid comparison
   and compatible methods; unsupported streaming/memory metrics remain unavailable.

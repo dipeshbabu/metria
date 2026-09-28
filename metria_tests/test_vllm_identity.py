@@ -343,3 +343,37 @@ def test_missing_tokenizer_revision_and_template_remain_unknown_not_verified(
     assert identity["tokenizer"]["revision"] is None
     assert identity["chat_template"]["status"] == "unknown"
     session.close()
+
+
+@pytest.mark.parametrize(
+    "module_version,accepted",
+    [
+        ("0.30.0", True),
+        ("0.30.0+cpu", True),
+        ("0.30.1", False),
+        ("0.30.0+cu129", False),
+    ],
+)
+def test_backend_wheel_public_version_and_local_build_identity(
+    monkeypatch, module_version, accepted
+):
+    module = SimpleNamespace(
+        __version__=module_version, LLM=_LLM, SamplingParams=_SamplingParams
+    )
+    _patch_runtime(monkeypatch, module=module)
+    monkeypatch.setattr(vllm_module, "_vllm_version", lambda: "0.30.0+cpu")
+    adapter = VLLMAdapter()
+    resolved = adapter.resolve(_spec(runtime_version="0.30.0+cpu"), {})
+    if not accepted:
+        with pytest.raises(RuntimeError, match="runtime|module version"):
+            adapter.launch(resolved, {})
+        assert _LLM.instances[-1].generate_calls == 0
+        assert _LLM.instances[-1].shutdown_calls == 1
+        return
+    session = adapter.launch(resolved, {})
+    runtime = adapter.observe(session)["identity"]["runtime"]
+    assert runtime["status"] == "verified"
+    assert runtime["distribution_version"] == "0.30.0+cpu"
+    assert runtime["module_version"] == module_version
+    assert runtime["version"] == "0.30.0+cpu"
+    session.close()
