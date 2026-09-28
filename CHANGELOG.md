@@ -5,6 +5,11 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Separate declared task checks, observed reference repeatability and compatible
+  latency from token drift in verification impact and policies. Add exact-text,
+  nonempty and strict JSON-object checks with redacted summaries; missing quality
+  evidence cannot become policy PASS. Preserve existing trajectory target versions.
+
 - Add qualified local vLLM prefix-cache verification through the shared verifier,
   with pinned model/tokenizer/runtime content, native cache evidence, bounded
   process isolation, retained failures, warmup/repeated trials and loaded-engine

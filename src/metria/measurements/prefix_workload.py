@@ -16,6 +16,7 @@ from ..protocols import (
     MeasurementResult,
     RuntimeSession,
 )
+from .task_checks import evaluate_checks, prompt_checks, summarize_checks
 from .trajectory import TokenTrajectoryProtocol, _prompt_rows
 
 WORKLOAD_METHOD = "metria.prefix_cache_trials.v1"
@@ -54,6 +55,11 @@ def trajectory_config(config: Mapping[str, Any]) -> dict[str, Any]:
         for name, value in config.items()
         if name in {"prompts", "generation"}
     }
+    prompt_checks(result.get("prompts"))
+    result["prompts"] = [
+        {key: value for key, value in row.items() if key != "checks"}
+        for row in result["prompts"]
+    ]
     if len(_prompt_rows(result)) > 100:
         raise ValueError("prefix verification accepts at most 100 prompts")
     trial_settings(config)
@@ -68,6 +74,9 @@ class _SequentialSession:
     trial: int
     measured: bool
     timings: list[dict[str, Any]] = field(default_factory=list)
+    checks: Sequence[Sequence[Mapping[str, Any]]] = ()
+    prompt_ids: Sequence[str] = ()
+    check_results: list[dict[str, Any]] = field(default_factory=list)
 
     def infer(
         self,
@@ -85,6 +94,19 @@ class _SequentialSession:
                     "invalid sequential inference result or clock sample"
                 )
             outputs.extend(batch.outputs)
+            if self.measured and self.checks:
+                import hashlib
+
+                self.check_results.extend(
+                    evaluate_checks(
+                        batch.outputs[0],
+                        self.checks[index],
+                        prompt_id=self.prompt_ids[index],
+                        prompt_sha256=hashlib.sha256(
+                            request.prompt.encode()
+                        ).hexdigest(),
+                    )
+                )
             for item in capture:
                 value = batch.captures.get(item.kind)
                 if (
@@ -204,15 +226,33 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
         warmups, trials = trial_settings(config)
         results = []
         timings = []
+        check_specs = prompt_checks(config["prompts"])
+        check_rows: list[dict[str, Any]] = []
         protocol = TokenTrajectoryProtocol()
         for index in range(warmups + trials):
             measured = index >= warmups
             trial = index - warmups
             session.reset("prefix-cache")
-            sequential = _SequentialSession(session, trial, measured)
             rows = [{**row, "id": f"{trial}:{row['id']}"} for row in base["prompts"]]
+            sequential = _SequentialSession(
+                session,
+                trial,
+                measured,
+                checks=check_specs,
+                prompt_ids=tuple(row["id"] for row in rows),
+            )
             result = protocol.execute(sequential, scenario, {**base, "prompts": rows})
+            check_rows.extend(sequential.check_results)
             if measured:
                 results.append(result)
             timings.extend(sequential.timings)
-        return _merge_results(results, timings, warmups, trials)
+        captured = _merge_results(results, timings, warmups, trials)
+        quality, metric = summarize_checks(
+            check_rows, check_specs, config["prompts"], trials
+        )
+        metrics = dict(captured.metrics)
+        if metric is not None:
+            metrics[metric.definition.name] = metric
+        return MeasurementResult(
+            metrics=metrics, evidence={**captured.evidence, "task_checks": quality}
+        )

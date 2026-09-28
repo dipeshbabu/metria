@@ -262,10 +262,10 @@ Quick table:
 
 | Composite | Band      | What it means                                  |
 |-----------|-----------|------------------------------------------------|
-| 90–100    | EXCELLENT | Indistinguishable from fp16. Safe to deploy.   |
-| 80–90     | PASS      | Minor drift; safe to deploy in most uses.      |
+| 90–100    | EXCELLENT | High measured similarity; evaluate task-specific checks.   |
+| 80–90     | PASS      | Minor measured drift; evaluate your acceptance policy.      |
 | 60–80     | DEGRADED  | Visible drift; audit on your workload first.   |
-| 0–60      | FAIL      | Material quality loss; treat as broken.        |
+| 0–60      | FAIL      | Large measured drift; investigate task-specific outcomes.        |
 
 If the composite is below 90, look at the per-axis breakdown and the
 **Diagnosis** block in the report. It will tell you in plain English

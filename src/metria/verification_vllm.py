@@ -15,6 +15,8 @@ from .measurements.prefix_workload import (
     trajectory_config,
     trial_settings,
 )
+from .measurements.task_checks import prompt_checks, task_workload_identity
+from .measurements.verification_impact import VerificationImpactAnalysis, _quality
 from .models import RunRecord
 from .protocols import InferenceRequest
 from .recipes import StudyRecipe
@@ -145,7 +147,10 @@ def validate_vllm_recipe(recipe: StudyRecipe) -> None:
         raise ValueError(
             "prefix verification permits only its five prefix-cache variation paths and no waivers"
         )
-    if comparison.analyses != (TrajectoryAgreementAnalysis.name,):
+    if comparison.analyses not in {
+        (TrajectoryAgreementAnalysis.name,),
+        (TrajectoryAgreementAnalysis.name, VerificationImpactAnalysis.name),
+    }:
         raise ValueError(
             "prefix verification requires the registered trajectory analysis"
         )
@@ -287,7 +292,11 @@ def _workload_gaps(record: RunRecord, expected_trials: Mapping[str, Any]) -> lis
 
 
 def evidence_gaps(
-    record: RunRecord, *, runtime_pin: str, trials: Mapping[str, Any]
+    record: RunRecord,
+    *,
+    runtime_pin: str,
+    trials: Mapping[str, Any],
+    quality_identity: Mapping[str, Any] | None = None,
 ) -> tuple[str, ...]:
     gaps = []
     hardware = _mapping(record.observed.get("hardware"))
@@ -332,6 +341,14 @@ def evidence_gaps(
     coverage = record.metrics.get("trajectory_nonempty_capture_rate")
     if coverage is None or isinstance(coverage.value, bool) or coverage.value != 1.0:
         gaps.append("every measured prompt must retain nonempty sampled token IDs")
+    if quality_identity is not None:
+        quality = _quality(record)
+        if (
+            quality is None
+            or quality.get("workload_sha256") != quality_identity["sha256"]
+            or quality.get("check_count") != quality_identity["check_count"]
+        ):
+            gaps.append("declared task-check evidence is missing or inconsistent")
     gaps.extend(_workload_gaps(record, trials))
     return tuple(dict.fromkeys(gaps))
 
@@ -343,15 +360,32 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
     measurement = PrefixWorkloadProtocol()
     analysis = TrajectoryAgreementAnalysis()
     trials = trial_identity(recipe.measurement_configs[measurement.name])
+    config = recipe.measurement_configs[measurement.name]
+    checks = prompt_checks(config["prompts"])
+    count = sum(len(row) for row in checks) * trials["measured_trials"]
+    quality_identity = (
+        {
+            "sha256": task_workload_identity(
+                checks, config["prompts"], trials["measured_trials"]
+            ),
+            "check_count": count,
+        }
+        if count
+        else None
+    )
     return VerificationRoute(
         scope=VLLM_SCOPE,
         adapters={"vllm": VLLMAdapter()},
         measurements={measurement.name: measurement},
-        analyses={analysis.name: analysis},
+        analyses={
+            analysis.name: analysis,
+            VerificationImpactAnalysis.name: VerificationImpactAnalysis(),
+        },
         evidence_gaps=partial(
             evidence_gaps,
             runtime_pin=recipe.environment["vllm_distribution_sha256"],
             trials=trials,
+            quality_identity=quality_identity,
         ),
         observed_facts=observed_facts,
         change={

@@ -8,6 +8,9 @@ from collections.abc import Mapping
 from typing import Any
 
 from .measurements import TrajectoryAgreementAnalysis
+from .measurements.impact_schema import NAME as IMPACT_NAME
+from .measurements.impact_schema import SCHEMA as IMPACT_SCHEMA
+from .measurements.impact_schema import VERSION as IMPACT_VERSION
 from .policies import render_policy_evaluation
 from .verification_schema import VERIFICATION_ROLES as _ROLES
 from .verification_schema import VERIFICATION_SCOPE, VLLM_VERIFICATION_SCOPE
@@ -55,6 +58,7 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
     lines.extend(("", "## Impact:"))
     for analysis in manifest["analyses"]:
         lines.append(f"  {analysis['name']}: {analysis['status']}")
+        lines.extend(_render_impact_details(analysis))
         metrics = analysis["metrics"]
         for key, error in sorted(analysis.get("metric_errors", {}).items()):
             lines.append(f"    {key}: invalid metric evidence ({error['error_type']})")
@@ -191,3 +195,48 @@ def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
     if scope == VLLM_VERIFICATION_SCOPE:
         return f"    Observed prefix caching: {facts['prefix_caching']}; context: {facts['context']}"
     return f"    Observed threads: {facts['threads']}; context: {facts['context']}"
+
+
+def _render_impact_details(analysis: Mapping[str, Any]) -> list[str]:
+    if analysis["name"] != IMPACT_NAME:
+        return []
+    data = analysis["diagnostics"]
+    if (data.get("schema"), data.get("method"), data.get("method_version")) != (
+        IMPACT_SCHEMA,
+        IMPACT_NAME,
+        IMPACT_VERSION,
+    ):
+        return [
+            "    Decision evidence unavailable: methodology is missing or incompatible."
+        ]
+    lines = []
+    quality = data.get("quality", {})
+    if quality.get("status") == "available":
+        lines.append(
+            f"    Task checks: reference {quality['reference_passed']}/{quality['check_count_per_role']}, candidate {quality['candidate_passed']}/{quality['check_count_per_role']} passed."
+        )
+        lines.append(
+            f"    Checked workload: {quality['configured_prompts']}/{quality['total_prompts']} unique prompts; results describe declared checks only."
+        )
+        for row in quality["failed_candidate_checks"][:10]:
+            lines.append(
+                f"      Failed {html.escape(json.dumps(row['check_id']))} on {html.escape(json.dumps(row['prompt_id']))} ({row['kind']}); answer content retained by digest."
+            )
+    else:
+        lines.append(
+            f"    Task quality unavailable: {quality.get('reason', 'task checks were not configured')}."
+        )
+    variability = data.get("reference_variability", {})
+    if variability.get("status") == "available":
+        lines.append(
+            f"    Reference repeatability: {variability['different_pairs']}/{variability['compared_pairs']} repeat pairs differed across {variability['unique_prompts']} prompts."
+        )
+        lines.append(f"    {variability['limitation']}")
+    else:
+        lines.append(
+            f"    Reference variability unavailable: {variability.get('reason', 'repeated evidence is missing')}."
+        )
+    lines.append(
+        "    Token differences are behavioral drift; task checks determine the declared quality outcomes."
+    )
+    return lines

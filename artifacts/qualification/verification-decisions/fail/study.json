@@ -1,0 +1,181 @@
+{
+  "environment": {
+    "verification_timeout_s": 900,
+    "vllm_distribution_sha256": "48c75a0bf883a02d4a61f5dedfe34f500b97350dd1e2d84052f0ea90be37be24"
+  },
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "measured_trials": 2,
+      "prompts": [
+        {
+          "category": "shared-prefix",
+          "checks": [
+            {
+              "id": "has-response",
+              "kind": "nonempty"
+            },
+            {
+              "expected": "METRIA_DELIBERATE_NEGATIVE_CHECK_94a7",
+              "id": "deliberate-failure",
+              "kind": "exact_text"
+            }
+          ],
+          "id": "shared-a",
+          "prompt": "This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. Question: How many shelves are in the archive? Answer:"
+        },
+        {
+          "category": "shared-prefix",
+          "checks": [
+            {
+              "id": "has-response",
+              "kind": "nonempty"
+            },
+            {
+              "expected": "METRIA_DELIBERATE_NEGATIVE_CHECK_94a7",
+              "id": "deliberate-failure",
+              "kind": "exact_text"
+            }
+          ],
+          "id": "shared-b",
+          "prompt": "This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. This is a synthetic systems test document. The archive has twelve shelves. Each shelf has a label and a list of books. The labels follow the same ordering. Question: What does every shelf have? Answer:"
+        }
+      ],
+      "warmup_trials": 1
+    }
+  },
+  "policy": {
+    "criteria": [
+      {
+        "min": 1.0,
+        "target": "quality.candidate_pass_rate",
+        "unit": "fraction",
+        "version": "1"
+      }
+    ],
+    "schema": "metria.verification_policy.v1"
+  },
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "comparison": {
+      "analyses": [
+        "kv_fidelity.trajectory_match",
+        "metria.verification_impact"
+      ],
+      "block_by": [],
+      "control": [
+        "measurements",
+        "model",
+        "scenario",
+        "trial_policy"
+      ],
+      "vary": [
+        "observed.applied.fields.cache.enable_prefix_caching",
+        "observed.configured.runtime.enable_prefix_caching",
+        "observed.identity.applied.fields.cache.enable_prefix_caching",
+        "resolved.runtime.settings.enable_prefix_caching",
+        "runtime.enable_prefix_caching"
+      ]
+    },
+    "constants": {},
+    "metadata": {},
+    "name": "vllm-prefix-cache-change",
+    "runs": [
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "files": {
+            "config.json": "1d556eab73b69c7f11f64c557a2f9c6f440bd4c6b89bb2584a6b498c92603843",
+            "generation_config.json": "2056c988e990b0d13670f63f2f3b87b3b6d07edaf7a3416998ba27dab2d8a059",
+            "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+            "model.safetensors": "80521b40281d6ce74e35c9282c22539e75aa0ac8578892b2a59955ef78d55da1",
+            "special_tokens_map.json": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3",
+            "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+            "tokenizer_config.json": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424",
+            "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+          },
+          "id": "HuggingFaceTB/SmolLM2-135M",
+          "path": "/var/tmp/metria-prefix-qualification/model",
+          "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+        },
+        "runtime": {
+          "dtype": "float32",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.35,
+          "max_model_len": 512,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false,
+          "version": "0.30.0+cpu"
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 512,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0
+        },
+        "treatments": [],
+        "trial_policy": {
+          "isolation": "reset_prefix_cache_before_each_trial",
+          "measured_trials": 2,
+          "method": "metria.prefix_cache_trials.v1",
+          "schedule": "sequential",
+          "warmup_trials": 1
+        }
+      },
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "files": {
+            "config.json": "1d556eab73b69c7f11f64c557a2f9c6f440bd4c6b89bb2584a6b498c92603843",
+            "generation_config.json": "2056c988e990b0d13670f63f2f3b87b3b6d07edaf7a3416998ba27dab2d8a059",
+            "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+            "model.safetensors": "80521b40281d6ce74e35c9282c22539e75aa0ac8578892b2a59955ef78d55da1",
+            "special_tokens_map.json": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3",
+            "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+            "tokenizer_config.json": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424",
+            "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+          },
+          "id": "HuggingFaceTB/SmolLM2-135M",
+          "path": "/var/tmp/metria-prefix-qualification/model",
+          "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+        },
+        "runtime": {
+          "dtype": "float32",
+          "enable_prefix_caching": true,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.35,
+          "max_model_len": 512,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false,
+          "version": "0.30.0+cpu"
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 512,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0
+        },
+        "treatments": [],
+        "trial_policy": {
+          "isolation": "reset_prefix_cache_before_each_trial",
+          "measured_trials": 2,
+          "method": "metria.prefix_cache_trials.v1",
+          "schedule": "sequential",
+          "warmup_trials": 1
+        }
+      }
+    ]
+  }
+}
