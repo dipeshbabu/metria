@@ -12,7 +12,7 @@ from typing import Any
 
 from .recipes import StudyRecipe, _json_value, study_recipe_digest
 from .verification import VERIFICATION_SCOPE, _write_atomic, verify_recipe
-from .verification_schema import VLLM_VERIFICATION_SCOPE
+from .verification_schema import LLAMACPP_BUILD_SCOPE, VLLM_VERIFICATION_SCOPE
 
 TRIALS_SCHEMA = "metria.verification_trials.v1"
 
@@ -67,6 +67,7 @@ def _baseline_identity(
     if result.get("scope") not in {
         VERIFICATION_SCOPE,
         VLLM_VERIFICATION_SCOPE,
+        LLAMACPP_BUILD_SCOPE,
     } or result.get("fixture_only"):
         return None
     records = result.get("records", {})

@@ -16,6 +16,10 @@ from metria.runtimes import llamacpp
 from metria.runtimes.llamacpp_qualified import PROVIDERS_KEY
 from metria.verification import verify_recipe
 from metria.verification_schema import LLAMACPP_BUILD_SCOPE
+from metria.verification_trials import (
+    VerificationTrialPolicy,
+    execute_verification_trials,
+)
 
 
 @pytest.fixture
@@ -32,7 +36,13 @@ def build_case(tmp_path, monkeypatch):
     model = tmp_path / "model.gguf"
     model.write_bytes(b"immutable shared GGUF fixture")
     model_pin = llamacpp._sha256_file(model)
-    prompts = [{"id": "task", "prompt": "private-workload-text"}]
+    prompts = [
+        {
+            "id": "task",
+            "prompt": "private-workload-text",
+            "checks": [{"id": "present", "kind": "nonempty"}],
+        }
+    ]
     recipe = prepare_llamacpp_build_recipe(
         binaries[0].parent,
         binaries[1].parent,
@@ -104,6 +114,16 @@ def test_build_comparison_retains_distinct_pins_and_matching_controls(build_case
     assert "CPU build comparison" in report
     assert "Capture provider SHA256" in report
     assert "private-workload-text" not in report
+
+
+def test_repeated_build_comparison_binds_both_providers_to_baseline(build_case):
+    result = execute_verification_trials(
+        build_case["recipe"], build_case["output"], policy=VerificationTrialPolicy(0, 2)
+    )
+    assert result["exit_code"] == 0
+    assert result["baseline_key"] is not None
+    assert len(result["pairs"]) == 2
+    assert build_case["calls"] == [False, True, False, True]
 
 
 @pytest.mark.parametrize("minimum,expected", [(0.6, "PASS"), (0.9, "FAIL")])
@@ -240,7 +260,14 @@ def _prepare_args(case, tmp_path):
     recipe = case["recipe"]
     workload = tmp_path / "prompts.jsonl"
     workload.write_text(
-        json.dumps({"id": "task", "prompt": "private-workload-text"}) + "\n"
+        json.dumps(
+            {
+                "id": "task",
+                "prompt": "private-workload-text",
+                "checks": [{"id": "present", "kind": "nonempty"}],
+            }
+        )
+        + "\n"
     )
     return [
         "recipe",
@@ -332,3 +359,79 @@ def test_build_profile_preserves_shared_cpu_input_restrictions(
         verify_recipe(recipe, build_case["output"])
     assert not build_case["calls"]
     assert not build_case["output"].exists()
+
+
+@pytest.mark.parametrize(
+    "expected,verdict", [("generated-answer", "PASS"), ("different-answer", "FAIL")]
+)
+def test_build_task_checks_evaluate_real_outputs_under_quality_policy(
+    build_case, expected, verdict
+):
+    from metria.measurements import TokenTrajectoryProtocol
+
+    recipe = build_case["recipe"]
+    config = {
+        "prompts": [
+            {
+                "id": "task",
+                "prompt": "private-workload-text",
+                "checks": [
+                    {"id": "answer", "kind": "exact_text", "expected": expected}
+                ],
+            }
+        ]
+    }
+    recipe = replace(
+        recipe,
+        measurement_configs={TokenTrajectoryProtocol.name: config},
+        policy=VerificationPolicy(
+            (PolicyCriterion("quality.candidate_pass_rate", "1", minimum=1.0),)
+        ),
+    )
+    result = verify_recipe(recipe, build_case["output"])
+    assert result.to_data()["verdict"] == verdict
+    report = (build_case["output"] / "report.md").read_text()
+    assert "Task checks:" in report
+    assert "generated-answer" not in report
+    assert "different-answer" not in report
+
+
+def test_missing_declared_task_check_evidence_cannot_be_verified(
+    build_case, monkeypatch
+):
+    from metria.measurements.checked_trajectory import CheckedTrajectoryProtocol
+    from metria.protocols import MeasurementResult
+
+    original = CheckedTrajectoryProtocol.execute
+
+    def omit_quality(protocol, session, scenario, config):
+        result = original(protocol, session, scenario, config)
+        return MeasurementResult(
+            metrics=result.metrics,
+            evidence={
+                key: value
+                for key, value in result.evidence.items()
+                if key != "task_checks"
+            },
+        )
+
+    monkeypatch.setattr(CheckedTrajectoryProtocol, "execute", omit_quality)
+    result = verify_recipe(build_case["recipe"], build_case["output"])
+    assert result.to_data()["verdict"] == "INSUFFICIENT_EVIDENCE"
+
+
+def test_unconfigured_build_checks_do_not_invent_quality(build_case):
+    from metria.measurements import TokenTrajectoryProtocol
+
+    recipe = replace(
+        build_case["recipe"],
+        measurement_configs={
+            TokenTrajectoryProtocol.name: {
+                "prompts": [{"id": "task", "prompt": "private-workload-text"}]
+            }
+        },
+    )
+    result = verify_recipe(recipe, build_case["output"])
+    assert result.to_data()["verdict"] == "VERIFIED"
+    report = (build_case["output"] / "report.md").read_text()
+    assert "Task quality unavailable" in report
