@@ -1,0 +1,85 @@
+{
+  "artifact": {
+    "kind": "qualification-report",
+    "metadata": {
+      "claim_scope": "local llama.cpp CPU thread comparison on a tiny integration model; integration fixture only, no performance or model-quality claim",
+      "created_at": "2026-09-28T02:17:19.505232+00:00",
+      "license_status": "No additional license asserted for model-derived material; upstream rights remain separate",
+      "limits": [
+        "three short prompts, 16 generated tokens each",
+        "CPU/WSL fixture qualification only",
+        "process wall timings include startup and model loading",
+        "no task-quality or statistical performance claim"
+      ],
+      "measurement_date": "2026-09-10"
+    },
+    "name": "llamacpp-cpu-threads-qualified-report",
+    "path": "artifacts/qualification/llamacpp-cpu-threads/threads-1-to-2/report.md",
+    "sha256": "21079e9949927193cb0db48dabaf1677cb79b6e7f025a0f776ef05c7b21bc35d",
+    "size_bytes": 798,
+    "source": {
+      "code": {
+        "identifier": "https://github.com/dipeshbabu/metria",
+        "revision": "e8ed545f9f6cb8d6936a8e9dcdf3d12f8392da37"
+      },
+      "environment": {
+        "python_executable": "python",
+        "python_implementation": "CPython",
+        "python_version": "3.12.3"
+      },
+      "hardware": {
+        "accelerators": [],
+        "host": {
+          "cpu_count": 12,
+          "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+        },
+        "metadata": {
+          "accelerator_detection": "runtime_or_adapter_required"
+        },
+        "platform": {
+          "machine": "x86_64",
+          "processor": "x86_64",
+          "release": "5.15.167.4-microsoft-standard-WSL2",
+          "system": "Linux",
+          "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+        },
+        "software": {
+          "python_executable": "python",
+          "python_implementation": "CPython",
+          "python_version": "3.12.3"
+        }
+      },
+      "model": {
+        "identifier": "ggml-org/models-moved/tinyllamas/stories260K.gguf",
+        "revision": "499bc8821c6b12b4e53c5bffcb21ec206f212d81",
+        "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+      },
+      "recipe_sha256": "802b2e1a23f1449bd60fb6c942131c93566caaf76cab2329c25223485f520257",
+      "runtime": {
+        "build": "Release, static libraries, CPU backend, GGML_NATIVE=OFF, GGML_OPENMP=OFF",
+        "compiler": "GNU 13.3.0",
+        "identifier": "https://github.com/ggml-org/llama.cpp",
+        "patch_sha256": "75eb5872101ab933c192355c93acdc4126cb5e70f5f928aee04f555bb36f6997",
+        "revision": "434ddbbc0e30522e897670681e503b797c12b7c1",
+        "sha256": "5e17486285ea5ecf5bce1bfd7bafa172fe3e0b0fea0ede0eafa59fe5c998c9b6"
+      },
+      "upstream": [
+        {
+          "license": "MIT; see tools/qualification/LICENSE.llama.cpp",
+          "redistribution": "source patch and upstream license retained; binary not distributed here",
+          "source": "https://github.com/ggml-org/llama.cpp/tree/434ddbbc0e30522e897670681e503b797c12b7c1"
+        },
+        {
+          "license": "unknown in the historical qualification metadata",
+          "redistribution": "model weights are not distributed in this repository",
+          "source": "https://huggingface.co/ggml-org/models-moved/resolve/499bc8821c6b12b4e53c5bffcb21ec206f212d81/tinyllamas/stories260K.gguf"
+        }
+      ],
+      "workload": {
+        "identifier": "artifacts/qualification/llamacpp-cpu-threads/threads-1-to-2/study.json",
+        "sha256": "305fbf32837e069a1cd03f57be6cb7b6ff830387c8ee079d0d1fbf08418a639a"
+      }
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}

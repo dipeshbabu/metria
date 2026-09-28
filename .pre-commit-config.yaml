@@ -31,6 +31,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: artifact-provenance
+        name: check package licenses and headline provenance
+        entry: uv run --locked python tools/maintenance/check_provenance.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: strict-json
         name: check strict JSON numbers
         entry: uv run --locked python tools/maintenance/check_strict_json.py

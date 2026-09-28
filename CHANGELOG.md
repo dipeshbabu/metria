@@ -11,6 +11,10 @@ TurboQuant reference packages have independent versions and release notes.
   artifact example. CI integrations that matched only exit 1 must accept every
   nonzero exit as failure.
 
+- Added versioned serialization for the shared `ArtifactManifest` and enforced
+  license-file and provenance checks for explicitly designated headline artifacts.
+  Third-party and generated-material rights remain explicit, including unknowns.
+
 - Added canonical `verification.json` output and deterministic Markdown reports
   with separate lifecycle, comparison, and policy states. The original manifest
   filename remains a compatibility alias; incomplete evidence cannot appear as

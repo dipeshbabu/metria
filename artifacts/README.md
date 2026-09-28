@@ -1,5 +1,8 @@
 # Research artifacts
 
+See the [third-party material and provenance policy](../docs/maintainers/third-party-material.md)
+for generated-material rights, shared manifests, and headline validation.
+
 This directory contains retained outputs used to support or reproduce the
 repository's research record.
 
