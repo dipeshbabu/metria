@@ -96,6 +96,9 @@ too slow for every commit.
 
 ## Required checks
 
+The [evidence-focused test strategy](docs/guides/testing-evidence.md) defines
+per-module coverage gates, required fixtures, skip reports, and fault/property tests.
+
 Before submitting a change:
 
 ```bash
