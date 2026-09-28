@@ -27,6 +27,14 @@ body:
       required: true
 
   - type: textarea
+    id: verifier_value
+    attributes:
+      label: Verification value and ownership
+      description: Which inference change becomes easier to verify, which evidence becomes more trustworthy, or which keep/reject decision improves? For specialized research, name its bounded purpose and owning component.
+    validations:
+      required: true
+
+  - type: textarea
     id: proposal
     attributes:
       label: Proposed outcome

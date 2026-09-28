@@ -6,6 +6,12 @@ clearly separated.
 
 ## Repository boundaries
 
+Apply the [verifier product scope](docs/architecture/verifier-product.md) when
+proposing features. State the inference change or evidence failure being addressed,
+the owning library contract, and the qualification needed before advertising support.
+Focused research work should identify its component and avoid a parallel runtime,
+measurement, or comparison architecture.
+
 - `src/metria/` contains the root `metria` package; `metria_tests/` tests its contracts.
 - `components/kv-fidelity/` contains the publishable `kv-fidelity` package.
 - `components/turboquant-reference/` contains the NumPy/SciPy TurboQuant

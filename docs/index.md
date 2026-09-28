@@ -11,6 +11,7 @@ generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
 ## Supporting architecture
 
+- [Verifier product decision and scope](architecture/verifier-product.md)
 - [Metria core architecture](architecture/metria-core.md)
 
 ## Guides

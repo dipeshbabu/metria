@@ -9,6 +9,10 @@ TurboQuant reference packages have independent versions and release notes.
   reusable qualified verification trials, explicit warmup/isolation, retained
   evidence, and exact baseline identity. Positional model/PDF calls require migration.
 
+- Record inference change verification as the single product direction, connect
+  architecture and governance to its evidence requirements, and require proposals
+  to identify verification value or a focused research purpose.
+
 - Reworked onboarding and package language around one reference/candidate
   inference change, evidence gates, behavioral/system impact, explicit policy,
   and recurring CI use, with qualified and staged scopes kept visible.
