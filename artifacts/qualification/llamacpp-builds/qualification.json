@@ -1,0 +1,42 @@
+{
+  "schema": "metria.build_qualification.v1",
+  "source_revision": "38438efc8072e1060e2182a7541ad1caf6509ba3",
+  "metria_version": "0.2.0.dev0",
+  "metria_wheel_sha256": "632ae0a43eef24079fa90b9679d456bf797989b3e59487082a637b9b83ec13fc",
+  "model_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+  "builds": {
+    "source_revision": "434ddbbc0e30522e897670681e503b797c12b7c1",
+    "capture_patch_sha256": "75eb5872101ab933c192355c93acdc4126cb5e70f5f928aee04f555bb36f6997",
+    "reference": "retained Release -O3 capture provider",
+    "candidate_configure_argv": [
+      "cmake",
+      "-S",
+      "/var/tmp/metria-build-regression-163/source",
+      "-B",
+      "/var/tmp/metria-build-regression-163/candidate",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
+      "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG",
+      "-DBUILD_SHARED_LIBS=OFF",
+      "-DGGML_NATIVE=OFF",
+      "-DGGML_BACKEND_DL=OFF",
+      "-DGGML_OPENMP=OFF",
+      "-DLLAMA_CURL=OFF",
+      "-DLLAMA_BUILD_TESTS=OFF",
+      "-DLLAMA_BUILD_EXAMPLES=OFF",
+      "-DLLAMA_BUILD_SERVER=OFF"
+    ],
+    "provider_pins": {
+      "/var/tmp/metria-build-regression-163/reference/llama-completion": "5e17486285ea5ecf5bce1bfd7bafa172fe3e0b0fea0ede0eafa59fe5c998c9b6",
+      "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42"
+    },
+    "compiler": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "verdict": "PASS",
+  "exit_code": 0,
+  "limitations": [
+    "Tiny-model maintainer contract qualification, not an external user pilot or a production quality/performance benchmark.",
+    "Both providers use the pinned capture ABI; comparison varies the actual native build.",
+    "Nonempty completion checks establish presence only, not answer correctness."
+  ]
+}

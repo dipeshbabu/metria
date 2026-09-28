@@ -20,3 +20,4 @@ class VerificationRoute:
     observed_facts: Callable[[RunRecord], dict[str, Any]]
     change: Mapping[str, Any]
     performance: Callable[[RunRecord, RunRecord, bool], dict[str, Any]]
+    isolated: bool = False

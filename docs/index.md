@@ -25,6 +25,7 @@ generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
 - [Verify a local vLLM prefix-cache change](guides/vllm-prefix-verification.md)
 - [Verify a local llama.cpp CPU thread change](guides/metria-verify.md)
+- [Verify a llama.cpp CPU build change](guides/llamacpp-build-verification.md)
 - [Copyable verification workflows and synthetic fixtures](../examples/verification/README.md)
 - [Gate verification in CI](guides/verification-ci.md)
 - [Metria llama.cpp runtime adapter](guides/metria-llamacpp-runtime.md)

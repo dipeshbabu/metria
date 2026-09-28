@@ -44,7 +44,12 @@
     "src/metria/measurements/task_checks.py": 88,
     "src/metria/measurements/verification_impact.py": 84,
     "src/metria/measurements/impact_schema.py": 95,
-    "src/metria/onboarding.py": 75
+    "src/metria/onboarding.py": 75,
+    "src/metria/verification_cpu.py": 85,
+    "src/metria/verification_build.py": 85,
+    "src/metria/runtimes/llamacpp_qualified.py": 85,
+    "src/metria/preparation_cpu.py": 85,
+    "src/metria/measurements/checked_trajectory.py": 85
   },
   "components": {
     "src/metria/integrations/turboquant_diagnostics.py": 90,

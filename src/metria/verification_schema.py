@@ -5,3 +5,4 @@ VERIFICATION_SCOPE = "local_llamacpp_cpu_threads.v1"
 VERIFICATION_ROLES = ("reference", "candidate")
 
 VLLM_VERIFICATION_SCOPE = "local_vllm_prefix_cache.v1"
+LLAMACPP_BUILD_SCOPE = "local_llamacpp_cpu_builds.v1"

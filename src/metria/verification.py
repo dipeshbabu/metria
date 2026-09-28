@@ -25,7 +25,6 @@ from .measurements.verification_impact import VerificationImpactAnalysis
 from .models import CompatibilityReport, RunRecord, RunStatus
 from .policies import PolicyDecision, evaluate_policy
 from .protocols import (
-    InferenceRequest,
     MeasurementProtocol,
     MeasurementResult,
     PairwiseAnalysis,
@@ -41,11 +40,9 @@ from .records import (
 from .reporting import render_verification as render_verification
 from .runtimes.llamacpp import (
     LlamaCppAdapter,
-    _generation_options,
-    _requested_model_sha256,
-    _runtime_config,
 )
 from .study_execution import PairwiseAnalysisStatus, StudyPairAnalysis, execute_study
+from .verification_cpu import validate_cpu_run
 from .verification_route import VerificationRoute
 from .verification_schema import VERIFICATION_ROLES as _ROLES
 from .verification_schema import VERIFICATION_SCHEMA, VERIFICATION_SCOPE
@@ -165,76 +162,7 @@ def _validate(recipe: StudyRecipe, registries: _Registries) -> None:
     config = recipe.measurement_configs[TokenTrajectoryProtocol.name]
     pins = []
     for index, run in enumerate(recipe.study.runs):
-        name = run.runtime.get("name")
-        if name not in registries.adapters:
-            raise ValueError(f"run[{index}] runtime is not registered for verification")
-        if name != "llamacpp":
-            raise ValueError("the first verify workflow supports local llama.cpp only")
-        if (
-            run.measurements != (TokenTrajectoryProtocol.name,)
-            or TokenTrajectoryProtocol.name not in registries.measurements
-        ):
-            raise ValueError(
-                "local verify requires the registered decode-time trajectory measurement"
-            )
-        if run.treatments or run.trial_policy or run.environment_selector:
-            raise ValueError(
-                "local CPU verification does not yet apply treatments, trial policies, or environment selectors"
-            )
-        if set(run.runtime) - {
-            "name",
-            "bin_dir",
-            "n_gpu_layers",
-            "flash_attention",
-            "threads",
-            "threads_batch",
-            "extra_args",
-        }:
-            raise ValueError("unsupported local verification runtime fields")
-        if set(run.model) - {"path", "sha256", "id", "revision", "geometry"}:
-            raise ValueError("unsupported local verification model fields")
-        if "system" in run.scenario:
-            raise ValueError(
-                "the plain-completion verifier does not accept system prompts"
-            )
-        if set(run.scenario) - {
-            "name",
-            "context",
-            "max_tokens",
-            "seed",
-            "temperature",
-            "timeout",
-            "chat_template",
-            "reasoning",
-        }:
-            raise ValueError("unsupported local verification scenario fields")
-        runtime = _runtime_config(run)
-        if runtime["n_gpu_layers"] != 0 or runtime["extra_args"]:
-            raise ValueError("local verify requires n_gpu_layers=0 and no extra_args")
-        if runtime["threads"] is None or runtime["threads_batch"] is None:
-            raise ValueError("local verify requires explicit threads and threads_batch")
-        pin = _requested_model_sha256(run)
-        if pin is None:
-            raise ValueError(
-                "local verify requires model.sha256 from a trusted artifact manifest"
-            )
-        pins.append(pin)
-        registries.measurements[TokenTrajectoryProtocol.name].requirements(config)
-        for row in config["prompts"]:
-            generation = {**config.get("generation", {}), **row.get("generation", {})}
-            options = _generation_options(
-                InferenceRequest(row["prompt"], generation), run.scenario
-            )
-            if (
-                options["temperature"] != 0.0
-                or options["chat_template"]
-                or options["system"]
-            ):
-                raise ValueError(
-                    "local verify requires greedy plain completion: temperature=0 and chat_template=false"
-                )
-            if options["max_tokens"] <= 0:
-                raise ValueError("local verify requires a positive generation length")
+        pins.append(validate_cpu_run(run, index, config, registries))
     if pins[0] != pins[1]:
         raise ValueError(
             "the first local verifier requires the same pinned model for both runs"
@@ -461,6 +389,10 @@ def _legacy_performance(
 
 
 def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
+    if "llama_cpp_capture_providers" in recipe.environment:
+        from .verification_build import build_route as build_llamacpp_route
+
+        return build_llamacpp_route(recipe)
     if recipe.study.runs and all(
         run.runtime.get("name") == "vllm" for run in recipe.study.runs
     ):
@@ -494,7 +426,7 @@ def verify_recipe(
     """Validate one qualified profile and retain its reference/candidate evidence."""
     resolve_capability_checks(capability_checks)
     route = _verification_route(recipe)
-    if route.scope != VERIFICATION_SCOPE:
+    if route.isolated:
         if capability_checks is not None:
             raise ValueError(
                 "qualified vLLM verification uses the built-in capability registry"

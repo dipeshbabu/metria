@@ -155,6 +155,7 @@ def _add_recipe_parser(subparsers: Any) -> None:
 
 
 def _add_preparation_parser(subparsers: Any) -> None:
+    _add_cpu_build_parser(subparsers)
     prepare = subparsers.add_parser(
         "prepare-vllm", help="prepare a pinned local vLLM prefix-cache recipe"
     )
@@ -192,6 +193,43 @@ def _add_preparation_parser(subparsers: Any) -> None:
         default=900,
         help="whole-verification deadline in seconds",
     )
+
+
+def _add_cpu_build_parser(subparsers: Any) -> None:
+    prepare = subparsers.add_parser(
+        "prepare-llamacpp-build",
+        help="qualify two pinned CPU capture builds and prepare their comparison",
+    )
+    prepare.add_argument("--reference-bin-dir", type=Path, required=True)
+    prepare.add_argument("--candidate-bin-dir", type=Path, required=True)
+    prepare.add_argument("--model", type=Path, required=True)
+    prepare.add_argument(
+        "--model-sha256", required=True, help="trusted GGUF artifact SHA256"
+    )
+    prepare.add_argument(
+        "--workload",
+        type=Path,
+        required=True,
+        help="JSONL prompts with optional task checks",
+    )
+    prepare.add_argument("--policy", type=Path)
+    prepare.add_argument("--output", type=Path, required=True)
+    prepare.add_argument("--threads", type=int, default=2)
+    prepare.add_argument("--context", type=int, default=256)
+    prepare.add_argument("--max-tokens", type=int, default=16)
+    prepare.add_argument(
+        "--timeout", type=float, default=300, help="per-request deadline in seconds"
+    )
+
+
+def _prepare_recipe_command(args: Any, out: TextIO) -> int:
+    if args.recipe_command == "prepare-llamacpp-build":
+        from .preparation_cpu import prepare_build_command
+
+        return prepare_build_command(args, out)
+    from .onboarding import prepare_command
+
+    return prepare_command(args, out)
 
 
 def _version() -> str:
@@ -500,10 +538,11 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
             from .onboarding import demo_command
 
             return demo_command(args, out, err)
-        if args.command == "recipe" and args.recipe_command == "prepare-vllm":
-            from .onboarding import prepare_command
-
-            return prepare_command(args, out)
+        if args.command == "recipe" and args.recipe_command in {
+            "prepare-vllm",
+            "prepare-llamacpp-build",
+        }:
+            return _prepare_recipe_command(args, out)
         if args.command == "compare":
             if len(args.records) < 2:
                 raise ValueError("compare requires at least two run record files")

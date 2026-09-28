@@ -394,4 +394,5 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
             "candidate": True,
         },
         performance=compare_prefix_performance,
+        isolated=True,
     )
