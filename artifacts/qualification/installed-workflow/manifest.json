@@ -1,0 +1,630 @@
+{
+  "acceptance_policy_evaluated": false,
+  "analyses": [
+    {
+      "diagnostics": {
+        "all_trajectories_match": true,
+        "comparison_steps": 64,
+        "divergence": {
+          "by_category": [
+            {
+              "category": "shared-prefix",
+              "diverged_prompts": 0,
+              "divergence_rate": 0.0,
+              "n_prompts": 4
+            }
+          ],
+          "compared_prompts": 4,
+          "diverged_prompts": 0,
+          "divergence_rate": 0.0,
+          "earliest_first_divergence": null,
+          "exact_match_rate": 1.0,
+          "exact_matches": 4,
+          "first_divergence_positions": [],
+          "length_mismatches": 0,
+          "mean_prefix_steps": 16.0,
+          "median_first_divergence": null,
+          "most_divergent": [],
+          "n_prompts": 4,
+          "position_origin": 0,
+          "ranking": "prefix_fraction_ascending,first_divergence_ascending,id_ascending",
+          "schema": "metria.trajectory_divergence.v1",
+          "status": "complete",
+          "top_limit": 10,
+          "unavailable_prompts": 0,
+          "uncategorized_prompts": 0
+        },
+        "mean_candidate_steps": 16.0,
+        "mean_reference_steps": 16.0,
+        "median_first_divergence": null,
+        "method": "kv_fidelity.trajectory_match",
+        "method_version": "0.3.4",
+        "n_prompts": 4,
+        "notes": [],
+        "per_prompt": [
+          {
+            "candidate_steps": 16,
+            "category": "shared-prefix",
+            "first_divergence": null,
+            "id": "0:shared-a",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": "shared-prefix",
+            "first_divergence": null,
+            "id": "0:shared-b",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": "shared-prefix",
+            "first_divergence": null,
+            "id": "1:shared-a",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": "shared-prefix",
+            "first_divergence": null,
+            "id": "1:shared-b",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331",
+            "reference_steps": 16
+          }
+        ],
+        "prefix_agreement_steps": 64,
+        "schema": "metria.trajectory_comparison.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "trajectory_agreement_score": {
+          "aggregation": "weighted_by_max_trajectory_length",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_agreement_score",
+            "unit": "score_0_100",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 100.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 100.0
+        },
+        "trajectory_divergence_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_divergence_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 0.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.0
+        },
+        "trajectory_full_match_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_full_match_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 1.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "trajectory_mean_prefix_steps": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "descriptive",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_mean_prefix_steps",
+            "unit": "tokens",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-a",
+                "prompt_sha256": "41e1f591ae4650d07f21750caff6455008949f505e26a5b973fd1d73f4fca62b"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:shared-b",
+                "prompt_sha256": "feef7394cf80f63702ba483bebbfcf2dd4d27c54418d00a832105bfe82c40331"
+              },
+              "value": 16.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 16.0
+        }
+      },
+      "name": "kv_fidelity.trajectory_match",
+      "reason": null,
+      "status": "completed",
+      "version": "0.3.4"
+    },
+    {
+      "diagnostics": {
+        "method": "metria.verification_impact",
+        "method_version": "1",
+        "performance": {
+          "absolute_delta": -0.13028583400000004,
+          "available": true,
+          "candidate": 0.8198981077499999,
+          "direction": "improved",
+          "label": "Loaded-engine request latency",
+          "limitations": "Sequential synchronous request calls after engine warmup; includes prompt evaluation and generation, excludes engine startup and cache reset. No streaming TTFT, serving-throughput, or statistical speedup claim.",
+          "methodology": {
+            "aggregation": "arithmetic mean across complete measured request calls",
+            "clock": "perf_counter_ns",
+            "excluded": [
+              "engine startup",
+              "warmup",
+              "cache reset"
+            ],
+            "isolation": "public prefix-cache reset before every warmup/measured trial",
+            "runtime_hardware": {
+              "device_type": "cpu",
+              "source": "vllm_native_platform",
+              "status": "observed"
+            },
+            "sample_count": 4,
+            "schedule": "sequential prompts in declared order",
+            "scope": "session.infer call after engine launch",
+            "source": "sequential session.infer calls",
+            "trials_per_prompt": 2,
+            "warmup_trials": 1,
+            "workload_sha256": "e932427e2f6c45df097efc415476d869c3dbef987d338ff13ef7981101213acc"
+          },
+          "metric": {
+            "direction": "lower_is_better",
+            "method": "metria.runtime_call_latency",
+            "name": "request_latency_seconds",
+            "unit": "seconds",
+            "version": "1"
+          },
+          "reference": 0.95018394175,
+          "relative_baseline_floor_seconds": 1e-09,
+          "relative_delta": -0.1371164342769741,
+          "relative_unavailable_reason": null,
+          "schema": "metria.performance_impact.v1",
+          "unsupported_metrics": [
+            "ttft",
+            "inter_token_latency",
+            "decode_throughput",
+            "peak_device_memory",
+            "kv_memory"
+          ]
+        },
+        "quality": {
+          "reason": "complete declared task checks were not retained for both runs",
+          "status": "unavailable"
+        },
+        "reference_variability": {
+          "compared_pairs": 2,
+          "different_pairs": 0,
+          "limitation": "Observed sample repeatability; not a statistical guarantee or a quality score.",
+          "reference_trials_per_prompt": 2,
+          "status": "available",
+          "unique_prompts": 2
+        },
+        "schema": "metria.verification_impact.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "candidate_latency_seconds": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.compatible_latency_impact",
+            "name": "candidate_latency_seconds",
+            "unit": "seconds",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.8198981077499999
+        },
+        "latency_ratio": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.compatible_latency_impact",
+            "name": "latency_ratio",
+            "unit": "ratio",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.8628835657230259
+        },
+        "reference_repeatability": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.observed_reference_repeatability",
+            "name": "reference_repeatability",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        }
+      },
+      "name": "metria.verification_impact",
+      "reason": null,
+      "status": "completed",
+      "version": "1"
+    }
+  ],
+  "change": {
+    "candidate": true,
+    "parameter": "enable_prefix_caching",
+    "reference": false
+  },
+  "comparison": {
+    "comparable_metrics": [
+      "request_latency_seconds",
+      "trajectory_mean_steps",
+      "trajectory_nonempty_capture_rate"
+    ],
+    "compatible": true,
+    "incompatible_metrics": {},
+    "issues": [],
+    "waived_differences": []
+  },
+  "comparison_plan": {
+    "block_by": [],
+    "control": [
+      "measurements",
+      "model",
+      "scenario",
+      "trial_policy"
+    ],
+    "vary": [
+      "observed.applied.fields.cache.enable_prefix_caching",
+      "observed.configured.runtime.enable_prefix_caching",
+      "observed.identity.applied.fields.cache.enable_prefix_caching",
+      "resolved.runtime.settings.enable_prefix_caching",
+      "runtime.enable_prefix_caching"
+    ]
+  },
+  "comparison_status": "VALID",
+  "controls": [
+    {
+      "dimension": "measurements",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "model",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "scenario",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "trial_policy",
+      "role": "control",
+      "status": "matched"
+    }
+  ],
+  "execution_boundary": {
+    "configured_engine_start_method": "spawn",
+    "elapsed_seconds": 101.35402388700001,
+    "includes_startup_and_cleanup": true,
+    "log_hash_scope": "retained bounded process output",
+    "mode": "bounded_native_worker",
+    "stderr_sha256": "ac1c0581d265a02f8fea1b07b7efef0f8a669551a8e3265c3a63f43ebc6fd29e",
+    "stderr_truncated": false,
+    "stdout_sha256": "cab5d9f0c369760f4d269dc7144729a25eda8c1d22592895464e4064cda090bc",
+    "stdout_truncated": false,
+    "timeout_seconds": 900
+  },
+  "exit_code": 0,
+  "hardware": {
+    "accelerators": [],
+    "host": {
+      "cpu_count": 12,
+      "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+    },
+    "metadata": {
+      "accelerator_detection": "runtime_or_adapter_required"
+    },
+    "platform": {
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "release": "5.15.167.4-microsoft-standard-WSL2",
+      "system": "Linux",
+      "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+    },
+    "software": {
+      "python_executable": "python",
+      "python_implementation": "CPython",
+      "python_version": "3.12.3"
+    }
+  },
+  "implementation": {
+    "name": "metria.verify",
+    "source_sha256": "86ef8130c49131fa5e48d7cd135d9ff3f5bddf00ccf590198c0f588df82a3540",
+    "version": "0.2.0.dev0"
+  },
+  "lifecycle": {
+    "records": {
+      "candidate": "completed",
+      "reference": "completed"
+    },
+    "status": "completed"
+  },
+  "performance": {
+    "absolute_delta": -0.13028583400000004,
+    "available": true,
+    "candidate": 0.8198981077499999,
+    "direction": "improved",
+    "label": "Loaded-engine request latency",
+    "limitations": "Sequential synchronous request calls after engine warmup; includes prompt evaluation and generation, excludes engine startup and cache reset. No streaming TTFT, serving-throughput, or statistical speedup claim.",
+    "methodology": {
+      "aggregation": "arithmetic mean across complete measured request calls",
+      "clock": "perf_counter_ns",
+      "excluded": [
+        "engine startup",
+        "warmup",
+        "cache reset"
+      ],
+      "isolation": "public prefix-cache reset before every warmup/measured trial",
+      "runtime_hardware": {
+        "device_type": "cpu",
+        "source": "vllm_native_platform",
+        "status": "observed"
+      },
+      "sample_count": 4,
+      "schedule": "sequential prompts in declared order",
+      "scope": "session.infer call after engine launch",
+      "source": "sequential session.infer calls",
+      "trials_per_prompt": 2,
+      "warmup_trials": 1,
+      "workload_sha256": "e932427e2f6c45df097efc415476d869c3dbef987d338ff13ef7981101213acc"
+    },
+    "metric": {
+      "direction": "lower_is_better",
+      "method": "metria.runtime_call_latency",
+      "name": "request_latency_seconds",
+      "unit": "seconds",
+      "version": "1"
+    },
+    "reference": 0.95018394175,
+    "relative_baseline_floor_seconds": 1e-09,
+    "relative_delta": -0.1371164342769741,
+    "relative_unavailable_reason": null,
+    "schema": "metria.performance_impact.v1",
+    "unsupported_metrics": [
+      "ttft",
+      "inter_token_latency",
+      "decode_throughput",
+      "peak_device_memory",
+      "kv_memory"
+    ]
+  },
+  "policy_status": "NOT_CONFIGURED",
+  "recipe_digest": "dc7dea11e1058690aef1754fd163062ea871b447b1655dab265e92d20428337a",
+  "records": {
+    "candidate": {
+      "evidence_digest": "e81369c354a6baea8591066cb03f1ca6c9e110ca015a208df1ee4d19b91d1d0f",
+      "evidence_gaps": [],
+      "observed": {
+        "context": 512,
+        "model_sha256": "42c24f9eaaa11c3bb9017b0c7959d115ccc6845857caac008784b98e5e118d21",
+        "prefix_caching": true,
+        "provider_sha256": "48c75a0bf883a02d4a61f5dedfe34f500b97350dd1e2d84052f0ea90be37be24",
+        "runtime_hardware": {
+          "device_type": "cpu",
+          "source": "vllm_native_platform",
+          "status": "observed"
+        },
+        "runtime_version": "0.30.0+cpu"
+      },
+      "path": "candidate.run.json",
+      "record_digest": "61d17b9606a1912a6930b7cc0edf6799be5d8f5ddaeb06fda82a40de4ea965d7",
+      "run_id": "run-0001",
+      "status": "completed"
+    },
+    "reference": {
+      "evidence_digest": "2e73994a1d588fd3abb13e23cdbd823de679ceec85501ccb177e92ec4402d479",
+      "evidence_gaps": [],
+      "observed": {
+        "context": 512,
+        "model_sha256": "42c24f9eaaa11c3bb9017b0c7959d115ccc6845857caac008784b98e5e118d21",
+        "prefix_caching": false,
+        "provider_sha256": "48c75a0bf883a02d4a61f5dedfe34f500b97350dd1e2d84052f0ea90be37be24",
+        "runtime_hardware": {
+          "device_type": "cpu",
+          "source": "vllm_native_platform",
+          "status": "observed"
+        },
+        "runtime_version": "0.30.0+cpu"
+      },
+      "path": "reference.run.json",
+      "record_digest": "00132cf3456b74af3ff98bdd0e966919246aded17f6d8f98cbb123eb11219d36",
+      "run_id": "run-0000",
+      "status": "completed"
+    }
+  },
+  "schema": "metria.verification.v1",
+  "scope": "local_vllm_prefix_cache.v1",
+  "study": "vllm-prefix-cache-change",
+  "systems": {
+    "candidate": {
+      "available": false
+    },
+    "reference": {
+      "available": false
+    }
+  },
+  "verdict": "VERIFIED"
+}

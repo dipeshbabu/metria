@@ -46,6 +46,17 @@ methods under `metria.fidelity` and `metria fidelity`; see the
 [qualified vLLM prefix-cache verification](docs/guides/vllm-prefix-verification.md)
 with retained CPU/CUDA evidence, cache isolation and loaded-engine latency.
 
+In the 0.2 development checkout, try the report flow without a model:
+
+```bash
+uv run metria demo --case pass --output demo-pass
+uv run metria recipe prepare-vllm --help
+```
+
+The demo is explicitly synthetic. Use the [installed workflow](docs/guides/installed-workflow.md)
+for your own pinned runtime/model and workload, then add
+[task checks and an acceptance policy](docs/guides/verification-decisions.md).
+
 Start with the [copyable workflows](examples/verification/README.md): a qualified
 local configuration change, synthetic PASS/FAIL/invalid-comparison fixtures,
 and clearly staged templates for runtime upgrades, KV precision, quantization,

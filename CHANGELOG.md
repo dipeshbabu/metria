@@ -9,6 +9,9 @@ TurboQuant reference packages have independent versions and release notes.
   latency from token drift in verification impact and policies. Add exact-text,
   nonempty and strict JSON-object checks with redacted summaries; missing quality
   evidence cannot become policy PASS. Preserve existing trajectory target versions.
+- Add installed-package recipe preparation and a bounded, explicitly synthetic
+  demo for PASS/FAIL/invalid comparisons. Bundle example workload/model pins and
+  document the real workflow, privacy boundaries and an external pilot protocol.
 
 - Add qualified local vLLM prefix-cache verification through the shared verifier,
   with pinned model/tokenizer/runtime content, native cache evidence, bounded

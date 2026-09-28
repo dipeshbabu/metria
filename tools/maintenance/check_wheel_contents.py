@@ -92,6 +92,8 @@ def check_wheel(path: Path) -> list[str]:
         required = {
             "metria/fidelity/prompts/v0.1.jsonl",
             "metria/fidelity/prompts/README.md",
+            "metria/data/smollm2-135m.json",
+            "metria/data/prefix-workload.jsonl",
         }
         for name in sorted(required - names):
             errors.append(f"{path}: missing {name}")

@@ -43,7 +43,8 @@
     "src/metria/verification_worker.py": 82,
     "src/metria/measurements/task_checks.py": 88,
     "src/metria/measurements/verification_impact.py": 84,
-    "src/metria/measurements/impact_schema.py": 95
+    "src/metria/measurements/impact_schema.py": 95,
+    "src/metria/onboarding.py": 75
   },
   "components": {
     "src/metria/integrations/turboquant_diagnostics.py": 90,
@@ -82,6 +83,7 @@
   "exclusions": {
     "src/metria/__main__.py": "Thin subprocess entry point; CLI behavior is covered through cli.py and subprocess CLI tests.",
     "src/metria/_process_windows.py": "Isolated native child bootstrap; real Windows process-tree timeout/success/exception/interruption tests cover its behavior. Parent-process coverage does not measure that child; it remains visible in the JSON report.",
-    "package __init__.py modules": "Export-only modules are measured and reported but do not receive a separate scientific guard threshold."
+    "package __init__.py modules": "Export-only modules are measured and reported but do not receive a separate scientific guard threshold.",
+    "src/metria/_demo_worker.py": "Isolated synthetic child exercised by real demo subprocess tests and clean wheel/sdist CLI smoke tests; parent-process coverage does not measure that child."
   }
 }
