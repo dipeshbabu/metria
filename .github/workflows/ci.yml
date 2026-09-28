@@ -39,6 +39,11 @@ jobs:
           export PATH="${uv_bin_dir}:${PATH}"
           uv run --locked pre-commit run --all-files --show-diff-on-failure
 
+      - name: Check verification trial shell wrappers
+        run: |
+          bash -n tools/benchmarks/turbo-quick-bench.sh
+          bash -n tools/benchmarks/turbo-realworld-bench.sh
+
   test:
     name: Tests / ${{ matrix.os }} / Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}

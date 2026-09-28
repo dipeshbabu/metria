@@ -26,6 +26,7 @@ from metria import (
     VerificationPolicy,
     dump_study_recipe,
     verification,
+    verification_trials,
 )
 from metria.cli import main
 from metria.measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
@@ -696,3 +697,31 @@ def test_ci_summary_explains_an_incomplete_bundle(tmp_path):
     summary = tmp_path / "step-summary.md"
     writer["append_summary"](tmp_path / "missing-output", summary)
     assert "No complete verification bundle" in summary.read_text()
+
+
+@pytest.mark.parametrize(
+    "mode,exit_code", [("normal", 0), ("timeout", 5), ("interrupt", 130)]
+)
+def test_trial_runner_reuses_verifier_evidence_lifecycle(
+    local_case, monkeypatch, tmp_path, mode, exit_code
+):
+    original = verification.verify_recipe
+    local_case["mode"] = mode
+
+    def retain_pair(recipe, output):
+        local_case["output"] = output
+        return original(recipe, output)
+
+    monkeypatch.setattr(verification_trials, "verify_recipe", retain_pair)
+    result = verification_trials.execute_verification_trials(
+        local_case["recipe"],
+        tmp_path / "trial-bundle",
+        policy=verification_trials.VerificationTrialPolicy(0, 2),
+    )
+    assert result["exit_code"] == exit_code
+    assert len(result["pairs"]) == (2 if mode == "normal" else 1)
+    for row in result["pairs"]:
+        pair_dir = tmp_path / "trial-bundle" / Path(row["path"]).parent
+        assert (pair_dir / "reference.run.json").is_file()
+        assert (pair_dir / "candidate.run.json").is_file()
+        assert (pair_dir / "verification.json").is_file()
