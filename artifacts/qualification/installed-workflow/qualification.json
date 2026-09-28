@@ -1,0 +1,19 @@
+{
+  "cli_json_matches_saved_result": true,
+  "commands": [
+    "metria recipe prepare-vllm --example --model /var/tmp/metria-prefix-qualification/model --measured-trials 2 --output study.json",
+    "metria recipe validate study.json",
+    "metria verify study.json --output verification --json"
+  ],
+  "execution": "installed console scripts from /var/tmp with PYTHONPATH unset",
+  "external_user_feedback_collected": false,
+  "limitations": [
+    "Maintainer-run installed-package contract walkthrough, not an external-user pilot or production benchmark.",
+    "Pinned CPU environment retains the documented setuptools84 override and OpenMP preload."
+  ],
+  "metria_wheel_sha256": "703318c1dc5c59b4e3ed02b99f48c717c7790ffb9c0428e4b4836545326b3753",
+  "runtime_version": "0.30.0+cpu",
+  "schema": "metria.installed_workflow_qualification.v1",
+  "source_revision": "fa9484f73d257b7f3243bd535e07dcb987d48cd9",
+  "verdict": "VERIFIED"
+}

@@ -7,6 +7,7 @@
     "artifacts/qualification/vllm-prefix-cache/cpu/headline-manifest.json",
     "artifacts/qualification/vllm-prefix-cache/cuda/headline-manifest.json",
     "artifacts/qualification/verification-decisions/pass/headline-manifest.json",
-    "artifacts/qualification/verification-decisions/fail/headline-manifest.json"
+    "artifacts/qualification/verification-decisions/fail/headline-manifest.json",
+    "artifacts/qualification/installed-workflow/headline-manifest.json"
   ]
 }
