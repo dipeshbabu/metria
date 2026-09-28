@@ -201,7 +201,12 @@ def _latency_summary(
                     }
                     for role, samples in values.items()
                 },
-                "limitation": "Cold-process request latency includes startup/model loading; no statistical speedup claim.",
+                "source_metric": measurements[0]["performance"].get("metric"),
+                "source_methodology": measurements[0]["performance"].get("methodology"),
+                "limitation": measurements[0]["performance"].get(
+                    "limitations",
+                    "Interpret latency using each pair's retained measurement boundary; no statistical speedup claim.",
+                ),
             }
     return latency
 

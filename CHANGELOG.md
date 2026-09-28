@@ -5,6 +5,11 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Add qualified local vLLM prefix-cache verification through the shared verifier,
+  with pinned model/tokenizer/runtime content, native cache evidence, bounded
+  process isolation, retained failures, warmup/repeated trials and loaded-engine
+  latency. Retain installed-wheel CPU/CUDA qualification and a preparation guide.
+
 - Unify KV Fidelity's implementation, prompt assets and report tools under
   `metria.fidelity` and `metria fidelity`. Retire separate KV package publication;
   keep source-only compatibility imports and preserved report/method identities.

@@ -320,3 +320,145 @@ def test_output_collision_never_launches_a_worker(prefix_case, tmp_path, monkeyp
     with pytest.raises(FileExistsError):
         verification.verify_recipe(prefix_case["recipe"], tmp_path)
     assert marker.read_text() == "keep"
+
+
+def test_worker_entrypoint_defers_publication_until_parent_validation(
+    prefix_case, tmp_path, monkeypatch
+):
+    from metria.recipes import study_recipe_digest, study_recipe_to_json
+
+    output = tmp_path / "worker entry"
+    output.mkdir()
+    transport = output / ".worker-recipe.json"
+    transport.write_text(study_recipe_to_json(prefix_case["recipe"]), encoding="utf-8")
+    argv = [
+        "worker",
+        "--recipe",
+        str(transport),
+        "--output",
+        str(output),
+        "--digest",
+        study_recipe_digest(prefix_case["recipe"]),
+    ]
+    monkeypatch.setattr(verification_worker.sys, "argv", argv)
+    assert verification_worker.main() == 0
+    assert (output / "worker-result.json").is_file()
+    assert not (output / "verification.json").exists()
+    assert not (output / "report.md").exists()
+    monkeypatch.setattr(verification_worker.sys, "argv", [*argv[:-1], "wrong digest"])
+    with pytest.raises(ValueError, match="digest"):
+        verification_worker.main()
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("version", "unqualified"),
+        ("trust_remote_code", True),
+        ("max_num_seqs", 2),
+        ("tensor_parallel_size", 2),
+        ("enforce_eager", False),
+        ("dtype", "unknown"),
+    ],
+)
+def test_unqualified_runtime_configuration_fails_before_launch(
+    prefix_case, tmp_path, field, value
+):
+    recipe = prefix_case["recipe"]
+    runs = tuple(
+        replace(run, runtime={**run.runtime, field: value}) for run in recipe.study.runs
+    )
+    recipe = replace(recipe, study=replace(recipe.study, runs=runs))
+    with pytest.raises((ValueError, TypeError)):
+        verification.verify_recipe(recipe, tmp_path / "invalid runtime")
+    assert not prefix_case["engines"]
+
+
+@pytest.mark.parametrize(
+    "environment",
+    [
+        {"vllm_distribution_sha256": "bad", "verification_timeout_s": 30},
+        {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": True},
+        {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": 0},
+        {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": float("inf")},
+    ],
+)
+def test_invalid_worker_environment_rejected_before_launch(
+    prefix_case, tmp_path, environment
+):
+    recipe = replace(prefix_case["recipe"], environment=environment)
+    with pytest.raises((ValueError, TypeError)):
+        verification.verify_recipe(recipe, tmp_path / "invalid environment")
+    assert not prefix_case["engines"]
+
+
+@pytest.mark.parametrize(
+    "damage", ["model", "runtime", "applied", "hardware", "invocations", "resets"]
+)
+def test_required_evidence_cannot_be_removed_from_completed_records(
+    prefix_case, tmp_path, damage
+):
+    from metria.recipes import _json_value
+
+    result = execute(prefix_case, tmp_path / damage)
+    record = load_run_record(result.output_dir / "candidate.run.json")
+    observed = _json_value(record.observed, path="observed")
+    if damage in {"model", "runtime"}:
+        observed["artifacts"][damage]["status"] = "unknown"
+    elif damage == "applied":
+        observed["applied"]["status"] = "unverified"
+    elif damage == "hardware":
+        observed["hardware"]["status"] = "unknown"
+    elif damage == "invocations":
+        observed["invocations"] = []
+    else:
+        observed["reset_events"] = None
+    damaged = replace(record, observed=observed)
+    assert build_route(prefix_case["recipe"]).evidence_gaps(damaged)
+
+
+def test_performance_rejects_an_uncontrolled_hardware_change(prefix_case, tmp_path):
+    from metria.measurements.prefix_performance import compare_prefix_performance
+
+    result = execute(prefix_case, tmp_path / "hardware mismatch")
+    left = load_run_record(result.output_dir / "reference.run.json")
+    right = load_run_record(result.output_dir / "candidate.run.json")
+    right = replace(
+        right,
+        observed={
+            **right.observed,
+            "hardware": {
+                "status": "observed",
+                "device_type": "cuda",
+                "name": "different fixture",
+            },
+        },
+    )
+    assert compare_prefix_performance(left, right, True)["available"] is False
+
+
+def test_preparation_pins_runtime_and_model_without_loading_engine(
+    prefix_case, monkeypatch
+):
+    from metria import preparation
+
+    monkeypatch.setattr(
+        preparation,
+        "installed_runtime_identity",
+        lambda: {"version": "0.30.0+cpu", "sha256": "a" * 64},
+    )
+    old = prefix_case["recipe"]
+    model = old.study.runs[0].model
+    config = old.measurement_configs[TokenTrajectoryProtocol.name]
+    prepared = preparation.prepare_vllm_prefix_recipe(
+        model["path"],
+        {"files": model["files"]},
+        config["prompts"],
+        warmup_trials=0,
+        measured_trials=4,
+    )
+    assert prepared.study.runs[0].runtime["enable_prefix_caching"] is False
+    assert prepared.study.runs[1].runtime["enable_prefix_caching"] is True
+    assert prepared.study.runs[0].trial_policy["measured_trials"] == 4
+    assert prepared.environment["vllm_distribution_sha256"] == "a" * 64
+    assert not prefix_case["engines"]

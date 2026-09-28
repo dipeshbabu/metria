@@ -81,10 +81,23 @@ def test_runtime_fingerprint_hashes_actual_installed_payload(tmp_path, monkeypat
     before = artifacts.installed_runtime_identity(
         loaded_module=SimpleNamespace(__file__=str(init))
     )
+    assert (
+        artifacts.require_runtime_pin({"vllm_distribution_sha256": before["sha256"]})
+        == before
+    )
+    assert artifacts.require_runtime_pin({}) is None
     init.write_text("modified runtime")
     after = artifacts.installed_runtime_identity()
     assert before["sha256"] != after["sha256"]
+    with pytest.raises(ValueError, match="differ"):
+        artifacts.require_runtime_pin({"vllm_distribution_sha256": before["sha256"]})
     with pytest.raises(ValueError, match="loaded"):
         artifacts.installed_runtime_identity(
             loaded_module=SimpleNamespace(__file__=str(tmp_path / "shadow.py"))
         )
+
+
+@pytest.mark.parametrize("value", [True, "", "A" * 64, "a" * 63])
+def test_runtime_pin_format_is_validated_before_inspection(value):
+    with pytest.raises(ValueError, match="SHA256"):
+        artifacts.require_runtime_pin({"vllm_distribution_sha256": value})
