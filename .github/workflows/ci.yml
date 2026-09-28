@@ -145,10 +145,15 @@ jobs:
           components/kv-fidelity/tests
           --cov=turboquant
           --cov=kv_fidelity
+          --cov=metria.integrations.turboquant_diagnostics
+          --cov=metria.integrations.turboquant_diagnostic_runner
           --cov-report=term-missing
           --cov-report=json:component-coverage.json
           --skip-report=component-skips.json
           -v --tb=short
+
+      - name: Preserve the component-only aggregate floor after diagnostic extraction
+        run: uv run --locked coverage report --include='components/*' --fail-under=86
 
       - name: Enforce per-runtime and evaluator coverage
         run: >-
