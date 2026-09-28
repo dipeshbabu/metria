@@ -38,11 +38,11 @@ metria verify study.json --output verification --json
 The root Python package has no runtime dependencies. Native engines and models
 are installed separately. Each output directory must be new.
 
-Published Metria 0.1.0 provides the initial local verifier. The development
-checkout adds the canonical result, richer diagnostics, explicit policies,
-performance deltas, and CI integration described here. See the
-[release notes](https://github.com/dipeshbabu/metria/releases/tag/metria-v0.1.0)
-for the published release's scope.
+Published [Metria 0.1.1](https://github.com/dipeshbabu/metria/releases/tag/metria-v0.1.1)
+includes canonical results, diagnostics, explicit policies, compatible performance
+deltas, and CI integration. The 0.2 development checkout also unifies fidelity
+methods under `metria.fidelity` and `metria fidelity`; see the
+[migration guide](docs/guides/unified-fidelity.md).
 
 Start with the [copyable workflows](examples/verification/README.md): a qualified
 local configuration change, synthetic PASS/FAIL/invalid-comparison fixtures,

@@ -25,7 +25,7 @@ def pytest_sessionstart(session):
         "artifacts/qualification/llamacpp-cpu-threads/threads-1-to-2/candidate.run.json",
         "artifacts/qualification/vllm-0.30.0/cpu/qualification.run.json",
         "artifacts/qualification/vllm-0.30.0/cuda/qualification.run.json",
-        "components/kv-fidelity/src/kv_fidelity/prompts/v0.1.jsonl",
+        "src/metria/fidelity/prompts/v0.1.jsonl",
     ]
     missing = [name for name in required if not (root / name).is_file()]
     if missing:

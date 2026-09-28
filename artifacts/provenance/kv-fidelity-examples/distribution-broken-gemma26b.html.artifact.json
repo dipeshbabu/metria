@@ -7,7 +7,7 @@
       "license_status": "No new license asserted for model-derived material"
     },
     "name": "distribution-broken-gemma26b.html",
-    "path": "components/kv-fidelity/src/kv_fidelity/examples/distribution-broken-gemma26b.html",
+    "path": "src/metria/fidelity/examples/distribution-broken-gemma26b.html",
     "sha256": "ab2b0d988df7e67002465474a9d1dcd7b5bac0fc7afb1c6c435bd108f09ea148",
     "size_bytes": 38013,
     "source": {

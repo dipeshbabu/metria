@@ -10,6 +10,7 @@ import argparse
 import subprocess
 import sys
 import tempfile
+from importlib import resources
 from importlib.metadata import distribution
 from pathlib import Path
 
@@ -25,7 +26,16 @@ def main() -> int:
     assert dist.version == metria.__version__ == args.version
     assert dist.metadata["License-Expression"] == "Apache-2.0"
     assert dist.metadata["Requires-Python"] == "<3.15,>=3.10"
-    assert not dist.requires, "root package must not install an inference stack"
+    required = [value for value in (dist.requires or ()) if "extra ==" not in value]
+    assert not required, "base package must not install an inference stack"
+    from metria.fidelity import __report_schema__
+    from metria.fidelity.measurement_math import approximate_topk_kl
+
+    assert __report_schema__ == "kv_fidelity.report.v0.3.3"
+    assert approximate_topk_kl({1: -0.5}, {1: -0.5}) == 0.0
+    prompts = resources.files("metria.fidelity").joinpath("prompts/v0.1.jsonl")
+    assert len(prompts.read_text(encoding="utf-8").splitlines()) == 30
+
     files = {str(path).replace("\\", "/") for path in (dist.files or ())}
     assert any(p.endswith(".dist-info/licenses/LICENSE") for p in files)
     assert any(p.endswith(".dist-info/licenses/NOTICE") for p in files)
@@ -40,6 +50,9 @@ def main() -> int:
             (["--version"], f"metria {args.version}"),
             (["--help"], "verify"),
             (["verify", "--help"], "--output"),
+            (["fidelity", "--help"], "score"),
+            (["fidelity", "--version"], f"metria fidelity {args.version}"),
+            (["fidelity", "compare", "--help"], "compare"),
             (["recipe", "--help"], "validate"),
             (["compare", "--help"], "compare"),
         ]:

@@ -5,8 +5,8 @@ independently versioned and locally buildable, with distribution name
 `turboquant-reference` and import `turboquant`. It is not folded into root Metria
 and does not define a second public Metria workflow.
 
-The previous planned package-index publishing workflow is retired. Root Metria
-and KV Fidelity keep their separate protected publication procedures. Publishing
+The previous planned package-index publishing workflow is retired. Root Metria owns the protected publication procedure and includes KV Fidelity
+methods in its distribution. Publishing
 this research component later requires a new reviewed lifecycle decision,
 upstream-rights review, namespace/publisher verification, and an end-to-end release
 rehearsal; this document makes no package-index ownership or availability claim.

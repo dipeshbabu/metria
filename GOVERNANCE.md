@@ -15,7 +15,7 @@ component work must state its own bounded purpose and reuse shared contracts.
 
 The project maintains four kinds of material with different stability needs:
 
-- the Metria verifier and independently versioned KV Fidelity methodology;
+- the Metria verifier and its integrated KV Fidelity methodology;
 - portable research reference implementations, including TurboQuant;
 - diagnostics, validation, benchmark, and conversion tools; and
 - research reports and retained experimental evidence.

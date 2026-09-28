@@ -89,6 +89,17 @@ def check_wheel(path: Path) -> list[str]:
             errors.append(f"{path}: expected exactly one entry_points.txt file")
         elif "metria = metria.cli:main" not in entry_points:
             errors.append(f"{path}: missing metria console script")
+        required = {
+            "metria/fidelity/prompts/v0.1.jsonl",
+            "metria/fidelity/prompts/README.md",
+        }
+        for name in sorted(required - names):
+            errors.append(f"{path}: missing {name}")
+        if not any(
+            name.startswith("metria/fidelity/examples/") and name.endswith(".json")
+            for name in names
+        ):
+            errors.append(f"{path}: missing packaged KV Fidelity JSON examples")
         if any(name.startswith("kv_fidelity/") for name in names):
             errors.append(
                 f"{path}: root Metria wheel unexpectedly contains kv_fidelity"
@@ -118,17 +129,6 @@ def check_wheel(path: Path) -> list[str]:
             ):
                 errors.append(f"{path}: unexpectedly contains refract console script")
 
-        required = {
-            "kv_fidelity/prompts/v0.1.jsonl",
-            "kv_fidelity/prompts/README.md",
-        }
-        for name in sorted(required - names):
-            errors.append(f"{path}: missing {name}")
-        if not any(
-            name.startswith("kv_fidelity/examples/") and name.endswith(".json")
-            for name in names
-        ):
-            errors.append(f"{path}: missing packaged KV Fidelity JSON examples")
         if any(name.startswith("metria/") for name in names):
             errors.append(f"{path}: unexpectedly contains metria")
         if any(name.startswith("turboquant/") for name in names):

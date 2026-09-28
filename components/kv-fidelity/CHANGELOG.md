@@ -3,15 +3,21 @@
 Reverse-chronological. Each entry: what changed, why it changed, and the
 matrix result that motivated or validated the change.
 
-This repository has not published a PyPI release. Versions 0.3.2.3 and earlier
+KV Fidelity is now integrated into the Metria distribution. It will not have
+a separate PyPI release. Versions 0.3.2.3 and earlier
 below preserve legacy upstream development history: the corresponding
 `refract-llm` files on PyPI were not released from this repository and retain
 their original ownership and MIT metadata. Versions 0.3.3 and 0.3.4 are source
-milestones. The first planned `kv-fidelity` release is 0.3.5.
+milestones. The standalone 0.3.5 publication plan is retired.
 
 ---
 
 ## Unreleased
+
+- The implementation and packaged assets now live in `metria.fidelity` and ship
+  in the Metria wheel. `metria fidelity` exposes the retained expert commands.
+  Source-only `kv_fidelity` aliases keep existing imports and numerical/report
+  behavior available during migration. No separate component release is planned.
 
 - `compare` now routes reports through Metria's shared comparison semantics,
   requires at least two valid inputs, and rejects missing identities or method

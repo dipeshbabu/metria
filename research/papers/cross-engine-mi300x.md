@@ -255,8 +255,8 @@ KV Fidelity framework changes are now consolidated in the
 
 - [KV Fidelity framework](../../components/kv-fidelity/README.md) — 4-axis KV-cache fidelity scoring
 - [KV Fidelity QUICKSTART](../../components/kv-fidelity/QUICKSTART.md)
-- [KV Fidelity vLLM backend](../../components/kv-fidelity/src/kv_fidelity/backends/vllm.py)
-- [KV Fidelity SGLang backend](../../components/kv-fidelity/src/kv_fidelity/backends/sglang.py)
+- [KV Fidelity vLLM backend](../../src/metria/fidelity/backends/vllm.py)
+- [KV Fidelity SGLang backend](../../src/metria/fidelity/backends/sglang.py)
 - [KV Fidelity leaderboard](../../components/kv-fidelity/LEADERBOARD.md)
 - [Historical llama.cpp fork](../../docs/reference/historical-forks.md#llamacpp-experimental-forks) — public URL unavailable
 - [Historical vLLM fork](../../docs/reference/historical-forks.md#vllm-experimental-forks) — public URL unavailable

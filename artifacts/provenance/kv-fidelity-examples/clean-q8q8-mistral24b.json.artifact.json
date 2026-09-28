@@ -7,7 +7,7 @@
       "license_status": "No new license asserted for model-derived material"
     },
     "name": "clean-q8q8-mistral24b.json",
-    "path": "components/kv-fidelity/src/kv_fidelity/examples/clean-q8q8-mistral24b.json",
+    "path": "src/metria/fidelity/examples/clean-q8q8-mistral24b.json",
     "sha256": "fc2151fb4ce348fafbe86e19ed5fe6da87c1be3914f3c654936222d9d8b150f8",
     "size_bytes": 93171,
     "source": {

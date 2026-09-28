@@ -5,6 +5,12 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Unify KV Fidelity's implementation, prompt assets and report tools under
+  `metria.fidelity` and `metria fidelity`. Retire separate KV package publication;
+  keep source-only compatibility imports and preserved report/method identities.
+- Begin the 0.2.0 development line. Metria 0.1.1 was published with verified
+  artifacts and signed provenance on 2026-09-28.
+
 ## 0.1.1
 
 Prepared for release; publication is a separate protected workflow.

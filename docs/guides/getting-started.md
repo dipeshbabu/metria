@@ -27,8 +27,8 @@ code review and retain artifacts on failure.
 
 The current CLI scope is local llama.cpp CPU thread changes. Other common-change
 templates are explicitly staged until their execution and evidence routes are
-qualified. The development checkout includes the richer reporting/policy/CI
-features; published 0.1.0 retains its initial release scope.
+qualified. Published Metria 0.1.1 includes the reporting, policy, and CI features.
+The 0.2 development checkout adds the [unified fidelity tools](unified-fidelity.md).
 
 Recipe validation, inspection, and saved-record comparison are supporting tools
 for this workflow. Find them in the [documentation index](../index.md).

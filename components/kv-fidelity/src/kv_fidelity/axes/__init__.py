@@ -1,13 +1,9 @@
-"""Implemented KV Fidelity scoring axes.
+"""Source compatibility aliases for Metria fidelity axes."""
 
-- ``gtm``: deprecated text-retokenization compatibility axis.
-- ``trajectory``: decode-time token-ID agreement.
-- ``kld``: corpus-anchored distribution divergence.
-- ``rniah``: long-context retrieval degradation.
-- ``plad``: excess drift under small prompt perturbations.
+import sys
+from importlib import import_module
 
-See each module and ``components/kv-fidelity/LIMITATIONS.md`` for protocols and backend
-constraints.
-"""
-
-from __future__ import annotations
+_implementation = import_module("metria.fidelity.axes")
+for _name in ("gtm", "kld", "plad", "rniah", "trajectory"):
+    sys.modules[f"{__name__}.{_name}"] = import_module(f"metria.fidelity.axes.{_name}")
+sys.modules[__name__] = _implementation

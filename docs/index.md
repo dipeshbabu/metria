@@ -16,6 +16,8 @@ generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
 ## Guides
 
+- [Unified fidelity methods and source migration](guides/unified-fidelity.md)
+
 - [Verified model and data artifacts](guides/artifact-resolution.md)
 
 - [Verify a local llama.cpp CPU thread change](guides/metria-verify.md)

@@ -88,15 +88,12 @@ allowed so the single maintainer can approve an explicitly requested upload.
 The workflow defaults to validation only; see the
 [root release procedure](../guides/releasing-metria.md).
 
-The component publishing environment is `pypi-kv-fidelity` for tags matching
-`kv-fidelity-v*`, with review and administrator-bypass protection. TurboQuant
-Reference is source-only and has no publishing workflow or required release
-environment. The obsolete `pypi` environment must not be referenced by a workflow.
-
-The `pypi-kv-fidelity` environment has `@dipeshbabu` as required reviewer and a
-tag-only `kv-fidelity-v*` policy. Administrator bypass was disabled through the
-REST API and read back as `false` on 2026-09-28, preserving the existing reviewer
-and tag restriction. The root environment's bypass control is also disabled.
+KV Fidelity ships through Metria. Its former standalone publisher is retired,
+as is TurboQuant Reference's publisher. The historical `pypi-kv-fidelity`
+environment remains protected but is not referenced by an active workflow;
+administrator bypass was verified disabled on 2026-09-28. No new component tag,
+publisher, or recovery setup is required for the unified package.
+The obsolete `pypi` environment must not be referenced by a workflow.
 
 ## Audit procedure
 

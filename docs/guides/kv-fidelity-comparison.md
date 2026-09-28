@@ -1,13 +1,13 @@
 # Comparing KV Fidelity reports
 
-`kv-fidelity compare` uses Metria's `RunRecord`, `ComparisonPlan`, and
+`metria fidelity compare` uses Metria's `RunRecord`, `ComparisonPlan`, and
 `compare_runs` APIs. It checks retained evidence before treating report scores as
 directly comparable. This is available in the development workspace; the first
-KV Fidelity PyPI release is still pending.
+KV Fidelity now ships through Metria; the standalone publication plan is retired.
 
 ```bash
 uv sync --locked --all-packages
-uv run --locked kv-fidelity compare run-a.json run-b.json --json-out comparison.json
+uv run --locked metria fidelity compare run-a.json run-b.json --json-out comparison.json
 ```
 
 The command requires at least two valid reports and checks every pair. It exits
@@ -81,7 +81,7 @@ For explicitly limited inspection of historical or methodologically different
 reports, supply a reason:
 
 ```bash
-kv-fidelity compare old-a.json old-b.json \
+metria fidelity compare old-a.json old-b.json \
   --allow-incompatible "Inspect historical estimates separately" \
   --json-out inspection.json
 ```

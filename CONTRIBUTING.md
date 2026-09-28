@@ -13,7 +13,9 @@ Focused research work should identify its component and avoid a parallel runtime
 measurement, or comparison architecture.
 
 - `src/metria/` contains the root `metria` package; `metria_tests/` tests its contracts.
-- `components/kv-fidelity/` contains the publishable `kv-fidelity` package.
+- `src/metria/fidelity/` contains the integrated fidelity methods and assets;
+  `components/kv-fidelity/` retains method documentation, characterization tests,
+  and the source-only compatibility bridge.
 - `components/turboquant-reference/` contains the NumPy/SciPy TurboQuant
   reference implementation.
 - `docs/` contains current guidance and repository documentation.
@@ -45,7 +47,7 @@ uv run pre-commit install
 uv run pytest
 ```
 
-`uv` creates `.venv`, installs all three workspace packages, and uses the shared
+`uv` creates `.venv`, installs the Metria package, source compatibility bridge, and TurboQuant reference, and uses the shared
 lockfile. The install command registers the repository's fast checks as a Git
 pre-commit hook. Backend-specific KV Fidelity dependencies remain optional. Add
 only the extra needed for the backend under test; for example:
@@ -110,7 +112,7 @@ Before submitting a change:
 ```bash
 uv run pre-commit run --all-files
 uv run --all-packages pytest metria_tests -q
-uv run pytest components/turboquant-reference/tests components/kv-fidelity/tests --cov=turboquant --cov=kv_fidelity --cov-report=term-missing -v --tb=short
+uv run pytest components/turboquant-reference/tests components/kv-fidelity/tests --cov=turboquant --cov=metria.fidelity --cov-report=term-missing -v --tb=short
 uv run python -m build --outdir dist/metria .
 uv run python -m build components/kv-fidelity
 uv run python -m build components/turboquant-reference
@@ -123,9 +125,7 @@ and `NOTICE` are present in the built artifacts.
 
 Publishing is restricted to maintainers. Root `metria` releases use a
 `metria-v<VERSION>` tag and the protected `pypi-metria` environment.
-`kv-fidelity` releases use a
-`kv-fidelity-v<VERSION>` tag and the protected `pypi-kv-fidelity` environment.
-Each published package has a separate PyPI Trusted Publisher and workflow.
+KV Fidelity ships through Metria; its separate publishing workflow is retired.
 TurboQuant Reference follows its [source-only lifecycle](docs/guides/turboquant-reference-lifecycle.md)
 with immutable Git pins and independent local builds. Follow the
 [release procedure](docs/guides/releasing.md) for the required configuration,
