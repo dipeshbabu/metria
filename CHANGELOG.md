@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added copyable verification workflows with synthetic PASS/FAIL/invalid-comparison
+  fixtures, qualified local configuration instructions, and explicitly staged
+  runtime/KV/quantization/build templates with readiness checks.
+
 - Added verifier-native cold-process request-latency impact with explicit source,
   workload, warmup/trial and aggregation identity. Deltas require valid comparison
   and compatible methods; unsupported streaming/memory metrics remain unavailable.

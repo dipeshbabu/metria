@@ -417,7 +417,13 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
         f"**Verdict: {manifest['verdict']}**",
         "",
         f"Recipe: `{manifest['recipe_digest']}`",
-        "Scope: local llama.cpp CPU thread comparison",
+        (
+            "Scope: synthetic fixture; no real runtime or model qualification"
+            if manifest.get("fixture_only") is True
+            else "Scope: local llama.cpp CPU thread comparison"
+            if manifest.get("scope") == VERIFICATION_SCOPE
+            else "Scope: unrecognized verification contract"
+        ),
         "",
         "## Change:",
         f"  CPU threads: {manifest['change']['reference_threads']} -> {manifest['change']['candidate_threads']}",

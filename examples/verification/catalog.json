@@ -1,0 +1,11 @@
+{
+  "schema": "metria.verification_examples.v1",
+  "examples": [
+    {"name": "synthetic-pass-fail-invalid", "status": "fixture", "entry": "run_fixture.py"},
+    {"name": "llamacpp-thread-configuration", "status": "qualified-local", "entry": "../../tools/qualification/prepare_cpu_verification.py"},
+    {"name": "vllm-runtime-upgrade", "status": "staged", "recipe": "staged/runtime-upgrade.json", "blocker": "qualified separate runtime environments and CLI execution route"},
+    {"name": "vllm-kv-precision", "status": "staged", "recipe": "staged/kv-precision.json", "blocker": "qualified FP8 applied-state evidence and CLI route"},
+    {"name": "quantization-treatment", "status": "staged", "recipe": "staged/quantization.json", "blocker": "qualified treatment application and CLI route"},
+    {"name": "llamacpp-build-regression", "status": "staged", "recipe": "staged/build-regression.json", "blocker": "independent provider qualification and CLI scope allowing binary changes"}
+  ]
+}
