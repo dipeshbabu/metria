@@ -6,7 +6,7 @@
 [project]
 name = "metria"
 version = "0.1.1.dev0"
-description = "Evidence and experimentation framework for reproducible LLM inference systems studies."
+description = "Verify reference-vs-candidate LLM inference changes with reproducible evidence."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]

@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Reworked onboarding and package language around one reference/candidate
+  inference change, evidence gates, behavioral/system impact, explicit policy,
+  and recurring CI use, with qualified and staged scopes kept visible.
+
 - Added copyable verification workflows with synthetic PASS/FAIL/invalid-comparison
   fixtures, qualified local configuration instructions, and explicitly staged
   runtime/KV/quantization/build templates with readiness checks.

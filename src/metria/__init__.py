@@ -1,4 +1,4 @@
-"""Metria core models for reproducible inference-systems studies."""
+"""Verification and evidence contracts for reference/candidate inference changes."""
 
 from .artifacts import (
     ArtifactIntegrityError,

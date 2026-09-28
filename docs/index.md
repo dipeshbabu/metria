@@ -1,10 +1,15 @@
 # Documentation
 
+Metria verifies one inference change between a reference and a candidate. Start
+with [getting started](guides/getting-started.md), the
+[copyable workflows](../examples/verification/README.md), and
+[CI integration](guides/verification-ci.md). The internal APIs support that path.
+
 This directory contains current, maintained guidance for Metria. Dated
 experiments and historical conclusions live under [`research/`](../research/README.md);
 generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
-## Architecture
+## Supporting architecture
 
 - [Metria core architecture](architecture/metria-core.md)
 

@@ -36,7 +36,7 @@ def _parser() -> argparse.ArgumentParser:
 
     parser = argparse.ArgumentParser(
         prog="metria",
-        description="Evidence-oriented tooling for LLM inference studies.",
+        description="Verify reference/candidate LLM inference changes with retained evidence.",
     )
     parser.add_argument(
         "--version",
