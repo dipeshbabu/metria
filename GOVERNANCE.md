@@ -1,14 +1,21 @@
 # Project governance
 
-Metria is a maintainer-led open-source inference research monorepo. This
+Metria is a maintainer-led open-source inference change verifier with focused
+research components in the same repository. This
 document explains how decisions are made, how responsibilities are assigned,
 and how contributors can propose changes or challenge a decision.
 
 ## Project scope
 
+The [verifier product decision](docs/architecture/verifier-product.md) defines
+the primary workflow, current qualified scope, and deferred directions. New work
+should make one inference change easier to verify, improve trust in its evidence,
+or help users decide whether to keep the candidate. Specialized research and
+component work must state its own bounded purpose and reuse shared contracts.
+
 The project maintains four kinds of material with different stability needs:
 
-- the published Metria evidence framework and independently versioned KV Fidelity;
+- the Metria verifier and independently versioned KV Fidelity methodology;
 - portable research reference implementations, including TurboQuant;
 - diagnostics, validation, benchmark, and conversion tools; and
 - research reports and retained experimental evidence.

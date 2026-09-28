@@ -1,9 +1,9 @@
 # Metria core architecture
 
-Metria is a neutral evidence and experiment layer for LLM inference systems.
-Its job is not to reimplement serving engines, quantizers, kernels, or schedulers.
-Instead, Metria defines how an inference-systems study is specified, executed,
-recorded, and compared.
+Metria verifies one reference/candidate inference change. Its shared evidence
+and execution contracts support the [verifier product decision](verifier-product.md).
+Serving engines, quantizers, kernels, and schedulers remain upstream systems
+under test. The reusable study model below implements that public workflow.
 
 The initial design deliberately keeps the public model small:
 
@@ -105,11 +105,11 @@ template text. Future endpoint identity is constrained to non-secret fields;
 credentials, authorization headers, API keys, and raw authenticated URLs do not
 belong in durable identity evidence.
 
-llama.cpp currently has asymmetric authority: Metria can content-identify the
-resolved executable, but the GGUF model, embedded tokenizer, chat template, and
-runtime-applied internal settings are not all independently observable. Those
-components therefore remain partial or unknown until immutable artifact and
-real-engine qualification work provides stronger evidence.
+llama.cpp identity authority is scoped: Metria content-identifies the executable
+and model artifact, and the qualified CPU capture reports selected applied fields.
+That evidence does not establish every tokenizer, template, or runtime internal.
+Fields outside the [qualified path](../guides/metria-verify.md) remain partial or
+unknown unless independently observed.
 
 Comparison uses the semantic identity facts and component authority states.
 Diagnostic source labels and explanatory reason strings are not comparison
@@ -267,8 +267,9 @@ study can diagnose more than one incompatibility at once.
 
 The first study executor deliberately supports exactly one measurement per run
 and one shared environment mapping. Multi-measurement scheduling, heterogeneous
-host placement, retries, persistence, parallel execution, and CLI recipes remain
-separate later concerns rather than hidden behavior in the initial contract.
+host placement, retries, and parallel execution remain separate concerns. The
+verifier composes this lifecycle with versioned recipes, immediate record
+persistence, comparison, policy, and a canonical result bundle.
 
 ## What is not in the first core
 
@@ -284,8 +285,9 @@ The first Metria core does not provide:
 
 The first stable milestone is narrower:
 
-> Metria can reproducibly run, record, and validly compare a defined
-> inference-systems study across at least two runtimes.
+> Given a reference and candidate in a qualified scope, Metria can retain what
+> ran, refuse an unjustified comparison, and produce reproducible behavioral
+> evidence and compatible systems measurements under the user's explicit policy.
 
 KV Fidelity and TurboQuant Reference remain independent focused components while
 Metria's shared study and evidence model matures.
