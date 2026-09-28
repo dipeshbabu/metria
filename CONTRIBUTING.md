@@ -118,10 +118,10 @@ and `NOTICE` are present in the built artifacts.
 Publishing is restricted to maintainers. Root `metria` releases use a
 `metria-v<VERSION>` tag and the protected `pypi-metria` environment.
 `kv-fidelity` releases use a
-`kv-fidelity-v<VERSION>` tag and the protected `pypi-kv-fidelity` environment;
-`turboquant-reference` releases use a `turboquant-reference-v<VERSION>` tag and
-the protected `pypi-turboquant-reference` environment. Each package has a
-separate PyPI Trusted Publisher and workflow. Follow the
+`kv-fidelity-v<VERSION>` tag and the protected `pypi-kv-fidelity` environment.
+Each published package has a separate PyPI Trusted Publisher and workflow.
+TurboQuant Reference follows its [source-only lifecycle](docs/guides/turboquant-reference-lifecycle.md)
+with immutable Git pins and independent local builds. Follow the
 [release procedure](docs/guides/releasing.md) for the required configuration,
 clean-wheel validation, and release steps.
 

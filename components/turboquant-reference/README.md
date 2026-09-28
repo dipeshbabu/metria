@@ -8,22 +8,21 @@ This component is intended for algorithm inspection, reproducibility, and
 experimentation. Production inference integrations live in their respective
 engine projects.
 
+Its lifecycle is **source-only research software**. Local wheel/source builds
+remain supported, but Metria does not publish this component to a package index.
+Pin a full repository commit when depending on it or citing its behavior.
+
 ## Install
 
-After a tagged release has been published, install it from your package index:
+Install an immutable source snapshot, for example:
 
 ```bash
-python -m pip install "turboquant-reference>=0.1,<0.2"
+python -m pip install "turboquant-reference @ git+https://github.com/dipeshbabu/metria.git@b536a6995e78b72e68e35ad002ace2135e9e725e#subdirectory=components/turboquant-reference"
 ```
 
-Install the optional real-model benchmark stack with:
-
-```bash
-python -m pip install "turboquant-reference[bench]>=0.1,<0.2"
-```
-
-Before the first package-index release, or when validating a checkout, use a
-non-editable source install from the repository root:
+The commit above is a known source snapshot. Select and record the reviewed full
+commit you intend to use; a mutable `main` branch is not a reproducibility pin.
+For a checked-out revision, install from the repository root:
 
 ```bash
 python -m pip install "./components/turboquant-reference"
@@ -101,19 +100,21 @@ instead of modifying `sys.path`.
 
 ## Stability and compatibility
 
-The package is an alpha research reference and follows semantic versioning.
-During the `0.x` series, incompatible public-API changes may ship in a minor
-release; patch releases preserve the documented API. Deprecations receive a
-changelog entry and a migration path when practical.
+The component is an alpha research reference with its own source version.
+The local distribution/import identities remain `turboquant-reference` and
+`turboquant`; they are independent of root Metria and KV Fidelity. Record the
+repository commit as well as the component version. Compatibility changes and
+deprecations receive a changelog entry and migration guidance when practical.
 
-Released wheels support Python 3.10 through 3.13 on operating systems where
+Source and locally built wheels support Python 3.10 through 3.14 where
 NumPy and SciPy satisfy the declared dependencies. The implementation is
 portable Python, but that does not imply support for any particular production
 inference engine or accelerator kernel.
 
-See the [changelog](CHANGELOG.md) for user-visible changes. Maintainers follow
-the repository's [protected release procedure](../../docs/guides/releasing.md)
-and tag releases as `turboquant-reference-v<VERSION>`.
+See the [changelog](CHANGELOG.md) for user-visible changes and the
+[source lifecycle](../../docs/guides/turboquant-reference-lifecycle.md) for
+reproducible installation and validation. There is no package-index publishing
+workflow or release-tag contract for this source-only component.
 
 ## License
 

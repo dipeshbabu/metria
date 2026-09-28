@@ -25,6 +25,10 @@ TurboQuant reference packages have independent versions and release notes.
   stable public Metria dependency must exist before publishing. Its protected
   environment now prevents administrator bypass.
 
+- Defined TurboQuant Reference as independently versioned source-only research
+  software, retaining build/test checks and immutable Git installation while
+  retiring its unused package-index publication workflow.
+
 - Added verifier-native cold-process request-latency impact with explicit source,
   workload, warmup/trial and aggregation identity. Deltas require valid comparison
   and compatible methods; unsupported streaming/memory metrics remain unavailable.
