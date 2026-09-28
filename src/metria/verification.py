@@ -451,7 +451,28 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
                 )
             else:
                 lines.append(f"    {label}: {metric['value'] * scale:.6g}{suffix}")
-        if "per_prompt" in analysis["diagnostics"]:
+        diagnostics = analysis["diagnostics"].get("divergence")
+        if diagnostics is not None:
+            lines.append(
+                f"    Divergent prompts: {diagnostics['diverged_prompts']}/{diagnostics['compared_prompts']}"
+            )
+            lines.append(
+                f"    Trajectory evidence: {diagnostics['status']}; unavailable prompts: {diagnostics['unavailable_prompts']}"
+            )
+            if diagnostics["median_first_divergence"] is not None:
+                lines.append(
+                    f"    First divergence (zero-based): earliest {diagnostics['earliest_first_divergence']}, median {diagnostics['median_first_divergence']}"
+                )
+            lines.append(f"    Length mismatches: {diagnostics['length_mismatches']}")
+            for category in diagnostics["by_category"]:
+                lines.append(
+                    f"      Category {json.dumps(category['category'], ensure_ascii=True)}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
+                )
+            for row in diagnostics["most_divergent"]:
+                lines.append(
+                    f"      {json.dumps(row['id'], ensure_ascii=True)}: first divergence at token {row['first_divergence']}"
+                )
+        elif "per_prompt" in analysis["diagnostics"]:
             diverged = [
                 row
                 for row in analysis["diagnostics"]["per_prompt"]

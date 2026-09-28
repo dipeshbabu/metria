@@ -88,6 +88,19 @@ _TARGETS = MappingProxyType(
                 "mean",
             ),
             _Target(
+                "behavior.divergence_rate",
+                "number",
+                "fraction",
+                MetricDefinition(
+                    "trajectory_divergence_rate",
+                    "fraction",
+                    MetricDirection.LOWER_IS_BETTER,
+                    _ANALYSIS,
+                    _METHOD_VERSION,
+                ),
+                "mean",
+            ),
+            _Target(
                 "behavior.all_trajectories_match",
                 "boolean",
                 "boolean",

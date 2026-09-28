@@ -56,6 +56,7 @@ package version. Targets are registered identifiers, not arbitrary JSON paths.
 |---|---|---|
 | `behavior.trajectory_agreement` | `fraction` | Numeric `min` and/or `max`, within 0–1 |
 | `behavior.full_match_rate` | `fraction` | Numeric `min` and/or `max`, within 0–1 |
+| `behavior.divergence_rate` | `fraction` | Numeric `min` and/or `max`, within 0–1; lower is better |
 | `behavior.all_trajectories_match` | `boolean` | Exact `equals: true` or `equals: false` |
 | `analysis.status` | `status` | Exact `equals: "completed"`, `"failed"`, or `"skipped"` |
 

@@ -52,6 +52,26 @@ def _policy(**bounds):
     )
 
 
+@pytest.mark.parametrize(
+    "candidate,expected",
+    [
+        ((1, 2, 3), PolicyDecision.PASS),
+        ((1, 2, 4), PolicyDecision.FAIL),
+        ((), PolicyDecision.INSUFFICIENT_EVIDENCE),
+    ],
+)
+def test_divergence_policy_uses_complete_method_identified_evidence(
+    candidate, expected
+):
+    policy = VerificationPolicy(
+        (PolicyCriterion("behavior.divergence_rate", "0.3.4", maximum=0.1),)
+    )
+    result = evaluate_policy(
+        policy, (_analysis(candidate),), verification_status="VERIFIED"
+    )
+    assert result.status is expected
+
+
 def test_numeric_policy_has_deterministic_pass_and_fail_with_explicit_units():
     analysis = _analysis()
     passed = evaluate_policy(
