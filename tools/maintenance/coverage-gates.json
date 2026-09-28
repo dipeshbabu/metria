@@ -1,6 +1,7 @@
 {
   "schema": "metria.coverage_gates.v1",
   "core": {
+    "src/metria/verification_trials.py": 85,
     "src/metria/_freeze.py": 78,
     "src/metria/artifacts.py": 88,
     "src/metria/capabilities.py": 80,
