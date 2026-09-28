@@ -9,6 +9,10 @@ TurboQuant reference packages have independent versions and release notes.
   inference change, evidence gates, behavioral/system impact, explicit policy,
   and recurring CI use, with qualified and staged scopes kept visible.
 
+- Extracted canonical reporting, KV result/math contracts, and diagnostic
+  policy/parsing/execution behind reusable library APIs with compatibility aliases.
+  Added staged size/complexity targets and no-growth ratchets for legacy code.
+
 - Added copyable verification workflows with synthetic PASS/FAIL/invalid-comparison
   fixtures, qualified local configuration instructions, and explicitly staged
   runtime/KV/quantization/build templates with readiness checks.

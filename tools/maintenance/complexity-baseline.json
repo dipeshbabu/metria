@@ -1,0 +1,274 @@
+{
+  "exceptions": {
+    "components/kv-fidelity/src/kv_fidelity/axes/gtm.py": {
+      "function_lines": {
+        "run_gtm": 153
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/axes/kld.py": {
+      "function_lines": {
+        "run_kld": 132
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/axes/plad.py": {
+      "function_lines": {
+        "run_plad": 144
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/axes/rniah.py": {
+      "function_lines": {
+        "run_rniah": 141
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/axes/trajectory.py": {
+      "function_lines": {
+        "run_trajectory": 162
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/backends/mlx.py": {
+      "function_lines": {
+        "MLXBackend.run_kld": 108
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/backends/sglang.py": {
+      "function_lines": {
+        "SGLangBackend.run_kld": 107
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/cli.py": {
+      "complexity": {
+        "_run_repeatability": 16,
+        "_run_score": 35,
+        "_run_selftest": 30
+      },
+      "function_lines": {
+        "_add_score_parser": 174,
+        "_run_repeatability": 145,
+        "_run_score": 352,
+        "_run_selftest": 196
+      },
+      "module_lines": 1309
+    },
+    "components/kv-fidelity/src/kv_fidelity/comparison.py": {
+      "complexity": {
+        "report_to_run_record": 36
+      },
+      "function_lines": {
+        "report_to_run_record": 236
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/comparison_cli.py": {
+      "complexity": {
+        "run_report_comparison": 20
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/measurement_math.py": {
+      "function_lines": {
+        "aggregate_topk_kld": 116
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/provenance.py": {
+      "complexity": {
+        "begin_report_capture": 16
+      },
+      "function_lines": {
+        "begin_report_capture": 116
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/report.py": {
+      "complexity": {
+        "text_report": 33
+      },
+      "function_lines": {
+        "json_report": 172,
+        "text_report": 221
+      }
+    },
+    "components/kv-fidelity/src/kv_fidelity/report_html.py": {
+      "complexity": {
+        "_hardware_metadata": 17
+      },
+      "function_lines": {
+        "_run_details": 107,
+        "html_report": 235
+      },
+      "module_lines": 1267
+    },
+    "components/kv-fidelity/src/kv_fidelity/runner.py": {
+      "function_lines": {
+        "run_completion": 123,
+        "run_completion_trajectory": 137
+      }
+    },
+    "components/turboquant-reference/src/turboquant/hw_replay.py": {
+      "complexity": {
+        "_parse_bench_table_row": 16,
+        "parse_diag_output": 51
+      },
+      "function_lines": {
+        "parse_diag_output": 130
+      }
+    },
+    "src/metria/artifacts.py": {
+      "complexity": {
+        "extract_verified_zip": 25
+      },
+      "function_lines": {
+        "extract_verified_zip": 128
+      }
+    },
+    "src/metria/cli.py": {
+      "complexity": {
+        "main": 17
+      },
+      "function_lines": {
+        "_parser": 101
+      }
+    },
+    "src/metria/comparison.py": {
+      "complexity": {
+        "compare_runs": 20
+      },
+      "function_lines": {
+        "compare_runs": 148
+      }
+    },
+    "src/metria/execution.py": {
+      "complexity": {
+        "execute_run": 22
+      },
+      "function_lines": {
+        "execute_run": 340
+      }
+    },
+    "src/metria/integrations/turboquant_diagnostic_runner.py": {
+      "complexity": {
+        "_capture_load_macos": 18,
+        "_detect_linux_hw": 20,
+        "_detect_macos_hw": 17,
+        "assess_runtime_backend": 16,
+        "run_diagnostic": 26,
+        "section_2_system_load_pre": 17
+      },
+      "function_lines": {
+        "_detect_linux_hw": 120,
+        "_detect_macos_hw": 104,
+        "run_diagnostic": 264,
+        "section_3_model_info": 116,
+        "section_4_gpu_capabilities": 107,
+        "section_5_build_validation": 102
+      },
+      "module_lines": 2646
+    },
+    "src/metria/integrations/turboquant_diagnostics.py": {
+      "complexity": {
+        "parse_bench_tps": 18
+      },
+      "function_lines": {
+        "get_platform_support": 162
+      }
+    },
+    "src/metria/measurements/performance.py": {
+      "function_lines": {
+        "measure_invocation_performance": 133
+      }
+    },
+    "src/metria/measurements/trajectory.py": {
+      "function_lines": {
+        "compare_trajectory_results": 208
+      }
+    },
+    "src/metria/policies.py": {
+      "complexity": {
+        "_observe": 16
+      }
+    },
+    "src/metria/processes.py": {
+      "complexity": {
+        "run_process": 25
+      },
+      "function_lines": {
+        "run_process": 167
+      }
+    },
+    "src/metria/reporting.py": {
+      "complexity": {
+        "render_verification": 26
+      },
+      "function_lines": {
+        "render_verification": 161
+      }
+    },
+    "src/metria/runtimes/llamacpp.py": {
+      "function_lines": {
+        "LlamaCppSession._infer_one": 121
+      }
+    },
+    "src/metria/runtimes/llamacpp_identity.py": {
+      "function_lines": {
+        "inspect_llamacpp_identity": 150
+      }
+    },
+    "src/metria/runtimes/vllm.py": {
+      "complexity": {
+        "_runtime_config": 17
+      },
+      "function_lines": {
+        "VLLMSession.infer": 110
+      }
+    },
+    "src/metria/runtimes/vllm_identity.py": {
+      "function_lines": {
+        "inspect_vllm_identity": 162
+      }
+    },
+    "src/metria/study_execution.py": {
+      "complexity": {
+        "_validate_registries": 16
+      }
+    },
+    "src/metria/verification.py": {
+      "complexity": {
+        "_validate": 26
+      },
+      "function_lines": {
+        "_validate": 122,
+        "verify_recipe": 222
+      }
+    },
+    "tools/maintenance/check_wheel_contents.py": {
+      "complexity": {
+        "check_wheel": 23
+      }
+    },
+    "tools/qualification/prepare_cpu_verification.py": {
+      "function_lines": {
+        "main": 113
+      }
+    },
+    "tools/qualification/qualify_vllm.py": {
+      "function_lines": {
+        "main": 170
+      }
+    },
+    "tools/validation/measure_skip_rate.py": {
+      "function_lines": {
+        "measure_skip_rates": 108
+      }
+    },
+    "tools/validation/niah_test.py": {
+      "function_lines": {
+        "parse_args": 104,
+        "run_multi_key_mode": 109,
+        "run_multi_value_mode": 106
+      },
+      "module_lines": 1500
+    }
+  },
+  "limits": {
+    "complexity": 15,
+    "function_lines": 100,
+    "module_lines": 800
+  },
+  "schema": "metria.complexity_baseline.v1"
+}
