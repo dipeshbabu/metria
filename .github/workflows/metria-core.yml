@@ -45,7 +45,26 @@ jobs:
         run: uv sync --locked --all-packages
 
       - name: Run Metria core tests
-        run: uv run --locked pytest metria_tests -v --tb=short
+        run: >-
+          uv run --locked pytest metria_tests -v --tb=short
+          --cov=metria --cov-report=json:core-coverage.json --cov-fail-under=0
+          --skip-report=core-skips.json
+
+      - name: Enforce per-module core coverage
+        run: >-
+          uv run --locked python tools/maintenance/check_coverage_gates.py
+          core-coverage.json --scope core --summary core-coverage.md
+
+      - name: Retain core coverage and skip evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: core-coverage-${{ matrix.os }}-${{ matrix.python-version }}
+          path: |
+            core-coverage.json
+            core-coverage.md
+            core-skips.json
+          if-no-files-found: warn
 
       - name: Check Metria types
         run: uv run --locked mypy src/metria

@@ -13,6 +13,10 @@ TurboQuant reference packages have independent versions and release notes.
   fixtures, qualified local configuration instructions, and explicitly staged
   runtime/KV/quantization/build templates with readiness checks.
 
+- Added independent runtime/evaluator/core coverage floors, generated-input
+  properties and guard fault tests, required evidence-fixture checks, and CI
+  coverage/skip artifacts. Expanded optional KV Fidelity vLLM contract coverage.
+
 - Added a pinned real vLLM qualification tool and controlled manual workflow.
   Official backend wheel build labels are retained separately from loaded module
   public versions; contradictory public versions or build labels still fail.

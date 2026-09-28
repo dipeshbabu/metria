@@ -146,7 +146,25 @@ jobs:
           --cov=turboquant
           --cov=kv_fidelity
           --cov-report=term-missing
+          --cov-report=json:component-coverage.json
+          --skip-report=component-skips.json
           -v --tb=short
+
+      - name: Enforce per-runtime and evaluator coverage
+        run: >-
+          uv run --locked python tools/maintenance/check_coverage_gates.py
+          component-coverage.json --scope components --summary component-coverage.md
+
+      - name: Retain component coverage and skip evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: component-coverage
+          path: |
+            component-coverage.json
+            component-coverage.md
+            component-skips.json
+          if-no-files-found: warn
 
   package:
     name: Build and inspect distributions
