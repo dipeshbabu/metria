@@ -1,5 +1,8 @@
 # Metria
 
+Start with the [copyable verification examples](examples/verification/README.md)
+for a real local thread-change recipe and explicitly labeled synthetic CI cases.
+
 Retained evidence follows the [artifact provenance and third-party material policy](docs/maintainers/third-party-material.md).
 
 [![PyPI](https://img.shields.io/pypi/v/metria)](https://pypi.org/project/metria/)

@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added copyable verification workflows with synthetic PASS/FAIL/invalid-comparison
+  fixtures, qualified local configuration instructions, and explicitly staged
+  runtime/KV/quantization/build templates with readiness checks.
+
 - Added a pinned real vLLM qualification tool and controlled manual workflow.
   Official backend wheel build labels are retained separately from loaded module
   public versions; contradictory public versions or build labels still fail.
