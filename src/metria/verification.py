@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import math
 from collections.abc import Mapping, Sequence
@@ -13,7 +14,7 @@ from typing import Any
 
 from ._freeze import freeze_mapping
 from .capability_checks import CapabilityCheckRegistry
-from .comparison import compare_runs
+from .comparison import _declared_dimension_issue, compare_runs
 from .hardware import capture_hardware_fingerprint
 from .inspection import resolve_capability_checks
 from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
@@ -329,7 +330,12 @@ def _comparison_data(report: CompatibilityReport) -> dict[str, Any]:
             for issue in report.issues
         ],
         "waived_differences": [
-            {"dimension": issue.dimension, "reason": issue.reason}
+            {
+                "dimension": issue.dimension,
+                "reason_sha256": hashlib.sha256(
+                    issue.reason.encode("utf-8")
+                ).hexdigest(),
+            }
             for issue in report.waived_differences
         ],
         "comparable_metrics": list(report.comparable_metrics),
@@ -393,17 +399,20 @@ def _wall_time(record: RunRecord) -> dict[str, Any]:
 def render_verification(manifest: Mapping[str, Any]) -> str:
     """Render a concise report without raw prompts or configuration values."""
     lines = [
-        f"Metria verification: {manifest['verdict']}",
+        "# Metria Verification",
         "",
-        f"Study: {manifest['study']}",
+        f"**Verdict: {manifest['verdict']}**",
+        "",
+        f"Recipe: `{manifest['recipe_digest']}`",
         "Scope: local llama.cpp CPU thread comparison",
         "",
-        "Change:",
+        "## Change:",
         f"  CPU threads: {manifest['change']['reference_threads']} -> {manifest['change']['candidate_threads']}",
         "",
-        "Evidence:",
+        "## Evidence:",
     ]
-    for role, record in manifest["records"].items():
+    for role in _ROLES:
+        record = manifest["records"][role]
         lines.append(f"  {role}: {record['status']} ({record['path']})")
         facts = record["observed"]
         lines.append(
@@ -411,13 +420,28 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
         )
         for gap in record["evidence_gaps"]:
             lines.append(f"    {gap}")
+    if "lifecycle" in manifest:
+        lines.append(f"  Lifecycle: {manifest['lifecycle']['status']}")
+    for control in manifest.get("controls", ()):
+        lines.append(f"  {control['dimension']}: {control['status']}")
+    lines.extend(
+        (
+            "",
+            "## Comparison:",
+            f"  {manifest.get('comparison_status', 'VALID' if manifest['comparison']['compatible'] else 'NOT_COMPARABLE')}",
+        )
+    )
     for issue in manifest["comparison"]["issues"]:
         lines.append(f"  {issue['dimension']}: {issue['reason']}")
-    lines.extend(("", "Impact:"))
+    for issue in manifest["comparison"]["waived_differences"]:
+        lines.append(
+            f"  Waived difference: {issue['dimension']} (rationale retained by digest)"
+        )
+    lines.extend(("", "## Impact:"))
     for analysis in manifest["analyses"]:
         lines.append(f"  {analysis['name']}: {analysis['status']}")
         metrics = analysis["metrics"]
-        for key, error in analysis.get("metric_errors", {}).items():
+        for key, error in sorted(analysis.get("metric_errors", {}).items()):
             lines.append(f"    {key}: invalid metric evidence ({error['error_type']})")
         for key, unit, label, scale, suffix in (
             (
@@ -466,11 +490,11 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
             lines.append(f"    Length mismatches: {diagnostics['length_mismatches']}")
             for category in diagnostics["by_category"]:
                 lines.append(
-                    f"      Category {json.dumps(category['category'], ensure_ascii=True)}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
+                    f"      Category {html.escape(json.dumps(category['category'], ensure_ascii=True))}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
                 )
             for row in diagnostics["most_divergent"]:
                 lines.append(
-                    f"      {json.dumps(row['id'], ensure_ascii=True)}: first divergence at token {row['first_divergence']}"
+                    f"      {html.escape(json.dumps(row['id'], ensure_ascii=True))}: first divergence at token {row['first_divergence']}"
                 )
         elif "per_prompt" in analysis["diagnostics"]:
             diverged = [
@@ -483,12 +507,19 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
                 lines.append(
                     f"      {row['id']}: first divergence at token {row['first_divergence']}"
                 )
-    for role, timing in manifest["systems"].items():
+    for role in _ROLES:
+        timing = manifest["systems"][role]
         if timing.get("available"):
             lines.append(
                 f"  {role} mean process wall time: {timing['mean_seconds']:.6g}s (includes startup and model loading)"
             )
-    lines.extend(("", "Verdict:", f"  {manifest['verdict']}"))
+    if not manifest["analyses"]:
+        lines.append("  Behavioral impact unavailable: analysis did not complete.")
+    if manifest.get("comparison_status") not in {None, "VALID"}:
+        lines.append(
+            "  No candidate benefit is inferred from an invalid or incomplete comparison."
+        )
+    lines.extend(("", "## Verdict:", f"  {manifest['verdict']}"))
     if "policy" in manifest:
         lines.extend(render_policy_evaluation(manifest["policy"]))
     else:
@@ -619,6 +650,34 @@ def verify_recipe(
         "verdict": verdict.value,
         "acceptance_policy_evaluated": policy_result is not None
         and policy_result.status is not PolicyDecision.NOT_EVALUATED,
+        "lifecycle": {
+            "status": (
+                "failed"
+                if any(
+                    record.status in failed
+                    or record.status is RunStatus.PREFLIGHT_FAILED
+                    for record in saved
+                )
+                else "partial"
+                if any(record.status is not RunStatus.COMPLETED for record in saved)
+                else "completed"
+            ),
+            "records": {
+                role: record.status.value
+                for role, record in zip(_ROLES, saved, strict=True)
+            },
+        },
+        "comparison_status": (
+            "NOT_EVALUATED"
+            if any(gaps)
+            or any(record.status is not RunStatus.COMPLETED for record in saved)
+            else "VALID"
+            if comparison.compatible
+            else "NOT_COMPARABLE"
+        ),
+        "policy_status": policy_result.status.value
+        if policy_result is not None
+        else "NOT_CONFIGURED",
         "change": {
             "reference_threads": recipe.study.runs[0].runtime["threads"],
             "candidate_threads": recipe.study.runs[1].runtime["threads"],
@@ -641,6 +700,25 @@ def verify_recipe(
             for index, (role, record) in enumerate(zip(_ROLES, saved, strict=True))
         },
         "comparison": _comparison_data(comparison),
+        "controls": [
+            {
+                "dimension": dimension,
+                "role": role,
+                "status": "matched"
+                if issue is None
+                else "missing"
+                if "missing" in issue.reason or "unknown" in issue.reason
+                else "different",
+            }
+            for role, dimensions in (
+                ("control", recipe.study.comparison.control),
+                ("block", recipe.study.comparison.block_by),
+            )
+            for dimension in sorted(dimensions)
+            for issue in (
+                _declared_dimension_issue(saved[0], saved[1], dimension, role),
+            )
+        ],
         "analyses": analysis_data,
         "systems": {
             role: _wall_time(record) for role, record in zip(_ROLES, saved, strict=True)
@@ -649,16 +727,19 @@ def verify_recipe(
     if policy_result is not None:
         manifest["policy"] = policy_result.to_data()
     _write_atomic(output / "report.md", render_verification(manifest))
-    _write_atomic(
-        output / "manifest.json",
+    serialized = (
         json.dumps(
             _json_value(manifest, path="verification"),
             indent=2,
             sort_keys=True,
             allow_nan=False,
         )
-        + "\n",
+        + "\n"
     )
+    # Keep the original name as a compatibility alias. The canonical result is
+    # published last, so its presence denotes a fully persisted evidence bundle.
+    _write_atomic(output / "manifest.json", serialized)
+    _write_atomic(output / "verification.json", serialized)
     return VerificationResult(
         output,
         manifest,

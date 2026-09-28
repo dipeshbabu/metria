@@ -77,6 +77,7 @@ Each output directory must be new. A completed verification contains:
 
 ```text
 verification/
+  verification.json
   manifest.json
   report.md
   reference.run.json
@@ -85,7 +86,8 @@ verification/
 
 The reference record is saved before the candidate starts. Runtime failures,
 timeouts, incomplete observation, and interruption are retained as evidence.
-Writes use temporary files, and the manifest is published last. A filesystem
+Writes use temporary files, and `verification.json` is published last. The
+original `manifest.json` name remains an identical compatibility alias. A filesystem
 failure leaves completed records intact and does not produce a success manifest.
 
 The report omits workload prompt text and generated text. Run records retain
@@ -137,3 +139,18 @@ print(result.manifest["verdict"])
 The JSON manifest uses `metria.verification.v1` and records the scoped contract,
 recipe digest, run/evidence digests, hardware evidence, observed facts, comparison
 issues, analysis identity, diagnostics, and process wall-time method.
+
+In the development version, `verification.json` is the canonical result and
+`report.md` is a deterministic projection of it. The report leads with the
+verdict and separates Change, Evidence, Comparison, Impact, and Verdict.
+`lifecycle.status`, `comparison_status`, and `policy_status` distinguish execution
+completion, comparison validity, and user acceptance. A completed lifecycle alone
+does not imply a valid comparison. Missing evidence prevents comparison from
+being reported as valid. Explicit controls are marked matched, missing, or
+different; intended paths and waived differences remain separate. Waiver rationale
+is represented by a digest in summaries because free-text rationale can be private.
+
+Timeouts, partial runs, preflight failures, and interruption retain the same
+report structure. Invalid recipes and unwritable output locations fail before
+a complete bundle can be published. Absence of `verification.json` means the
+bundle is incomplete; preserved run records can still aid investigation.
