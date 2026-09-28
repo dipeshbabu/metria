@@ -8,6 +8,7 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.sh text eol=lf
+*.patch text eol=lf
 *.html text eol=lf
 
 # Curated log hashes use the repository's canonical LF bytes on every platform.

@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added installed preparation and strict verification for independently pinned
+  llama.cpp CPU builds, preserving model/workload controls, provider capture
+  qualification records, task policies and method-aware latency reporting.
+
 - Separate declared task checks, observed reference repeatability and compatible
   latency from token drift in verification impact and policies. Add exact-text,
   nonempty and strict JSON-object checks with redacted summaries; missing quality

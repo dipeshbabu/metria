@@ -173,17 +173,27 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
 
 
 def _scope_label(manifest: Mapping[str, Any]) -> str:
+    from .verification_schema import LLAMACPP_BUILD_SCOPE
+
     if manifest.get("fixture_only") is True:
         return "Scope: synthetic fixture; no real runtime or model qualification"
     if manifest.get("scope") == VERIFICATION_SCOPE:
         return "Scope: local llama.cpp CPU thread comparison"
     if manifest.get("scope") == VLLM_VERIFICATION_SCOPE:
         return "Scope: local vLLM prefix-cache comparison"
+    if manifest.get("scope") == LLAMACPP_BUILD_SCOPE:
+        return "Scope: local llama.cpp CPU build comparison"
     return "Scope: unrecognized verification contract"
 
 
 def _change_label(manifest: Mapping[str, Any]) -> str:
+    from .verification_schema import LLAMACPP_BUILD_SCOPE
+
     change = manifest["change"]
+    if manifest.get("scope") == LLAMACPP_BUILD_SCOPE:
+        return (
+            f"  Capture provider SHA256: {change['reference']} -> {change['candidate']}"
+        )
     if manifest.get("scope") == VLLM_VERIFICATION_SCOPE:
         return f"  Prefix caching: {change['reference']} -> {change['candidate']}"
     return (
