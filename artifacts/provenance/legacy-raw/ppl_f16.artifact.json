@@ -1,0 +1,25 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-log",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:45:58.829815+00:00",
+      "license_status": "No new license asserted; original evidence and upstream rights remain separate"
+    },
+    "name": "ppl_f16",
+    "path": "artifacts/benchmarks/legacy-raw/ppl_f16.log",
+    "sha256": "05b3855b266fe1b5fa9179ca51857e45bfd42419ca34890243a6e2661b84b67e",
+    "size_bytes": 15207,
+    "source": {
+      "original_git_blob_sha256": "d96b4c1e1e17094877143c309d841b3ee88f90c2a6b38b05fd3bf2333cf97362",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; model basenames, numerical measurements, and all other bytes preserved.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical experimental fork has no retained public source archive",
+        "model filenames are retained but immutable model hashes were not recorded"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}

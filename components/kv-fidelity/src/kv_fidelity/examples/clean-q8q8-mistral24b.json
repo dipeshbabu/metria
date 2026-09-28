@@ -6,7 +6,7 @@
     0,
     100
   ],
-  "model": "/Users/dipesh/local_llms/models/Mistral-Small-24B-Instruct-2501-Q4_K_M.gguf",
+  "model": "${HOME}/local_llms/models/Mistral-Small-24B-Instruct-2501-Q4_K_M.gguf",
   "reference": "ctk=f16,ctv=f16",
   "candidate": "ctk=q8_0,ctv=turbo4",
   "composite": 90.86023928171333,
@@ -3326,7 +3326,7 @@
       "ctx": 512,
       "is_self_reference": false,
       "corpus": {
-        "path": "/Users/dipesh/local_llms/llama.cpp/wikitext-2-raw/wiki.test.raw",
+        "path": "${HOME}/local_llms/llama.cpp/wikitext-2-raw/wiki.test.raw",
         "size_bytes": 1290590,
         "sha256_head": "6cb1872543ff1f1b9c1b0ddce665aeb46322754d48d78dc5ecd631e7781c8729",
         "sha256_head_bytes": 1048576

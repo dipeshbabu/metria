@@ -1,0 +1,24 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-report",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:57:36.465340+00:00",
+      "license_status": "No new license asserted for model-derived material"
+    },
+    "name": "clean-q8q8-mistral24b.html",
+    "path": "components/kv-fidelity/src/kv_fidelity/examples/clean-q8q8-mistral24b.html",
+    "sha256": "272cd432fb9a337ff086b7eaaca141b19cb4f947aefa46b34220ae4c6c3a6dac",
+    "size_bytes": 37956,
+    "source": {
+      "original_git_blob_sha256": "787712c87ed425ddca7571bab7b87a24f8b0e44919e0f6307b7e2f1d1953367b",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; all other canonical Git-blob bytes unchanged.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical model/runtime immutable identity is incomplete; example illustrates report interpretation rather than current support"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}

@@ -1,0 +1,25 @@
+{
+  "artifact": {
+    "kind": "redacted-historical-log",
+    "metadata": {
+      "archival": true,
+      "created_at": "2026-09-28T02:45:58.594947+00:00",
+      "license_status": "No new license asserted; original evidence and upstream rights remain separate"
+    },
+    "name": "kld_dense_q4_0",
+    "path": "artifacts/benchmarks/legacy-raw/kld_dense_q4_0.log",
+    "sha256": "7a78310421d3ec680a914163eaf17e7985eb3c9ab48053749b5d81278d4dcba5",
+    "size_bytes": 17025,
+    "source": {
+      "original_git_blob_sha256": "2807fdce526a473c3954554455a4ca484b5d87dc07816f05bea095d00ce1c554",
+      "original_revision": "70d778c09348263b4e9486a854d8f8beed983c43",
+      "redaction": "Contributor home prefix replaced with ${HOME}; model basenames, numerical measurements, and all other bytes preserved.",
+      "repository": "https://github.com/dipeshbabu/metria",
+      "reproducibility_gaps": [
+        "historical experimental fork has no retained public source archive",
+        "model filenames are retained but immutable model hashes were not recorded"
+      ]
+    }
+  },
+  "schema": "metria.artifact_manifest.v1"
+}
