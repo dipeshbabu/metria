@@ -240,7 +240,19 @@ def inspect_vllm_identity(
 
     package_version = resolved_runtime.get("version")
     module_version = _scalar(getattr(module, "__version__", None))
+    # Official backend wheels retain their local build label in distribution
+    # metadata while exposing only the public version from the loaded module.
+    # Keep both facts and accept only an exact public-version match; conflicting
+    # local labels or different public versions remain concrete mismatches.
+    public_version_matches = (
+        isinstance(package_version, str)
+        and "+" in package_version
+        and bool(package_version.partition("+")[2])
+        and module_version == package_version.partition("+")[0]
+    )
     observed_runtime_version = module_version or package_version
+    if public_version_matches:
+        observed_runtime_version = package_version
     requested_runtime_version = resolved_runtime.get("requested_version")
     runtime_status, runtime_reasons = _match_status(
         expected_id="vllm",
@@ -253,6 +265,7 @@ def inspect_vllm_identity(
         module_version is not None
         and package_version is not None
         and str(module_version) != str(package_version)
+        and not public_version_matches
     ):
         runtime_status = IdentityStatus.MISMATCH
         runtime_reasons = (
@@ -271,6 +284,9 @@ def inspect_vllm_identity(
         "version": observed_runtime_version,
         "distribution_version": package_version,
         "module_version": module_version,
+        "local_build_label_source": "distribution_metadata"
+        if public_version_matches
+        else None,
         "source": "loaded_module_and_distribution",
     }
 
