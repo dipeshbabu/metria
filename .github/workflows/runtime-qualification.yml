@@ -1,0 +1,55 @@
+name: Manual runtime qualification
+on:
+  workflow_dispatch:
+    inputs:
+      backend:
+        description: Pinned vLLM environment to qualify
+        type: choice
+        options: [cpu, cuda]
+        required: true
+permissions:
+  contents: read
+jobs:
+  qualify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, linux, x64, metria-qualification]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run pinned qualification on the controlled runner
+        shell: bash
+        env:
+          BACKEND: ${{ inputs.backend }}
+          RUNTIME_PYTHON: ${{ inputs.backend == 'cuda' && vars.METRIA_VLLM_CUDA_PYTHON || vars.METRIA_VLLM_CPU_PYTHON }}
+          RUNTIME_WHEEL: ${{ inputs.backend == 'cuda' && vars.METRIA_VLLM_CUDA_WHEEL || vars.METRIA_VLLM_CPU_WHEEL }}
+          MODEL_ROOT: ${{ vars.METRIA_VLLM_MODEL_ROOT }}
+          OMP_NUM_THREADS: '2'
+          HF_HUB_OFFLINE: '1'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          DO_NOT_TRACK: '1'
+        run: |
+          set -euo pipefail
+          test -x "$RUNTIME_PYTHON"
+          test -f "$RUNTIME_WHEEL"
+          test -d "$MODEL_ROOT"
+          export PYTHONPATH="$GITHUB_WORKSPACE/src"
+          if [ "$BACKEND" = cpu ]; then
+            runtime_prefix="$(dirname "$(dirname "$RUNTIME_PYTHON")")"
+            export LD_PRELOAD="$runtime_prefix/lib/libiomp5.so"
+            export VLLM_CPU_KVCACHE_SPACE=1
+            export VLLM_CPU_OMP_THREADS_BIND=0-1
+          fi
+          timeout --signal=TERM --kill-after=30s 900 "$RUNTIME_PYTHON" tools/qualification/qualify_vllm.py \
+            --backend "$BACKEND" --model-root "$MODEL_ROOT" \
+            --runtime-wheel "$RUNTIME_WHEEL" --source-revision "$(git rev-parse HEAD)" \
+            --output qualification-output
+      - name: Retain qualification evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: vllm-qualification-${{ inputs.backend }}
+          path: qualification-output/
+          retention-days: 90
+          if-no-files-found: warn

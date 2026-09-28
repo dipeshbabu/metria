@@ -117,6 +117,19 @@ def test_repository_checker_rejects_missing_licenses_and_tampered_artifacts(tmp_
         destination = tmp_path / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(root / relative, destination)
+    # The fixture deliberately contains one artifact, independent of additions
+    # to the live repository's headline catalog.
+    (tmp_path / "artifacts/headline-manifests.json").write_text(
+        json.dumps(
+            {
+                "schema": "metria.headline_index.v1",
+                "manifests": [
+                    "artifacts/qualification/llamacpp-cpu-threads/headline-manifest.json"
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     checker(tmp_path)
     (tmp_path / "NOTICE").unlink()
     with pytest.raises(ValueError, match="licensing file"):

@@ -117,9 +117,11 @@ launch before a measurement can execute. Missing tokenizer revision, missing
 chat-template metadata, or incomplete applied introspection remains partial or
 unknown instead of being filled from requested configuration.
 
-Real-engine qualification still needs a pinned vLLM environment, immutable model
-identity, and accelerator evidence. The default CI suite does not make that
-claim.
+The [pinned vLLM qualification procedure](vllm-qualification.md) exercises the
+real adapter with immutable model/tokenizer files, separate CPU/CUDA environments,
+reset and repeated capture, and actual device/driver evidence for CUDA.
+Its retained scope is narrow; the default mocked CI suite does not extend that
+claim to other devices, upstream versions, chat templates, or treatments.
 
 ## Evidence required for a real qualification
 
