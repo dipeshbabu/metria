@@ -119,6 +119,7 @@ metria = { workspace = true }
 package-dir = { "" = "src" }
 
 [tool.setuptools.package-data]
+metria = ["data/*.json", "data/*.jsonl"]
 "metria.fidelity" = ["prompts/*.jsonl", "prompts/*.md", "examples/*.json", "examples/*.html", "examples/*.md"]
 
 [tool.setuptools.packages.find]

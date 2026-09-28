@@ -47,6 +47,15 @@ def _parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
 
     _add_recipe_parser(subparsers)
+    demo = subparsers.add_parser(
+        "demo", help="run an explicitly synthetic verifier example without a model"
+    )
+    demo.add_argument(
+        "--case", choices=("pass", "fail", "not-comparable"), default="pass"
+    )
+    demo.add_argument(
+        "--output", type=Path, required=True, help="new synthetic evidence directory"
+    )
     subparsers.add_parser(
         "fidelity",
         help="expert fidelity scoring and saved-report tools",
@@ -112,6 +121,7 @@ def _add_recipe_parser(subparsers: Any) -> None:
         help="validate and normalize versioned study recipes",
     )
     recipe_subparsers = recipe.add_subparsers(dest="recipe_command", required=True)
+    _add_preparation_parser(recipe_subparsers)
 
     validate = recipe_subparsers.add_parser(
         "validate",
@@ -141,6 +151,46 @@ def _add_recipe_parser(subparsers: Any) -> None:
         "--output",
         type=Path,
         help="write normalized JSON to a file instead of stdout",
+    )
+
+
+def _add_preparation_parser(subparsers: Any) -> None:
+    prepare = subparsers.add_parser(
+        "prepare-vllm", help="prepare a pinned local vLLM prefix-cache recipe"
+    )
+    prepare.add_argument(
+        "--model",
+        type=Path,
+        required=True,
+        help="existing local model/tokenizer directory",
+    )
+    prepare.add_argument(
+        "--descriptor", type=Path, help="trusted model file-to-SHA256 manifest"
+    )
+    prepare.add_argument(
+        "--workload", type=Path, help="JSONL prompt rows with optional task checks"
+    )
+    prepare.add_argument(
+        "--example",
+        action="store_true",
+        help="use bundled SmolLM2 descriptor/workload defaults; no model download",
+    )
+    prepare.add_argument("--policy", type=Path, help="explicit acceptance policy JSON")
+    prepare.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="new recipe file; contains supplied workload text",
+    )
+    prepare.add_argument("--context", type=int, default=512)
+    prepare.add_argument("--max-tokens", type=int, default=16)
+    prepare.add_argument("--warmup-trials", type=int, default=1)
+    prepare.add_argument("--measured-trials", type=int, default=3)
+    prepare.add_argument(
+        "--timeout",
+        type=float,
+        default=900,
+        help="whole-verification deadline in seconds",
     )
 
 
@@ -445,21 +495,15 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
 
     try:
         if args.command == "verify":
-            recipe = _load(args.path)
-            try:
-                result = verify_recipe(recipe, args.output)
-            except OSError as exc:
-                return _verification_error(
-                    exc, "EXECUTION_FAILED", 5, args.json_output, out, err
-                )
-            if args.json_output:
-                out.write(
-                    json.dumps(result.to_data(), sort_keys=True, allow_nan=False) + "\n"
-                )
-            else:
-                out.write(render_verification(result.manifest))
-                out.write(f"Evidence: {result.output_dir}\n")
-            return result.exit_code
+            return _verify_command(args, out, err)
+        if args.command == "demo":
+            from .onboarding import demo_command
+
+            return demo_command(args, out, err)
+        if args.command == "recipe" and args.recipe_command == "prepare-vllm":
+            from .onboarding import prepare_command
+
+            return prepare_command(args, out)
         if args.command == "compare":
             if len(args.records) < 2:
                 raise ValueError("compare requires at least two run record files")
@@ -533,3 +577,19 @@ def _verification_error(
     else:
         err.write(f"metria: error: {error}\n")
     return code
+
+
+def _verify_command(args: argparse.Namespace, out: TextIO, err: TextIO) -> int:
+    recipe = _load(args.path)
+    try:
+        result = verify_recipe(recipe, args.output)
+    except OSError as exc:
+        return _verification_error(
+            exc, "EXECUTION_FAILED", 5, args.json_output, out, err
+        )
+    if args.json_output:
+        out.write(json.dumps(result.to_data(), sort_keys=True, allow_nan=False) + "\n")
+    else:
+        out.write(render_verification(result.manifest))
+        out.write(f"Evidence: {result.output_dir}\n")
+    return result.exit_code

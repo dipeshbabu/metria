@@ -7,6 +7,7 @@ Only the standard library and installed Metria distribution are required.
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 import tempfile
@@ -54,6 +55,8 @@ def main() -> int:
             (["fidelity", "--version"], f"metria fidelity {args.version}"),
             (["fidelity", "compare", "--help"], "compare"),
             (["recipe", "--help"], "validate"),
+            (["recipe", "prepare-vllm", "--help"], "--example"),
+            (["demo", "--help"], "not-comparable"),
             (["compare", "--help"], "compare"),
         ]:
             result = subprocess.run(
@@ -64,8 +67,37 @@ def main() -> int:
                 text=True,
             )
             assert expected in result.stdout, result.stdout
+        _check_demos(cli, Path(directory))
     print(f"Installed Metria {args.version}: metadata, SDK, and CLI passed")
     return 0
+
+
+def _check_demos(cli: Path, directory: Path) -> None:
+    assets = resources.files("metria").joinpath("data")
+    descriptor = json.loads(
+        assets.joinpath("smollm2-135m.json").read_text(encoding="utf-8")
+    )
+    assert len(descriptor["files"]) == 8
+    assert (
+        len(
+            assets.joinpath("prefix-workload.jsonl")
+            .read_text(encoding="utf-8")
+            .splitlines()
+        )
+        == 2
+    )
+    for case, code in (("pass", 0), ("fail", 1), ("not-comparable", 3)):
+        output = directory / case
+        result = subprocess.run(
+            [str(cli), "demo", "--case", case, "--output", str(output)],
+            cwd=directory,
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == code, result.stderr
+        data = json.loads((output / "verification.json").read_text(encoding="utf-8"))
+        assert data["fixture_only"] is True and data["scope"] == "synthetic_fixture.v1"
+        assert data["exit_code"] == code
 
 
 if __name__ == "__main__":
