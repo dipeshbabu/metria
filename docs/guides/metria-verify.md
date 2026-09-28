@@ -77,6 +77,7 @@ Each output directory must be new. A completed verification contains:
 
 ```text
 verification/
+  verification.json
   manifest.json
   report.md
   reference.run.json
@@ -85,7 +86,8 @@ verification/
 
 The reference record is saved before the candidate starts. Runtime failures,
 timeouts, incomplete observation, and interruption are retained as evidence.
-Writes use temporary files, and the manifest is published last. A filesystem
+Writes use temporary files, and `verification.json` is published last. The
+original `manifest.json` name remains an identical compatibility alias. A filesystem
 failure leaves completed records intact and does not produce a success manifest.
 
 The report omits workload prompt text and generated text. Run records retain
@@ -104,8 +106,12 @@ instead of silently ignoring them.
 | `INSUFFICIENT_EVIDENCE` | Required model/provider identity, runtime readback, or token captures are absent or inconsistent with the request. |
 | `EXECUTION_FAILED` | Execution, timeout, interruption, or behavioral analysis prevented completion. |
 
-Exit status is `0` for `VERIFIED` or `PASS`, `1` for other verification outcomes, `2` for
-invalid input or filesystem errors, and `130` for interruption.
+In the development version, exit status is `0` for `VERIFIED` or `PASS`, `1` for
+policy `FAIL`, `2` for invalid input/configuration, `3` for `NOT_COMPARABLE`, `4`
+for `INSUFFICIENT_EVIDENCE`, `5` for execution/preflight or persistence failure,
+and `130` for interruption. See [CI integration](verification-ci.md) for
+machine-readable errors, migration from the earlier catch-all exit 1, job
+summaries, and artifact retention.
 
 `VERIFIED` is not a task-quality or deployment-acceptance verdict. Token prefix
 agreement and exact sequence matches describe behavioral change on the supplied
@@ -115,10 +121,11 @@ policy was evaluated. The development version adds
 does not include that feature.
 
 Process wall-time samples include startup, model loading, prompt evaluation, and
-generation. They are descriptive observations from this workload; they are not
-decode-only throughput, TTFT, isolated kernel timing, or a statistically qualified
-performance claim. Repeated-trial and verifier-native performance measurement
-remain separate follow-up work; current policy targets cover behavioral analysis.
+generation. The development verifier reports method-compatible cold-process
+request-latency deltas after comparison passes. These are not decode-only
+throughput, TTFT, isolated kernel timing, or a statistically qualified speedup.
+See [performance methodology and availability](verification-performance.md).
+Current acceptance-policy targets cover behavioral analysis.
 
 The observed thread count and context come from the running llama.cpp context.
 Missing readback never becomes a match. For example, if llama.cpp rounds a
@@ -137,3 +144,18 @@ print(result.manifest["verdict"])
 The JSON manifest uses `metria.verification.v1` and records the scoped contract,
 recipe digest, run/evidence digests, hardware evidence, observed facts, comparison
 issues, analysis identity, diagnostics, and process wall-time method.
+
+In the development version, `verification.json` is the canonical result and
+`report.md` is a deterministic projection of it. The report leads with the
+verdict and separates Change, Evidence, Comparison, Impact, and Verdict.
+`lifecycle.status`, `comparison_status`, and `policy_status` distinguish execution
+completion, comparison validity, and user acceptance. A completed lifecycle alone
+does not imply a valid comparison. Missing evidence prevents comparison from
+being reported as valid. Explicit controls are marked matched, missing, or
+different; intended paths and waived differences remain separate. Waiver rationale
+is represented by a digest in summaries because free-text rationale can be private.
+
+Timeouts, partial runs, preflight failures, and interruption retain the same
+report structure. Invalid recipes and unwritable output locations fail before
+a complete bundle can be published. Absence of `verification.json` means the
+bundle is incomplete; preserved run records can still aid investigation.

@@ -60,6 +60,9 @@ result is bound to GitHub Advanced Security. `CI required` also gates component
 tests, coverage, lint, and component distribution validation.
 
 Only squash merges are enabled. Merge commits and rebase merges are disabled.
+Auto-merge is enabled. Reviewed PRs may request squash auto-merge after their
+applicable checks succeed; strict checks and current-branch requirements remain
+in force. This setting was verified on 2026-09-28.
 The approving-review count remains zero under the single-maintainer policy in
 [GOVERNANCE.md](../../GOVERNANCE.md); a PR and the required checks are still
 mandatory.

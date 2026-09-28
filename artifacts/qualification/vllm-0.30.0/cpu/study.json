@@ -1,0 +1,62 @@
+{
+  "environment": {},
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "prompts": [
+        {
+          "id": "capital",
+          "prompt": "The capital of France is"
+        },
+        {
+          "id": "arithmetic",
+          "prompt": "Two plus two equals"
+        }
+      ]
+    }
+  },
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "comparison": {
+      "analyses": [],
+      "block_by": [],
+      "control": [],
+      "vary": []
+    },
+    "constants": {},
+    "metadata": {},
+    "name": "vllm-cpu-qualification",
+    "runs": [
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "id": "HuggingFaceTB/SmolLM2-135M",
+          "path": "${MODEL_SNAPSHOT}",
+          "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+          "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+        },
+        "runtime": {
+          "dtype": "float32",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.65,
+          "max_model_len": 128,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "version": "0.30.0+cpu"
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 96,
+          "max_tokens": 8,
+          "seed": 42,
+          "temperature": 0.0
+        },
+        "treatments": [],
+        "trial_policy": {}
+      }
+    ]
+  }
+}

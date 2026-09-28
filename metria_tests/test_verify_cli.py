@@ -230,6 +230,16 @@ def test_verify_saves_incremental_records_manifest_and_readable_report(local_cas
         (local_case["output"] / "manifest.json").read_text(encoding="utf-8")
     )
     assert stored == payload
+    canonical = json.loads(
+        (local_case["output"] / "verification.json").read_text(encoding="utf-8")
+    )
+    assert canonical == stored
+    assert canonical["lifecycle"]["status"] == "completed"
+    assert canonical["comparison_status"] == "VALID"
+    assert canonical["policy_status"] == "NOT_CONFIGURED"
+    assert canonical["performance"]["available"] is True
+    assert canonical["performance"]["absolute_delta"] == 0
+    assert canonical["performance"]["relative_delta"] is None
     report = (local_case["output"] / "report.md").read_text(encoding="utf-8")
     assert "CPU threads: 1 -> 2" in report
     assert "first divergence at token 2" in report
@@ -289,7 +299,10 @@ def test_policy_cannot_override_failed_verification_gates(local_case, mode):
         ),
     )
     code, output, errors = _invoke(local_case)
-    assert code == 1 and not errors
+    assert (
+        code == {"different_vocab": 3, "failure": 5, "timeout": 5}.get(mode, 4)
+        and not errors
+    )
     data = json.loads(output)
     assert data["verdict"] not in {"PASS", "FAIL"}
     assert data["policy"]["status"] == "NOT_EVALUATED"
@@ -325,7 +338,7 @@ def test_missing_or_incompatible_policy_metric_is_reported_as_insufficient(
 
     monkeypatch.setattr(TrajectoryAgreementAnalysis, "analyze", analyze)
     code, output, errors = _invoke(local_case)
-    assert code == 1 and not errors
+    assert code == 4 and not errors
     data = json.loads(output)
     assert data["verdict"] == "INSUFFICIENT_EVIDENCE"
     assert data["policy"]["status"] in {"INSUFFICIENT_EVIDENCE", "NOT_EVALUATED"}
@@ -355,12 +368,12 @@ def test_unknown_policy_target_is_rejected_before_execution(local_case):
 @pytest.mark.parametrize(
     ("mode", "verdict", "status"),
     [
-        ("legacy", "INSUFFICIENT_EVIDENCE", 1),
-        ("empty", "INSUFFICIENT_EVIDENCE", 1),
-        ("ignored_threads", "INSUFFICIENT_EVIDENCE", 1),
-        ("different_vocab", "NOT_COMPARABLE", 1),
-        ("timeout", "EXECUTION_FAILED", 1),
-        ("failure", "EXECUTION_FAILED", 1),
+        ("legacy", "INSUFFICIENT_EVIDENCE", 4),
+        ("empty", "INSUFFICIENT_EVIDENCE", 4),
+        ("ignored_threads", "INSUFFICIENT_EVIDENCE", 4),
+        ("different_vocab", "NOT_COMPARABLE", 3),
+        ("timeout", "EXECUTION_FAILED", 5),
+        ("failure", "EXECUTION_FAILED", 5),
         ("interrupt", "EXECUTION_FAILED", 130),
     ],
 )
@@ -372,6 +385,8 @@ def test_verifier_distinguishes_incomplete_invalid_and_failed_runs(
     assert actual == status and errors == "", (actual, errors, output)
     payload = json.loads(output)
     assert payload["verdict"] == verdict
+    assert payload["exit_code"] == status
+    assert payload["performance"]["available"] is False
     assert "private" not in output
     assert (local_case["output"] / "reference.run.json").is_file()
     assert (local_case["output"] / "candidate.run.json").is_file()
@@ -390,7 +405,7 @@ def test_insufficient_evidence_does_not_invoke_behavioral_analyzer(
         TrajectoryAgreementAnalysis, "analyze", lambda *args: calls.append(True)
     )
     status, _, _ = _invoke(local_case)
-    assert status == 1 and calls == []
+    assert status == 4 and calls == []
 
 
 @pytest.mark.parametrize("count", [1, 3])
@@ -403,7 +418,8 @@ def test_invalid_run_count_is_rejected_before_output_or_execution(local_case, co
     )
     local_case["recipe"] = replace(recipe, study=replace(recipe.study, runs=runs))
     status, output, errors = _invoke(local_case)
-    assert status == 2 and output == "" and "exactly two" in errors
+    assert status == 2 and json.loads(output)["verdict"] == "INVALID_CONFIGURATION"
+    assert "INVALID_CONFIGURATION" in errors
     assert not local_case["output"].exists() and not local_case["calls"]
 
 
@@ -414,15 +430,15 @@ def test_missing_routes_fail_before_any_execution(local_case, monkeypatch, missi
         verification, "_builtin_registries", lambda: replace(registry, **{missing: {}})
     )
     status, _, errors = _invoke(local_case)
-    assert status == 2 and "registered" in errors
+    assert status == 2 and "INVALID_CONFIGURATION" in errors
     assert not local_case["calls"] and not local_case["output"].exists()
 
 
 def test_unqualified_provider_has_failure_records_and_no_execution(local_case):
     local_case["binary"].unlink()
     status, output, _ = _invoke(local_case)
-    assert status == 1 and not local_case["calls"]
-    assert json.loads(output)["verdict"] == "INSUFFICIENT_EVIDENCE"
+    assert status == 5 and not local_case["calls"]
+    assert json.loads(output)["verdict"] == "EXECUTION_FAILED"
 
 
 def test_existing_output_is_never_overwritten(local_case):
@@ -430,7 +446,7 @@ def test_existing_output_is_never_overwritten(local_case):
     marker = local_case["output"] / "keep.txt"
     marker.write_text("keep this", encoding="utf-8")
     status, _, _ = _invoke(local_case)
-    assert status == 2 and not local_case["calls"]
+    assert status == 5 and not local_case["calls"]
     assert marker.read_text(encoding="utf-8") == "keep this"
     assert list(local_case["output"].iterdir()) == [marker]
 
@@ -447,7 +463,7 @@ def test_write_failure_keeps_completed_record_without_success_manifest(
 
     monkeypatch.setattr(Path, "replace", fail_candidate)
     status, _, errors = _invoke(local_case)
-    assert status == 2 and "simulated disk failure" in errors
+    assert status == 5 and "EXECUTION_FAILED" in errors
     assert (
         load_run_record(local_case["output"] / "reference.run.json").status
         is RunStatus.COMPLETED
@@ -465,13 +481,67 @@ def test_fixed_evidence_produces_deterministic_manifests(local_case):
     assert json.loads(first) == json.loads(second)
 
 
+@pytest.mark.parametrize(
+    "mode,verdict,lifecycle,comparison",
+    [
+        ("normal", "VERIFIED", "completed", "VALID"),
+        ("legacy", "INSUFFICIENT_EVIDENCE", "completed", "NOT_EVALUATED"),
+        ("different_vocab", "NOT_COMPARABLE", "completed", "NOT_COMPARABLE"),
+        ("timeout", "EXECUTION_FAILED", "failed", "NOT_EVALUATED"),
+        ("failure", "EXECUTION_FAILED", "failed", "NOT_EVALUATED"),
+        ("interrupt", "EXECUTION_FAILED", "failed", "NOT_EVALUATED"),
+    ],
+)
+def test_report_state_golden_projection(
+    local_case, mode, verdict, lifecycle, comparison
+):
+    local_case["mode"] = mode
+    _invoke(local_case)
+    canonical = json.loads((local_case["output"] / "verification.json").read_text())
+    report = (local_case["output"] / "report.md").read_text()
+    assert report == verification.render_verification(canonical)
+    assert report.splitlines()[:3] == [
+        "# Metria Verification",
+        "",
+        f"**Verdict: {verdict}**",
+    ]
+    assert [line for line in report.splitlines() if line.startswith("## ")] == [
+        "## Change:",
+        "## Evidence:",
+        "## Comparison:",
+        "## Impact:",
+        "## Verdict:",
+    ]
+    assert canonical["lifecycle"]["status"] == lifecycle
+    assert canonical["comparison_status"] == comparison
+    assert f"## Comparison:\n  {comparison}\n" in report
+    assert "private" not in report
+
+
+def test_canonical_result_is_not_published_if_legacy_alias_write_fails(
+    local_case, monkeypatch
+):
+    original = verification._write_atomic
+
+    def fail(path, text):
+        if path.name == "manifest.json":
+            raise OSError("manifest persistence failed")
+        original(path, text)
+
+    monkeypatch.setattr(verification, "_write_atomic", fail)
+    status, _, errors = _invoke(local_case)
+    assert status == 5 and "EXECUTION_FAILED" in errors
+    assert not (local_case["output"] / "verification.json").exists()
+    assert (local_case["output"] / "reference.run.json").exists()
+
+
 def test_observation_failure_cannot_be_verified(local_case, monkeypatch):
     def fail(*args):
         raise RuntimeError("private observation failure")
 
     monkeypatch.setattr(llamacpp.LlamaCppAdapter, "observe", fail)
     status, output, errors = _invoke(local_case)
-    assert status == 1 and not errors
+    assert status == 4 and not errors
     payload = json.loads(output)
     assert payload["verdict"] == "INSUFFICIENT_EVIDENCE"
     assert payload["records"]["reference"]["status"] == "partial"
@@ -485,7 +555,7 @@ def test_unimplemented_trial_policy_is_not_silently_ignored(local_case):
     )
     local_case["recipe"] = replace(recipe, study=replace(recipe.study, runs=runs))
     status, _, errors = _invoke(local_case)
-    assert status == 2 and "trial policies" in errors
+    assert status == 2 and "INVALID_CONFIGURATION" in errors
     assert not local_case["calls"]
 
 
@@ -497,7 +567,7 @@ def test_failed_analysis_is_retained_without_zero_regression_claim(
 
     monkeypatch.setattr(TrajectoryAgreementAnalysis, "analyze", fail)
     status, output, errors = _invoke(local_case)
-    assert status == 1 and errors == ""
+    assert status == 5 and errors == ""
     payload = json.loads(output)
     assert payload["verdict"] == "EXECUTION_FAILED"
     assert payload["analyses"][0]["error_type"] == "RuntimeError"
@@ -521,9 +591,64 @@ def test_matching_mismatch_statuses_do_not_make_identity_verified(
 
     monkeypatch.setattr(llamacpp.LlamaCppAdapter, "observe", mismatch)
     status, output, _ = _invoke(local_case)
-    assert status == 1
+    assert status == 4
     payload = json.loads(output)
     assert payload["verdict"] == "INSUFFICIENT_EVIDENCE"
     assert "inconsistent or mismatched" in " ".join(
         payload["records"]["reference"]["evidence_gaps"]
     )
+
+
+@pytest.mark.parametrize("minimum,expected", [(0.6, 0), (0.9, 1)])
+def test_ci_summary_and_exit_follow_fake_runtime_policy(local_case, minimum, expected):
+    import runpy
+
+    writer = runpy.run_path(
+        str(Path(__file__).parents[1] / "tools/ci/write_verification_summary.py")
+    )
+    local_case["recipe"] = replace(
+        local_case["recipe"],
+        policy=VerificationPolicy(
+            (
+                PolicyCriterion(
+                    "behavior.trajectory_agreement", "0.3.4", minimum=minimum
+                ),
+            )
+        ),
+    )
+    code, output, errors = _invoke(local_case)
+    assert code == expected and not errors
+    assert json.loads(output)["exit_code"] == expected
+    summary = local_case["output"].parent / "step-summary.md"
+    summary.write_text("Existing job summary\n")
+    writer["append_summary"](local_case["output"], summary)
+    text = summary.read_text()
+    assert text.startswith("Existing job summary\n# Metria Verification")
+    assert ("**Verdict: PASS**" if expected == 0 else "**Verdict: FAIL**") in text
+    assert "private" not in text
+    assert "Policy checks:" in text
+
+
+def test_json_input_error_does_not_copy_sensitive_exception_values(local_case):
+    local_case["path"].write_text('{"private-secret":')
+    stdout, stderr = io.StringIO(), io.StringIO()
+    code = main(
+        ["verify", str(local_case["path"]), "--json"], stdout=stdout, stderr=stderr
+    )
+    assert code == 2
+    data = json.loads(stdout.getvalue())
+    assert data["schema"] == "metria.verification_error.v1"
+    assert data["verdict"] == "INVALID_CONFIGURATION"
+    assert data["exit_code"] == 2
+    assert "private-secret" not in stdout.getvalue() + stderr.getvalue()
+
+
+def test_ci_summary_explains_an_incomplete_bundle(tmp_path):
+    import runpy
+
+    writer = runpy.run_path(
+        str(Path(__file__).parents[1] / "tools/ci/write_verification_summary.py")
+    )
+    summary = tmp_path / "step-summary.md"
+    writer["append_summary"](tmp_path / "missing-output", summary)
+    assert "No complete verification bundle" in summary.read_text()

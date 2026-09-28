@@ -1,5 +1,7 @@
 # Metria
 
+Retained evidence follows the [artifact provenance and third-party material policy](docs/maintainers/third-party-material.md).
+
 [![PyPI](https://img.shields.io/pypi/v/metria)](https://pypi.org/project/metria/)
 [![CI](https://github.com/dipeshbabu/metria/actions/workflows/ci.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/ci.yml)
 [![Metria core](https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml)

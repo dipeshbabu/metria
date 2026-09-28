@@ -9,6 +9,25 @@ TurboQuant reference packages have independent versions and release notes.
   Official backend wheel build labels are retained separately from loaded module
   public versions; contradictory public versions or build labels still fail.
 
+- Added verifier-native cold-process request-latency impact with explicit source,
+  workload, warmup/trial and aggregation identity. Deltas require valid comparison
+  and compatible methods; unsupported streaming/memory metrics remain unavailable.
+
+- Assigned distinct verification exits for policy failure, invalid inputs,
+  non-comparable runs, insufficient evidence, and execution/preflight failure.
+  Added redacted machine-readable input errors and a GitHub Actions summary and
+  artifact example. CI integrations that matched only exit 1 must accept every
+  nonzero exit as failure.
+
+- Added versioned serialization for the shared `ArtifactManifest` and enforced
+  license-file and provenance checks for explicitly designated headline artifacts.
+  Third-party and generated-material rights remain explicit, including unknowns.
+
+- Added canonical `verification.json` output and deterministic Markdown reports
+  with separate lifecycle, comparison, and policy states. The original manifest
+  filename remains a compatibility alias; incomplete evidence cannot appear as
+  a valid comparison in the summary.
+
 - Added versioned trajectory divergence diagnostics with sample counts, category
   rates, first-divergence distributions, deterministic prompt ranking, and length
   mismatches. Policies can bound `behavior.divergence_rate`; missing captures do
