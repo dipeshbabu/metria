@@ -7,6 +7,7 @@ import os
 import subprocess
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -33,7 +34,7 @@ def build_case(tmp_path, monkeypatch):
             "llama-completion.exe" if os.name == "nt" else "llama-completion"
         )
         binary.write_bytes(f"qualified {role} fixture".encode())
-        binaries.append(binary)
+        binaries.append(binary.resolve())
     model = tmp_path / "model.gguf"
     model.write_bytes(b"immutable shared GGUF fixture")
     model_pin = llamacpp._sha256_file(model)
@@ -96,7 +97,15 @@ def build_case(tmp_path, monkeypatch):
             argv, 0, stdout="generated-answer", stderr=""
         )
 
-    monkeypatch.setattr(llamacpp.subprocess, "run", run)
+    monkeypatch.setattr(
+        llamacpp,
+        "subprocess",
+        SimpleNamespace(
+            run=run,
+            DEVNULL=subprocess.DEVNULL,
+            TimeoutExpired=subprocess.TimeoutExpired,
+        ),
+    )
     return case
 
 
