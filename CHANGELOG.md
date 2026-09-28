@@ -5,6 +5,11 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added canonical `verification.json` output and deterministic Markdown reports
+  with separate lifecycle, comparison, and policy states. The original manifest
+  filename remains a compatibility alias; incomplete evidence cannot appear as
+  a valid comparison in the summary.
+
 - Added versioned trajectory divergence diagnostics with sample counts, category
   rates, first-divergence distributions, deterministic prompt ranking, and length
   mismatches. Policies can bound `behavior.divergence_rate`; missing captures do

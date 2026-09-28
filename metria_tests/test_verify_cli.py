@@ -230,6 +230,13 @@ def test_verify_saves_incremental_records_manifest_and_readable_report(local_cas
         (local_case["output"] / "manifest.json").read_text(encoding="utf-8")
     )
     assert stored == payload
+    canonical = json.loads(
+        (local_case["output"] / "verification.json").read_text(encoding="utf-8")
+    )
+    assert canonical == stored
+    assert canonical["lifecycle"]["status"] == "completed"
+    assert canonical["comparison_status"] == "VALID"
+    assert canonical["policy_status"] == "NOT_CONFIGURED"
     report = (local_case["output"] / "report.md").read_text(encoding="utf-8")
     assert "CPU threads: 1 -> 2" in report
     assert "first divergence at token 2" in report
@@ -463,6 +470,60 @@ def test_fixed_evidence_produces_deterministic_manifests(local_case):
     status, second, _ = _invoke(local_case)
     assert status == 0
     assert json.loads(first) == json.loads(second)
+
+
+@pytest.mark.parametrize(
+    "mode,verdict,lifecycle,comparison",
+    [
+        ("normal", "VERIFIED", "completed", "VALID"),
+        ("legacy", "INSUFFICIENT_EVIDENCE", "completed", "NOT_EVALUATED"),
+        ("different_vocab", "NOT_COMPARABLE", "completed", "NOT_COMPARABLE"),
+        ("timeout", "EXECUTION_FAILED", "failed", "NOT_EVALUATED"),
+        ("failure", "EXECUTION_FAILED", "failed", "NOT_EVALUATED"),
+        ("interrupt", "EXECUTION_FAILED", "failed", "NOT_EVALUATED"),
+    ],
+)
+def test_report_state_golden_projection(
+    local_case, mode, verdict, lifecycle, comparison
+):
+    local_case["mode"] = mode
+    _invoke(local_case)
+    canonical = json.loads((local_case["output"] / "verification.json").read_text())
+    report = (local_case["output"] / "report.md").read_text()
+    assert report == verification.render_verification(canonical)
+    assert report.splitlines()[:3] == [
+        "# Metria Verification",
+        "",
+        f"**Verdict: {verdict}**",
+    ]
+    assert [line for line in report.splitlines() if line.startswith("## ")] == [
+        "## Change:",
+        "## Evidence:",
+        "## Comparison:",
+        "## Impact:",
+        "## Verdict:",
+    ]
+    assert canonical["lifecycle"]["status"] == lifecycle
+    assert canonical["comparison_status"] == comparison
+    assert f"## Comparison:\n  {comparison}\n" in report
+    assert "private" not in report
+
+
+def test_canonical_result_is_not_published_if_legacy_alias_write_fails(
+    local_case, monkeypatch
+):
+    original = verification._write_atomic
+
+    def fail(path, text):
+        if path.name == "manifest.json":
+            raise OSError("manifest persistence failed")
+        original(path, text)
+
+    monkeypatch.setattr(verification, "_write_atomic", fail)
+    status, _, errors = _invoke(local_case)
+    assert status == 2 and "persistence failed" in errors
+    assert not (local_case["output"] / "verification.json").exists()
+    assert (local_case["output"] / "reference.run.json").exists()
 
 
 def test_observation_failure_cannot_be_verified(local_case, monkeypatch):
