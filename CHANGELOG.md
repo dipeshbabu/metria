@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+## 0.1.1
+
+Prepared for release; publication is a separate protected workflow.
+
 - Replaced unsafe legacy benchmark shell orchestration with thin wrappers around
   reusable qualified verification trials, explicit warmup/isolation, retained
   evidence, and exact baseline identity. Positional model/PDF calls require migration.
@@ -89,7 +93,7 @@ TurboQuant reference packages have independent versions and release notes.
 
 - Added shared, bounded SHA-256 artifact resolution and allowlisted ZIP
   extraction with reusable provenance manifests. KV Fidelity now consumes this
-  API for its pinned WikiText-2 cache. Root development is `0.1.1.dev0`.
+  API for its pinned WikiText-2 cache. The shared artifact API is included in Metria `0.1.1`.
 
 - Runtime identity mapping reads reuse deeply immutable evidence instead of
   rebuilding it for every field lookup, iteration, or length query.

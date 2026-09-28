@@ -1,9 +1,9 @@
-# Publish Metria 0.1.0
+# Publishing Metria
 
-The first root release is `metria==0.1.0`, classified as Alpha. Its qualified
-end-to-end CLI scope is local llama.cpp CPU thread-count verification.
+The current release candidate is `metria==0.1.1`, classified as Alpha. Its qualified
+end-to-end CLI scope remains local llama.cpp CPU thread-count verification.
 The broader framework roadmap and component release gates are independent.
-The release decision is recorded in
+The original first-release decision is recorded in
 [issue #109](https://github.com/dipeshbabu/metria/issues/109).
 
 Preparation does not upload anything to PyPI. A maintainer explicitly starts
@@ -50,10 +50,10 @@ Only the protected publishing job receives OIDC permission.
 
    ```bash
    gh workflow run publish-metria.yml --repo dipeshbabu/metria \
-     --ref metria-v0.1.0 -f version=0.1.0 -F publish=false
+     --ref metria-v0.1.1 -f version=0.1.1 -F publish=false
    ```
 
-   Download `metria-0.1.0` from the completed run. It contains the wheel,
+   Download `metria-0.1.1` from the completed run. It contains the wheel,
    source archive, and `SHA256SUMS`. The workflow tests the root package,
    builds its wheel from the source archive, checks metadata and setup assets,
    and clean-installs both formats on Linux (Python 3.10 and 3.14),
@@ -62,7 +62,7 @@ Only the protected publishing job receives OIDC permission.
 
    ```bash
    gh workflow run publish-metria.yml --repo dipeshbabu/metria \
-     --ref metria-v0.1.0 -f version=0.1.0 -F publish=true
+     --ref metria-v0.1.1 -f version=0.1.1 -F publish=true
    ```
 
 5. Review this run's checks, artifacts, and hashes, then approve the
@@ -74,7 +74,7 @@ Only the protected publishing job receives OIDC permission.
 6. The remaining jobs verify PyPI file hashes and publisher identity, validate
    signatures, install the published package in a clean environment, and
    publish the GitHub release. An existing draft is finalized with the exact
-   published files. Confirm `python -m pip install metria==0.1.0` works.
+   published files. Confirm `python -m pip install metria==0.1.1` works.
 
 Do not rerun the upload if PyPI succeeded but a later verification or GitHub
 release step failed. Rerun only failed downstream jobs or complete their
