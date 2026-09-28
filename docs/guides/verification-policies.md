@@ -101,8 +101,11 @@ retained, including observed values, source identity, and its result/reason.
 | Exit | Meaning |
 |---|---|
 | `0` | `PASS`, or `VERIFIED` when no policy was supplied |
-| `1` | `FAIL` or another unsuccessful verification outcome |
-| `2` | Invalid input/configuration or a filesystem error |
+| `1` | Policy `FAIL` |
+| `2` | Invalid input/configuration |
+| `3` | `NOT_COMPARABLE` |
+| `4` | `INSUFFICIENT_EVIDENCE` |
+| `5` | Execution/preflight or persistence failure |
 | `130` | Interrupted verification |
 
 The manifest adds a `policy` evaluation with schema `metria.policy_evaluation.v1`

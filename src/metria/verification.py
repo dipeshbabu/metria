@@ -46,6 +46,15 @@ VERIFICATION_SCHEMA = "metria.verification.v1"
 VERIFICATION_SCOPE = "local_llamacpp_cpu_threads.v1"
 _ROLES = ("reference", "candidate")
 _CAPTURE_KEY = "llama_cpp_token_ids_capture_sha256"
+VERIFICATION_EXIT_CODES = {
+    "VERIFIED": 0,
+    "PASS": 0,
+    "FAIL": 1,
+    "INVALID_CONFIGURATION": 2,
+    "NOT_COMPARABLE": 3,
+    "INSUFFICIENT_EVIDENCE": 4,
+    "EXECUTION_FAILED": 5,
+}
 
 
 class VerificationVerdict(str, Enum):
@@ -614,6 +623,7 @@ def verify_recipe(
     analysis_data = [_analysis_data(outcome) for outcome in outcomes]
     gaps = [_evidence_gaps(record, provider) for record in saved]
     failed = {
+        RunStatus.PREFLIGHT_FAILED,
         RunStatus.FAILED,
         RunStatus.TIMED_OUT,
         RunStatus.INTERRUPTED,
@@ -640,6 +650,7 @@ def verify_recipe(
         )
         if policy_result.status is not PolicyDecision.NOT_EVALUATED:
             verdict = VerificationVerdict(policy_result.status.value)
+    exit_code = 130 if interrupted else VERIFICATION_EXIT_CODES[verdict.value]
     manifest = {
         "schema": VERIFICATION_SCHEMA,
         "scope": VERIFICATION_SCOPE,
@@ -648,6 +659,7 @@ def verify_recipe(
         "implementation": context["implementation"],
         "hardware": hardware,
         "verdict": verdict.value,
+        "exit_code": exit_code,
         "acceptance_policy_evaluated": policy_result is not None
         and policy_result.status is not PolicyDecision.NOT_EVALUATED,
         "lifecycle": {
@@ -743,11 +755,5 @@ def verify_recipe(
     return VerificationResult(
         output,
         manifest,
-        130
-        if interrupted
-        else (
-            0
-            if verdict in {VerificationVerdict.VERIFIED, VerificationVerdict.PASS}
-            else 1
-        ),
+        exit_code,
     )

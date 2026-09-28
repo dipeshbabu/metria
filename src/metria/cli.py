@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from collections.abc import Mapping, Sequence
@@ -417,7 +418,13 @@ def main(
 
     try:
         if args.command == "verify":
-            result = verify_recipe(_load(args.path), args.output)
+            recipe = _load(args.path)
+            try:
+                result = verify_recipe(recipe, args.output)
+            except OSError as exc:
+                return _verification_error(
+                    exc, "EXECUTION_FAILED", 5, args.json_output, out, err
+                )
             if args.json_output:
                 out.write(
                     json.dumps(result.to_data(), sort_keys=True, allow_nan=False) + "\n"
@@ -464,8 +471,38 @@ def main(
             _write_normalized(recipe, args.output, out)
             return 0
     except (OSError, TypeError, ValueError) as exc:
+        if args.command == "verify":
+            return _verification_error(
+                exc, "INVALID_CONFIGURATION", 2, args.json_output, out, err
+            )
         err.write(f"metria: error: {exc}\n")
         return 2
 
     err.write("metria: error: unsupported command\n")
     return 2
+
+
+def _verification_error(
+    error: Exception,
+    status: str,
+    code: int,
+    json_output: bool,
+    out: TextIO,
+    err: TextIO,
+) -> int:
+    """Return a machine-readable failure without exposing exception values."""
+    payload = {
+        "schema": "metria.verification_error.v1",
+        "verdict": status,
+        "exit_code": code,
+        "error_type": type(error).__name__,
+        "message_sha256": hashlib.sha256(str(error).encode("utf-8")).hexdigest(),
+    }
+    if json_output:
+        out.write(json.dumps(payload, sort_keys=True) + "\n")
+        err.write(
+            f"metria: {status} ({type(error).__name__}); no complete verification bundle was published\n"
+        )
+    else:
+        err.write(f"metria: error: {error}\n")
+    return code
