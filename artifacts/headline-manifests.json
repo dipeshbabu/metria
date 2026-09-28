@@ -3,6 +3,8 @@
   "manifests": [
     "artifacts/qualification/llamacpp-cpu-threads/headline-manifest.json",
     "artifacts/qualification/vllm-0.30.0/cpu/headline-manifest.json",
-    "artifacts/qualification/vllm-0.30.0/cuda/headline-manifest.json"
+    "artifacts/qualification/vllm-0.30.0/cuda/headline-manifest.json",
+    "artifacts/qualification/vllm-prefix-cache/cpu/headline-manifest.json",
+    "artifacts/qualification/vllm-prefix-cache/cuda/headline-manifest.json"
   ]
 }

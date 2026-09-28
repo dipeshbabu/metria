@@ -1,5 +1,9 @@
 # Verify a local llama.cpp CPU thread change
 
+This guide covers the llama.cpp CPU profile. The 0.2 development line also
+supports a [qualified vLLM prefix-cache profile](vllm-prefix-verification.md)
+through the same `metria verify` command, lifecycle and report schema.
+
 `metria verify` runs one reference and one candidate, checks the evidence needed
 for their comparison, and writes a result you can inspect or retain in CI.
 The first supported workflow changes CPU thread count while holding the local

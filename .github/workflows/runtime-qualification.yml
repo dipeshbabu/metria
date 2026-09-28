@@ -2,6 +2,12 @@ name: Manual runtime qualification
 on:
   workflow_dispatch:
     inputs:
+      scope:
+        description: Qualification contract
+        type: choice
+        options: [adapter, prefix-cache]
+        default: prefix-cache
+        required: true
       backend:
         description: Pinned vLLM environment to qualify
         type: choice
@@ -22,6 +28,7 @@ jobs:
         shell: bash
         env:
           BACKEND: ${{ inputs.backend }}
+          QUALIFICATION_SCOPE: ${{ inputs.scope }}
           RUNTIME_PYTHON: ${{ inputs.backend == 'cuda' && vars.METRIA_VLLM_CUDA_PYTHON || vars.METRIA_VLLM_CPU_PYTHON }}
           RUNTIME_WHEEL: ${{ inputs.backend == 'cuda' && vars.METRIA_VLLM_CUDA_WHEEL || vars.METRIA_VLLM_CPU_WHEEL }}
           MODEL_ROOT: ${{ vars.METRIA_VLLM_MODEL_ROOT }}
@@ -41,10 +48,20 @@ jobs:
             export VLLM_CPU_KVCACHE_SPACE=1
             export VLLM_CPU_OMP_THREADS_BIND=0-1
           fi
-          timeout --signal=TERM --kill-after=30s 900 "$RUNTIME_PYTHON" tools/qualification/qualify_vllm.py \
-            --backend "$BACKEND" --model-root "$MODEL_ROOT" \
-            --runtime-wheel "$RUNTIME_WHEEL" --source-revision "$(git rev-parse HEAD)" \
-            --output qualification-output
+          if [ "$QUALIFICATION_SCOPE" = prefix-cache ]; then
+            mkdir qualification-output
+            "$RUNTIME_PYTHON" tools/qualification/prepare_vllm_prefix_verification.py \
+              --model "$MODEL_ROOT" --descriptor tools/qualification/vllm-smollm2-135m.json \
+              --workload examples/verification/vllm-prefix-workload.jsonl \
+              --output qualification-output/study.json
+            "$RUNTIME_PYTHON" -m metria verify qualification-output/study.json \
+              --output qualification-output/verification
+          else
+            timeout --signal=TERM --kill-after=30s 900 "$RUNTIME_PYTHON" tools/qualification/qualify_vllm.py \
+              --backend "$BACKEND" --model-root "$MODEL_ROOT" \
+              --runtime-wheel "$RUNTIME_WHEEL" --source-revision "$(git rev-parse HEAD)" \
+              --output qualification-output
+          fi
       - name: Retain qualification evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

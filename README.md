@@ -42,7 +42,9 @@ Published [Metria 0.1.1](https://github.com/dipeshbabu/metria/releases/tag/metri
 includes canonical results, diagnostics, explicit policies, compatible performance
 deltas, and CI integration. The 0.2 development checkout also unifies fidelity
 methods under `metria.fidelity` and `metria fidelity`; see the
-[migration guide](docs/guides/unified-fidelity.md).
+[migration guide](docs/guides/unified-fidelity.md). It also provides
+[qualified vLLM prefix-cache verification](docs/guides/vllm-prefix-verification.md)
+with retained CPU/CUDA evidence, cache isolation and loaded-engine latency.
 
 Start with the [copyable workflows](examples/verification/README.md): a qualified
 local configuration change, synthetic PASS/FAIL/invalid-comparison fixtures,

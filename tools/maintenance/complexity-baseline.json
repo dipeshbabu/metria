@@ -233,7 +233,7 @@
       },
       "function_lines": {
         "_validate": 122,
-        "verify_recipe": 222
+        "_verify_with_profile": 222
       }
     },
     "tools/maintenance/check_wheel_contents.py": {

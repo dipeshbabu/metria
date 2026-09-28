@@ -10,7 +10,7 @@ from typing import Any
 from .measurements import TrajectoryAgreementAnalysis
 from .policies import render_policy_evaluation
 from .verification_schema import VERIFICATION_ROLES as _ROLES
-from .verification_schema import VERIFICATION_SCOPE
+from .verification_schema import VERIFICATION_SCOPE, VLLM_VERIFICATION_SCOPE
 
 
 def render_verification(manifest: Mapping[str, Any]) -> str:
@@ -21,16 +21,10 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
         f"**Verdict: {manifest['verdict']}**",
         "",
         f"Recipe: `{manifest['recipe_digest']}`",
-        (
-            "Scope: synthetic fixture; no real runtime or model qualification"
-            if manifest.get("fixture_only") is True
-            else "Scope: local llama.cpp CPU thread comparison"
-            if manifest.get("scope") == VERIFICATION_SCOPE
-            else "Scope: unrecognized verification contract"
-        ),
+        _scope_label(manifest),
         "",
         "## Change:",
-        f"  CPU threads: {manifest['change']['reference_threads']} -> {manifest['change']['candidate_threads']}",
+        _change_label(manifest),
         "",
         "## Evidence:",
     ]
@@ -38,9 +32,7 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
         record = manifest["records"][role]
         lines.append(f"  {role}: {record['status']} ({record['path']})")
         facts = record["observed"]
-        lines.append(
-            f"    Observed threads: {facts['threads']}; context: {facts['context']}"
-        )
+        lines.append(_facts_label(facts, manifest.get("scope")))
         for gap in record["evidence_gaps"]:
             lines.append(f"    {gap}")
     if "lifecycle" in manifest:
@@ -140,7 +132,7 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
     if performance is not None:
         if performance["available"]:
             lines.append(
-                f"  Cold-process request latency: {performance['absolute_delta']:+.6g}s ({performance['direction']})"
+                f"  {performance.get('label', 'Cold-process request latency')}: {performance['absolute_delta']:+.6g}s ({performance['direction']})"
             )
             if performance["relative_delta"] is not None:
                 lines.append(
@@ -174,3 +166,28 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
         )
     lines.append("")
     return "\n".join(lines)
+
+
+def _scope_label(manifest: Mapping[str, Any]) -> str:
+    if manifest.get("fixture_only") is True:
+        return "Scope: synthetic fixture; no real runtime or model qualification"
+    if manifest.get("scope") == VERIFICATION_SCOPE:
+        return "Scope: local llama.cpp CPU thread comparison"
+    if manifest.get("scope") == VLLM_VERIFICATION_SCOPE:
+        return "Scope: local vLLM prefix-cache comparison"
+    return "Scope: unrecognized verification contract"
+
+
+def _change_label(manifest: Mapping[str, Any]) -> str:
+    change = manifest["change"]
+    if manifest.get("scope") == VLLM_VERIFICATION_SCOPE:
+        return f"  Prefix caching: {change['reference']} -> {change['candidate']}"
+    return (
+        f"  CPU threads: {change['reference_threads']} -> {change['candidate_threads']}"
+    )
+
+
+def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
+    if scope == VLLM_VERIFICATION_SCOPE:
+        return f"    Observed prefix caching: {facts['prefix_caching']}; context: {facts['context']}"
+    return f"    Observed threads: {facts['threads']}; context: {facts['context']}"

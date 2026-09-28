@@ -46,8 +46,9 @@ retains the same result and stable exit codes.
 
 This delivery has explicit limits:
 
-- vLLM has [retained real-engine CPU/CUDA qualification](../guides/runtime-qualification.md),
-  but that adapter evidence does not qualify a vLLM `metria verify` recipe.
+- The 0.2 development line also qualifies a [local vLLM prefix-cache comparison](../guides/vllm-prefix-verification.md),
+  backed by retained installed-wheel CPU/CUDA evidence. That scope does not
+  qualify runtime upgrades, FP8 precision, or arbitrary vLLM recipes.
 - Runtime/build upgrades, KV precision changes, and quantization examples remain
   [staged templates](../../examples/verification/README.md) until the full intended
   change, observed identity, workload, and comparison path are qualified.

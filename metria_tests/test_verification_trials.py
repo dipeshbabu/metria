@@ -231,3 +231,20 @@ def test_invalid_baseline_fails_before_output_creation(tmp_path, fake_verifier):
     with pytest.raises(ValueError, match="schema"):
         trials.execute_verification_trials(_recipe(), output, baseline={})
     assert not output.exists() and not fake_verifier[0]
+
+
+def test_trial_summary_preserves_loaded_engine_timing_boundary(tmp_path, fake_verifier):
+    _, data = fake_verifier
+    data["scope"] = trials.VLLM_VERIFICATION_SCOPE
+    for record in data["records"].values():
+        record["observed"]["runtime_hardware"] = {
+            "status": "observed",
+            "device_type": "cpu",
+        }
+    data["performance"]["limitations"] = (
+        "Loaded-engine inference call; startup excluded."
+    )
+    result = trials.execute_verification_trials(_recipe(), tmp_path / "warm timing")
+    assert result["exit_code"] == 0
+    assert result["latency"]["limitation"] == data["performance"]["limitations"]
+    assert result["latency"]["source_metric"] == data["performance"]["metric"]

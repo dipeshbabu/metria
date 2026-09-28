@@ -26,6 +26,8 @@ from ..protocols import (
     RuntimeSession,
     SupportReport,
 )
+from .vllm_artifacts import require_runtime_pin, validate_file_pins, verify_model_files
+from .vllm_hardware import native_hardware
 from .vllm_identity import inspect_vllm_identity, require_matching_vllm_identity
 
 _SUPPORTED_GENERATION_KEYS = frozenset(
@@ -361,6 +363,58 @@ def _cleanup_failed_llm(llm: Any) -> None:
     gc.collect()
 
 
+def _response_capture(
+    response: Any, index: int
+) -> tuple[str, tuple[int, ...], dict[str, Any]]:
+    candidates = getattr(response, "outputs", None)
+    if not candidates:
+        raise RuntimeError(f"vLLM response[{index}] has no generated output")
+    output = candidates[0]
+    text = getattr(output, "text", None)
+    if not isinstance(text, str):
+        raise RuntimeError(f"vLLM response[{index}] text is not a string")
+    tokens = _native_token_ids(getattr(output, "token_ids", None), required=True)
+    assert tokens is not None
+    prompt_tokens = _native_token_ids(
+        getattr(response, "prompt_token_ids", None), required=False
+    )
+    cached = getattr(response, "num_cached_tokens", None)
+    if cached is not None and (
+        isinstance(cached, bool) or not isinstance(cached, int) or cached < 0
+    ):
+        raise RuntimeError("vLLM cached-token evidence is invalid")
+    if prompt_tokens is not None and cached is not None and cached > len(prompt_tokens):
+        raise RuntimeError("vLLM cached-token count exceeds prompt tokens")
+    return (
+        text,
+        tokens,
+        {
+            "prompt_tokens": len(prompt_tokens) if prompt_tokens is not None else None,
+            "cached_tokens": cached,
+            "finished": getattr(response, "finished", None),
+        },
+    )
+
+
+def _native_token_ids(value: Any, *, required: bool) -> tuple[int, ...] | None:
+    if value is None and not required:
+        return None
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        raise RuntimeError(
+            "vLLM response does not expose output token IDs"
+            if required
+            else "invalid vLLM prompt token IDs"
+        )
+    if any(
+        isinstance(token, bool) or not isinstance(token, int) or token < 0
+        for token in value
+    ):
+        raise RuntimeError(
+            "vLLM response contains a non-integer token ID or negative token ID"
+        )
+    return tuple(value)
+
+
 class VLLMSession:
     """One instance-scoped vLLM offline engine plus immutable invocation evidence."""
 
@@ -370,6 +424,7 @@ class VLLMSession:
         environment: Mapping[str, Any],
         module: Any,
         llm: Any,
+        runtime_artifact: Mapping[str, Any] | None = None,
     ) -> None:
         self._resolved = freeze_mapping(resolved)
         self._environment = freeze_mapping(environment)
@@ -385,9 +440,29 @@ class VLLMSession:
             applied=self._applied,
         )
         require_matching_vllm_identity(self._identity)
+        self._artifacts: dict[str, Any] = {}
+        if runtime_artifact is not None:
+            self._artifacts["runtime"] = runtime_artifact
+        pins = self._resolved["model"].get("artifact_files")
+        if pins is not None:
+            observed_model = self._identity.model.get("identifier")
+            observed_tokenizer = self._identity.tokenizer.get("identifier")
+            if not isinstance(observed_model, str) or not isinstance(
+                observed_tokenizer, str
+            ):
+                raise ValueError(
+                    "runtime did not identify its loaded model/tokenizer source"
+                )
+            if Path(observed_model).resolve() != Path(observed_tokenizer).resolve():
+                raise ValueError(
+                    "qualified local verification requires the pinned tokenizer beside the model"
+                )
+            self._artifacts["model"] = verify_model_files(observed_model, pins)
         self._invocations: list[Mapping[str, Any]] = []
         self._closed = False
+        self._hardware = native_hardware()
         self._reset_count = 0
+        self._reset_events: list[dict[str, Any]] = []
         self._cleanup: Mapping[str, Any] = {}
 
     @property
@@ -464,33 +539,10 @@ class VLLMSession:
         token_batches: list[tuple[int, ...]] = []
         frozen_rows: list[Mapping[str, Any]] = []
         for index, response in enumerate(responses):
-            candidates = getattr(response, "outputs", None)
-            if not candidates:
-                raise RuntimeError(f"vLLM response[{index}] has no generated output")
-            output = candidates[0]
-            text = getattr(output, "text", None)
-            token_ids = getattr(output, "token_ids", None)
-            if not isinstance(text, str):
-                raise RuntimeError(f"vLLM response[{index}] text is not a string")
-            if isinstance(token_ids, (str, bytes)) or not isinstance(
-                token_ids, Sequence
-            ):
-                raise RuntimeError(
-                    f"vLLM response[{index}] does not expose output token IDs"
-                )
-            tokens: list[int] = []
-            for token in token_ids:
-                if isinstance(token, bool) or not isinstance(token, int):
-                    raise RuntimeError(
-                        f"vLLM response[{index}] contains a non-integer token ID"
-                    )
-                tokens.append(token)
-            outputs.append(text)
-            token_batches.append(tuple(tokens))
-            row = {
-                **invocation_rows[index],
-                "output_tokens": len(tokens),
-            }
+            output_text, tokens, native = _response_capture(response, index)
+            outputs.append(output_text)
+            token_batches.append(tokens)
+            row = {**invocation_rows[index], "output_tokens": len(tokens), **native}
             frozen = freeze_mapping(row)
             self._invocations.append(frozen)
             frozen_rows.append(frozen)
@@ -514,6 +566,14 @@ class VLLMSession:
             raise RuntimeError("vLLM session is closed")
         if not scope:
             raise ValueError("reset scope must not be empty")
+        if scope == "prefix-cache":
+            reset = getattr(self._llm, "reset_prefix_cache", None)
+            if not callable(reset) or reset() is not True:
+                raise RuntimeError("vLLM did not confirm the public prefix-cache reset")
+            mode = "public_prefix_cache_reset"
+        else:
+            mode = "logical_boundary"
+        self._reset_events.append({"scope": scope, "mode": mode})
         self._reset_count += 1
 
     def close(self) -> None:
@@ -544,6 +604,7 @@ class VLLMSession:
 
         return freeze_mapping(
             {
+                **({"artifacts": self._artifacts} if self._artifacts else {}),
                 "runtime": {
                     "name": "vllm",
                     "version": self._resolved["runtime"]["version"],
@@ -556,7 +617,9 @@ class VLLMSession:
                 },
                 "applied": self._applied,
                 "invocations": tuple(self._invocations),
+                "hardware": self._hardware,
                 "reset_count": self._reset_count,
+                "reset_events": tuple(self._reset_events),
                 "closed": self._closed,
                 "cleanup": self._cleanup,
                 "environment": self._environment,
@@ -627,6 +690,12 @@ class VLLMAdapter:
         if support.status != "supported":
             raise ValueError("; ".join(support.reasons) or "vLLM run is unsupported")
         model = _model_source(spec)
+        if "files" in spec.model:
+            model["artifact_files"] = validate_file_pins(spec.model["files"])
+            model["artifacts"] = verify_model_files(
+                model["model"], model["artifact_files"]
+            )
+        runtime_artifact = require_runtime_pin(environment)
         runtime = _runtime_config(spec)
         kv = _kv_treatment(spec.treatments)
         return freeze_mapping(
@@ -636,6 +705,7 @@ class VLLMAdapter:
                     "version": _vllm_version(),
                     "requested_version": _requested_runtime_version(spec),
                     "settings": runtime,
+                    **({"artifact": runtime_artifact} if runtime_artifact else {}),
                 },
                 "model": model,
                 "scenario": spec.scenario,
@@ -665,6 +735,7 @@ class VLLMAdapter:
             raise ValueError("resolved vLLM KV-cache configuration is missing")
 
         module = _load_vllm()
+        runtime_artifact = require_runtime_pin(environment, loaded_module=module)
         llm_cls = getattr(module, "LLM", None)
         if not callable(llm_cls):
             raise RuntimeError("installed vLLM module does not expose LLM")
@@ -688,7 +759,7 @@ class VLLMAdapter:
             kwargs["tokenizer_revision"] = model["tokenizer_revision"]
         llm = llm_cls(**kwargs)
         try:
-            return VLLMSession(resolved, environment, module, llm)
+            return VLLMSession(resolved, environment, module, llm, runtime_artifact)
         except Exception:
             _cleanup_failed_llm(llm)
             raise

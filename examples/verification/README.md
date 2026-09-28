@@ -80,3 +80,11 @@ The public CLI stays narrow until the new route meets its evidence contract.
 The source recipes and readiness catalog are validated in CI. Use the
 [CI workflow example](github-actions.yml) to retain a real verification result
 and summary after preparing an appropriate runner and recipe.
+
+
+## vLLM prefix-cache change
+
+The 0.2 development verifier also supports a pinned local vLLM prefix-cache change.
+Use [vllm-prefix-workload.jsonl](vllm-prefix-workload.jsonl) and the
+[preparation/verification guide](../../docs/guides/vllm-prefix-verification.md).
+Runtime upgrades, FP8 KV precision and quantization examples remain staged.

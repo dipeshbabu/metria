@@ -57,3 +57,7 @@ This is a research utility around one reference/candidate workflow. It does not
 add `metria benchmark`, generic sweeps, a server framework, or an arbitrary plugin
 surface. Historical scripts remain recoverable from Git history for interpreting
 dated results; their old output is not relabeled as current qualified evidence.
+
+The vLLM prefix-cache profile retains its own loaded-engine timing boundary and
+internal warmup/cache-reset policy. Outer pair repetitions do not relabel that
+latency as cold-process timing or preserve engine state across pairs.

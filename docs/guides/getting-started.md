@@ -25,7 +25,8 @@ must meet numeric or exact criteria. Metria does not choose universal behavior o
 safety thresholds. Use the [CI guide](verification-ci.md) to run the same check in
 code review and retain artifacts on failure.
 
-The current CLI scope is local llama.cpp CPU thread changes. Other common-change
+The published 0.1.1 CLI covers local llama.cpp CPU thread changes. The 0.2
+development checkout adds [vLLM prefix-cache verification](vllm-prefix-verification.md). Other common-change
 templates are explicitly staged until their execution and evidence routes are
 qualified. Published Metria 0.1.1 includes the reporting, policy, and CI features.
 The 0.2 development checkout adds the [unified fidelity tools](unified-fidelity.md).
