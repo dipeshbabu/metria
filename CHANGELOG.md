@@ -17,6 +17,10 @@ TurboQuant reference packages have independent versions and release notes.
   properties and guard fault tests, required evidence-fixture checks, and CI
   coverage/skip artifacts. Expanded optional KV Fidelity vLLM contract coverage.
 
+- Closed the local verifier's intended-change scope before execution: broad,
+  incomplete, or unknown variation paths and comparison waivers are rejected.
+  The preparation tool shares the exact qualified thread-change contract.
+
 - Added a pinned real vLLM qualification tool and controlled manual workflow.
   Official backend wheel build labels are retained separately from loaded module
   public versions; contradictory public versions or build labels still fail.

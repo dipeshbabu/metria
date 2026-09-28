@@ -48,6 +48,14 @@ from .study_execution import PairwiseAnalysisStatus, StudyPairAnalysis, execute_
 
 VERIFICATION_SCHEMA = "metria.verification.v1"
 VERIFICATION_SCOPE = "local_llamacpp_cpu_threads.v1"
+LOCAL_CPU_THREAD_VARIATIONS = frozenset(
+    {
+        "runtime.threads",
+        "resolved.runtime.threads",
+        "observed.runtime.threads",
+        "observed.identity.applied.fields.threads",
+    }
+)
 _ROLES = ("reference", "candidate")
 _CAPTURE_KEY = "llama_cpp_token_ids_capture_sha256"
 VERIFICATION_EXIT_CODES = {
@@ -110,6 +118,14 @@ def _validate(recipe: StudyRecipe, registries: _Registries) -> None:
     if not recipe.study.comparison.vary:
         raise ValueError(
             "verify requires an explicit intended change in comparison.vary"
+        )
+    if recipe.study.comparison.vary != LOCAL_CPU_THREAD_VARIATIONS:
+        raise ValueError(
+            "local CPU verification requires exactly the four qualified thread-change paths; use the preparation tool"
+        )
+    if recipe.study.comparison.waivers:
+        raise ValueError(
+            "local CPU verification does not permit comparison waivers outside its qualified thread-change scope"
         )
     if recipe.study.comparison.analyses != (TrajectoryAgreementAnalysis.name,):
         raise ValueError(

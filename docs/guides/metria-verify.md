@@ -96,6 +96,11 @@ artifact paths. Review configuration and paths before sharing the records.
 The plain-completion workflow rejects system prompts and expert runtime flags
 instead of silently ignoring them.
 
+The development CLI also requires the preparation tool's four exact thread-change
+paths and disallows comparison waivers in this qualified scope. Broad variations
+such as `runtime` or `observed.identity` could conceal unrelated changes and are
+rejected before execution. See the [verification contract](../architecture/verification-contract.md).
+
 ## Read the outcome
 
 | Verdict | Meaning |

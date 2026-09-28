@@ -18,6 +18,7 @@ from metria.measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnal
 from metria.recipes import study_recipe_to_json
 from metria.records import run_record_to_json
 from metria.runtimes.llamacpp import LlamaCppAdapter, _find_binary, _sha256_file
+from metria.verification import LOCAL_CPU_THREAD_VARIATIONS
 
 TINY_MODEL_SHA256 = "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
 
@@ -104,14 +105,7 @@ def main() -> int:
             name="llamacpp-cpu-thread-change",
             runs=runs,
             comparison=ComparisonPlan(
-                vary=frozenset(
-                    {
-                        "runtime.threads",
-                        "resolved.runtime.threads",
-                        "observed.runtime.threads",
-                        "observed.identity.applied.fields.threads",
-                    }
-                ),
+                vary=LOCAL_CPU_THREAD_VARIATIONS,
                 control=frozenset({"model", "scenario", "measurements"}),
                 analyses=(TrajectoryAgreementAnalysis.name,),
             ),
