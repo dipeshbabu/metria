@@ -5,6 +5,12 @@ The package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Defined the component as source-only research software. Local package builds
+  and the `turboquant` import remain independent; reproducible consumers pin a
+  full Metria revision. The unused package-index publishing workflow is retired.
+
 ### Fixed
 
 - Public quantizer, rotation, packing, and memory APIs now validate numeric
