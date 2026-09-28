@@ -560,16 +560,20 @@ bash tools/validation/turbo-quality-gate.sh
 
 Configure paths via environment variables: `LLAMA`, `MODEL`, `WIKI`.
 
-### turbo-realworld-bench.sh
+### Verification trial wrappers
 
-Real-world decode benchmark using a long PDF document (70+ pages). Compares turbo3 vs q8_0 at realistic context depths by spinning up `llama-server` instances, sending the full PDF as a prompt, and measuring prefill + decode speed.
+`turbo-quick-bench.sh` and `turbo-realworld-bench.sh` now pass arguments to
+the same Python verification-trial utility:
 
-**Usage:**
 ```bash
-bash tools/benchmarks/turbo-realworld-bench.sh [path-to-pdf]
+bash tools/benchmarks/turbo-quick-bench.sh --recipe study.json --output trials --warmup-pairs 1 --measured-pairs 3
 ```
 
-**Requirements:** A long PDF file (not included in repo), `pdftotext` (from poppler), and a built llama.cpp with turbo3 support. Configure via `LLAMA`, `MODEL`, `PORT_BASE`, `THREADS`, and `MAX_TOKENS` env vars.
+Prepare a qualified recipe with the [verifier guide](../docs/guides/metria-verify.md).
+See [trial policy and migration](../docs/guides/verification-trials.md) for
+retained evidence, native timing, exact baseline identity, and retired legacy
+PDF/server and hard-coded baseline options. Each pair uses the existing bounded
+verifier lifecycle; these wrappers do not launch a persistent HTTP service.
 
 ---
 

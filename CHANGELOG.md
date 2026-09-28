@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Replaced unsafe legacy benchmark shell orchestration with thin wrappers around
+  reusable qualified verification trials, explicit warmup/isolation, retained
+  evidence, and exact baseline identity. Positional model/PDF calls require migration.
+
 - Reworked onboarding and package language around one reference/candidate
   inference change, evidence gates, behavioral/system impact, explicit policy,
   and recurring CI use, with qualified and staged scopes kept visible.
