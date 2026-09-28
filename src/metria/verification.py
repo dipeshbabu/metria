@@ -18,6 +18,10 @@ from .comparison import _declared_dimension_issue, compare_runs
 from .hardware import capture_hardware_fingerprint
 from .inspection import resolve_capability_checks
 from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
+from .measurements.performance import (
+    compare_performance,
+    measure_invocation_performance,
+)
 from .models import CompatibilityReport, RunRecord, RunStatus
 from .policies import PolicyDecision, evaluate_policy, render_policy_evaluation
 from .protocols import (
@@ -522,6 +526,26 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
             lines.append(
                 f"  {role} mean process wall time: {timing['mean_seconds']:.6g}s (includes startup and model loading)"
             )
+    performance = manifest.get("performance")
+    if performance is not None:
+        if performance["available"]:
+            lines.append(
+                f"  Cold-process request latency: {performance['absolute_delta']:+.6g}s ({performance['direction']})"
+            )
+            if performance["relative_delta"] is not None:
+                lines.append(
+                    f"    Relative change: {performance['relative_delta'] * 100:+.6g}%"
+                )
+            else:
+                lines.append(
+                    f"    Relative change unavailable: {performance['relative_unavailable_reason']}"
+                )
+            lines.append(f"    {performance['limitations']}")
+        else:
+            lines.append(f"  Performance impact unavailable: {performance['reason']}")
+        lines.append(
+            "  TTFT, decode throughput, inter-token latency, and device/KV memory: unavailable."
+        )
     if not manifest["analyses"]:
         lines.append("  Behavioral impact unavailable: analysis did not complete.")
     if manifest.get("comparison_status") not in {None, "VALID"}:
@@ -735,6 +759,13 @@ def verify_recipe(
         "systems": {
             role: _wall_time(record) for role, record in zip(_ROLES, saved, strict=True)
         },
+        "performance": compare_performance(
+            measure_invocation_performance(saved[0]),
+            measure_invocation_performance(saved[1]),
+            comparable=comparison.compatible
+            and not any(gaps)
+            and all(record.status is RunStatus.COMPLETED for record in saved),
+        ),
     }
     if policy_result is not None:
         manifest["policy"] = policy_result.to_data()

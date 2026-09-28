@@ -237,6 +237,9 @@ def test_verify_saves_incremental_records_manifest_and_readable_report(local_cas
     assert canonical["lifecycle"]["status"] == "completed"
     assert canonical["comparison_status"] == "VALID"
     assert canonical["policy_status"] == "NOT_CONFIGURED"
+    assert canonical["performance"]["available"] is True
+    assert canonical["performance"]["absolute_delta"] == 0
+    assert canonical["performance"]["relative_delta"] is None
     report = (local_case["output"] / "report.md").read_text(encoding="utf-8")
     assert "CPU threads: 1 -> 2" in report
     assert "first divergence at token 2" in report
@@ -383,6 +386,7 @@ def test_verifier_distinguishes_incomplete_invalid_and_failed_runs(
     payload = json.loads(output)
     assert payload["verdict"] == verdict
     assert payload["exit_code"] == status
+    assert payload["performance"]["available"] is False
     assert "private" not in output
     assert (local_case["output"] / "reference.run.json").is_file()
     assert (local_case["output"] / "candidate.run.json").is_file()

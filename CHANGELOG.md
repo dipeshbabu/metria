@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added verifier-native cold-process request-latency impact with explicit source,
+  workload, warmup/trial and aggregation identity. Deltas require valid comparison
+  and compatible methods; unsupported streaming/memory metrics remain unavailable.
+
 - Assigned distinct verification exits for policy failure, invalid inputs,
   non-comparable runs, insufficient evidence, and execution/preflight failure.
   Added redacted machine-readable input errors and a GitHub Actions summary and

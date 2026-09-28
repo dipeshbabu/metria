@@ -121,10 +121,11 @@ policy was evaluated. The development version adds
 does not include that feature.
 
 Process wall-time samples include startup, model loading, prompt evaluation, and
-generation. They are descriptive observations from this workload; they are not
-decode-only throughput, TTFT, isolated kernel timing, or a statistically qualified
-performance claim. Repeated-trial and verifier-native performance measurement
-remain separate follow-up work; current policy targets cover behavioral analysis.
+generation. The development verifier reports method-compatible cold-process
+request-latency deltas after comparison passes. These are not decode-only
+throughput, TTFT, isolated kernel timing, or a statistically qualified speedup.
+See [performance methodology and availability](verification-performance.md).
+Current acceptance-policy targets cover behavioral analysis.
 
 The observed thread count and context come from the running llama.cpp context.
 Missing readback never becomes a match. For example, if llama.cpp rounds a
