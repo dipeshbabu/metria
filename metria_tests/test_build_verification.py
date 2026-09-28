@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
@@ -435,3 +436,17 @@ def test_unconfigured_build_checks_do_not_invent_quality(build_case):
     assert result.to_data()["verdict"] == "VERIFIED"
     report = (build_case["output"] / "report.md").read_text()
     assert "Task quality unavailable" in report
+
+
+def test_retained_build_evidence_preserves_original_file_and_record_digests():
+    from metria.records import load_run_record, run_record_digest
+
+    root = Path(__file__).parents[1] / "artifacts/qualification/llamacpp-builds"
+    index = json.loads((root / "files-sha256.json").read_text())
+    for relative, expected in index["files"].items():
+        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
+    result = json.loads((root / "verification/verification.json").read_text())
+    assert result["verdict"] == "PASS"
+    for role in ("reference", "candidate"):
+        record = load_run_record(root / "verification" / f"{role}.run.json")
+        assert run_record_digest(record) == result["records"][role]["record_digest"]

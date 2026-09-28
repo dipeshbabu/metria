@@ -13,6 +13,7 @@
 
 # Curated log hashes use the repository's canonical LF bytes on every platform.
 artifacts/benchmarks/legacy-raw/*.log text eol=lf
+artifacts/qualification/**/*.log text eol=lf
 
 *.png binary
 *.jpg binary
