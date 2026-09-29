@@ -6,6 +6,13 @@ its Triton attention backend and rejected FP8 KV cache because that path require
 SM89 or newer. This was a native capability failure, not a timeout or a missing
 model download.
 
+The [retained evidence](../../artifacts/qualification/fp8-unsupported/preflight.json)
+records the installed preflight result, hardware, source revision and wheel hash.
+The [native failure log](../../artifacts/qualification/fp8-unsupported/native-stderr.log)
+and [content index](../../artifacts/qualification/fp8-unsupported/sha256.json)
+preserve the earlier engine attempt. These are negative capability observations;
+they do not qualify an FP8 comparison.
+
 The first-party adapter now detects that exact observed runtime/device
 combination during preflight and returns an actionable unsupported result before
 constructing the inference engine. Ordinary automatic-cache workflows continue

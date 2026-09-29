@@ -98,3 +98,19 @@ def test_adapter_rejects_confirmed_fp8_hardware_without_constructing_engine(
     assert result.status == "unsupported"
     assert any("SM89+" in reason for reason in result.reasons)
     assert result.evidence["unsupported_cache_hardware"]["compute_capability"] == (7, 5)
+
+
+def test_retained_native_failure_and_installed_preflight_are_consistent():
+    import hashlib
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).parents[1] / "artifacts/qualification/fp8-unsupported"
+    hashes = json.loads((root / "sha256.json").read_text())
+    for name, digest in hashes.items():
+        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
+    evidence = json.loads((root / "preflight.json").read_text())
+    assert evidence["positive_qualification"] is False
+    assert evidence["preflight"]["status"] == "unsupported"
+    assert evidence["hardware"]["compute_capability"] == [7, 5]
+    assert "FP8" in (root / "native-stderr.log").read_text()

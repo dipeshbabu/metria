@@ -1,0 +1,50 @@
+{
+  "schema": "metria.fp8_unsupported_qualification.v1",
+  "source_commit": "f3817e1",
+  "wheel_sha256": "65f9b8cdc2cc255e23a86da9187fc9501630fd8055b7dde51cafb56c19883ccd",
+  "hardware": {
+    "status": "observed",
+    "device_type": "cuda",
+    "source": "vllm_native_platform_and_torch_cuda",
+    "logical_device": 0,
+    "name": "NVIDIA GeForce GTX 1650",
+    "compute_capability": [
+      7,
+      5
+    ],
+    "capacity_bytes": 4294639616,
+    "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893",
+    "cuda_runtime": "12.9"
+  },
+  "preflight": {
+    "status": "unsupported",
+    "reasons": [
+      "vLLM 0.30 CUDA FP8 KV cache is unsupported on the observed SM75 device: its default Triton backend requires SM89+ native FP8 support. Use the model's automatic cache dtype here, or qualify FP8 on a supported GPU."
+    ],
+    "evidence": {
+      "runtime": "vllm",
+      "runtime_version": "0.30.0+cu129",
+      "vllm_version": "0.30.0+cu129",
+      "token_ids_capture": "native_output_token_ids",
+      "requested_runtime_version": "0.30.0+cu129",
+      "max_model_len": 672,
+      "kv_cache_dtype": "fp8_e4m3",
+      "unsupported_cache_hardware": {
+        "status": "observed",
+        "device_type": "cuda",
+        "source": "vllm_native_platform_and_torch_cuda",
+        "logical_device": 0,
+        "name": "NVIDIA GeForce GTX 1650",
+        "compute_capability": [
+          7,
+          5
+        ],
+        "capacity_bytes": 4294639616,
+        "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893",
+        "cuda_runtime": "12.9"
+      }
+    }
+  },
+  "positive_qualification": false,
+  "remaining": "Successful FP8-cache qualification requires the future supported GPU."
+}

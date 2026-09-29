@@ -1,0 +1,114 @@
+(EngineCore pid=750) Process EngineCore:
+(EngineCore pid=750) Traceback (most recent call last):
+(EngineCore pid=750)   File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+(EngineCore pid=750)     self.run()
+(EngineCore pid=750)   File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
+(EngineCore pid=750)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1370, in run_engine_core
+(EngineCore pid=750)     raise e
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1328, in run_engine_core
+(EngineCore pid=750)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=750)                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=750)     return func(*args, **kwargs)
+(EngineCore pid=750)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 1085, in __init__
+(EngineCore pid=750)     super().__init__(
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 134, in __init__
+(EngineCore pid=750)     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=750)                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=750)     return func(*args, **kwargs)
+(EngineCore pid=750)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/executor/abstract.py", line 110, in __init__
+(EngineCore pid=750)     self._init_executor()
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/executor/uniproc_executor.py", line 74, in _init_executor
+(EngineCore pid=750)     self.driver_worker.load_model()
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/worker/gpu_worker.py", line 507, in load_model
+(EngineCore pid=750)     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/worker/gpu/model_runner.py", line 400, in load_model
+(EngineCore pid=750)     self.model = model_loader.load_model(
+(EngineCore pid=750)                  ^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=750)     return func(*args, **kwargs)
+(EngineCore pid=750)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/model_loader/base_loader.py", line 68, in load_model
+(EngineCore pid=750)     model = self.create_model(
+(EngineCore pid=750)             ^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/model_loader/base_loader.py", line 46, in create_model
+(EngineCore pid=750)     model = initialize_model(
+(EngineCore pid=750)             ^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=750)     return func(*args, **kwargs)
+(EngineCore pid=750)            ^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/model_loader/utils.py", line 59, in initialize_model
+(EngineCore pid=750)     model = model_class(vllm_config=vllm_config, prefix=prefix)
+(EngineCore pid=750)             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 496, in __init__
+(EngineCore pid=750)     self.model = self._init_model(
+(EngineCore pid=750)                  ^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 529, in _init_model
+(EngineCore pid=750)     return LlamaModel(vllm_config=vllm_config, prefix=prefix, layer_type=layer_type)
+(EngineCore pid=750)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/compilation/decorators.py", line 385, in __init__
+(EngineCore pid=750)     old_init(self, *args, **kwargs)
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 389, in __init__
+(EngineCore pid=750)     self.start_layer, self.end_layer, self.layers = make_layers(
+(EngineCore pid=750)                                                     ^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/utils.py", line 881, in make_layers
+(EngineCore pid=750)     + get_offloader().wrap_modules(
+(EngineCore pid=750)       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/offloader/base.py", line 119, in wrap_modules
+(EngineCore pid=750)     return list(modules_generator)
+(EngineCore pid=750)            ^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/utils.py", line 882, in <genexpr>
+(EngineCore pid=750)     layer_fn(prefix=f"{prefix}.{idx}") for idx in range(start_layer, end_layer)
+(EngineCore pid=750)     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 391, in <lambda>
+(EngineCore pid=750)     lambda prefix: layer_type(vllm_config=vllm_config, prefix=prefix),
+(EngineCore pid=750)                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 285, in __init__
+(EngineCore pid=750)     self.self_attn = attn_layer_type(
+(EngineCore pid=750)                      ^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 212, in __init__
+(EngineCore pid=750)     self.attn = attn_cls(
+(EngineCore pid=750)                 ^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/model_executor/layers/attention/attention.py", line 417, in __init__
+(EngineCore pid=750)     self.impl = impl_cls(  # type: ignore[assignment]  # impl_cls always returns an AttentionImpl subclass
+(EngineCore pid=750)                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(EngineCore pid=750)   File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/attention/backends/triton_attn.py", line 492, in __init__
+(EngineCore pid=750)     raise ValueError(
+(EngineCore pid=750) ValueError: FP8 KV cache is not supported by the Triton attention backend on NVIDIA GeForce GTX 1650 (compute capability 7.5); native FP8 (fp8e4nv) requires SM89+. Re-run with --kv-cache-dtype float16.
+[rank0]:[W928 18:39:35.503659399 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+Traceback (most recent call last):
+  File "/mnt/d/metria/notes/probe_fp8_native.py", line 19, in <module>
+    main()
+  File "/mnt/d/metria/notes/probe_fp8_native.py", line 11, in main
+    llm=LLM(model='/var/tmp/metria-prefix-qualification/model',tokenizer='/var/tmp/metria-prefix-qualification/model',dtype='float16',max_model_len=256,max_num_seqs=1,tensor_parallel_size=1,enforce_eager=True,enable_prefix_caching=False,trust_remote_code=False,gpu_memory_utilization=0.5,kv_cache_dtype='fp8_e4m3',disable_log_stats=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/entrypoints/llm.py", line 343, in __init__
+    self.llm_engine = LLMEngine.from_engine_args(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/llm_engine.py", line 184, in from_engine_args
+    return cls(
+           ^^^^
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/llm_engine.py", line 109, in __init__
+    self.engine_core = EngineCoreClient.make_client(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 122, in make_client
+    return SyncMPClient(
+           ^^^^^^^^^^^^^
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 880, in __init__
+    super().__init__(
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 656, in __init__
+    with launch_core_engines(
+  File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__
+    next(self.gen)
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py", line 1240, in launch_core_engines
+    wait_for_engine_startup(
+  File "/var/tmp/metria-vllm-gpu-20260928/venv/lib/python3.12/site-packages/vllm/v1/engine/utils.py", line 1320, in wait_for_engine_startup
+    raise RuntimeError(
+RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
