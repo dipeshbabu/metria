@@ -6,7 +6,7 @@ import hashlib
 import importlib.metadata
 import json
 from collections.abc import Mapping
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePath, PurePosixPath
 from typing import Any
 
 _PAYLOAD_SUFFIXES = frozenset(
@@ -30,6 +30,17 @@ def _digest(rows: Any) -> str:
     ).hexdigest()
 
 
+def _hub_tree_metadata(path: PurePath) -> bool:
+    """Recognize only Hub local-directory tree-cache receipts, not payloads."""
+    return (
+        len(path.parts) == 4
+        and path.parts[:3] == (".cache", "huggingface", "trees")
+        and path.suffix == ".json"
+        and len(path.stem) == 40
+        and all(char in "0123456789abcdef" for char in path.stem)
+    )
+
+
 def validate_file_pins(files: Any) -> dict[str, str]:
     if not isinstance(files, Mapping) or not files or len(files) > 10_000:
         raise ValueError("model.files must contain a bounded file-to-SHA256 manifest")
@@ -49,6 +60,7 @@ def validate_file_pins(files: Any) -> dict[str, str]:
             or ".." in path.parts
             or path.as_posix() != name
             or path.suffix not in _PAYLOAD_SUFFIXES
+            or _hub_tree_metadata(path)
         ):
             raise ValueError(
                 "model manifest contains an unsafe or unsupported payload path"
@@ -78,7 +90,9 @@ def verify_model_files(directory: str | Path, files: Any) -> dict[str, Any]:
     present = {
         path.relative_to(root).as_posix()
         for path in root.rglob("*")
-        if path.is_file() and path.suffix in _PAYLOAD_SUFFIXES
+        if path.is_file()
+        and path.suffix in _PAYLOAD_SUFFIXES
+        and not _hub_tree_metadata(path.relative_to(root))
     }
     if present != set(pins):
         raise ValueError("model payload inventory differs from its pinned manifest")

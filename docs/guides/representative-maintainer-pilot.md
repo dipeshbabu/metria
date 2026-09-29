@@ -10,6 +10,12 @@ tokenizer contents, runtime, greedy decoding, context and each study's generatio
 limit remain fixed. Shared system instructions provide a repeated prefix;
 retained native cache counts must prove reuse.
 
+The initial preparation attempt rejected a Hugging Face revision-tree cache
+receipt as an extra model payload. That failed setup is retained. The inventory
+check now recognizes only `.cache/huggingface/trees/<40-hex-revision>.json` as
+download metadata. Extra weights, unknown cache JSON and other configuration
+files still fail inventory validation; no artifact pins were relaxed.
+
 Acceptance criteria are declared before execution:
 
 - Candidate and reference must pass every configured task check.
