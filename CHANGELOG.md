@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added bounded local vLLM serving comparisons with observed streaming timing,
+  concurrency, token/request throughput, native CUDA allocator/KV allocation
+  evidence, and separate policy targets.
+
 - Added separate-interpreter CPU runtime-upgrade verification with pinned
   environment contents, native worker placement, bounded process cleanup and
   checked run-record bindings through the shared study lifecycle.

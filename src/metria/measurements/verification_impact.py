@@ -17,6 +17,7 @@ from .impact_schema import VERSION as VERSION
 from .performance import compare_performance, measure_invocation_performance
 from .prefix_performance import compare_prefix_performance
 from .prefix_workload import WORKLOAD_METHOD
+from .serving_workload import WORKLOAD_METHOD as SERVING_METHOD
 from .task_checks import METHOD as CHECK_METHOD
 from .task_checks import PASS_DEFINITION
 from .task_checks import SCHEMA as CHECK_SCHEMA
@@ -170,7 +171,7 @@ def reference_variability(record: RunRecord) -> tuple[dict[str, Any], dict[str, 
     workload = capture.get("workload", {})
     if (
         not isinstance(workload, Mapping)
-        or workload.get("method") != WORKLOAD_METHOD
+        or workload.get("method") not in {WORKLOAD_METHOD, SERVING_METHOD}
         or workload.get("measured_trials", 0) < 2
     ):
         return {

@@ -41,3 +41,10 @@ The 0.2 [vLLM prefix-cache profile](vllm-prefix-verification.md) uses the distin
 `metria.runtime_call_latency` method after engine loading, with explicit cache
 isolation, warmup and repetitions. Its values are not method-compatible with the
 llama.cpp cold-process metric described above.
+
+The [local serving profile](serving-measurements.md) uses separate streaming,
+batch-throughput and native-memory methods. Its `performance.metrics` map retains
+each metric's availability, units, method/version, reference/candidate values and
+ratio. `serving.*` policy targets apply to these observations. Client-observed
+token deliveries do not imply HTTP endpoint timing, and PyTorch allocation peaks
+do not imply device-wide memory usage.
