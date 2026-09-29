@@ -389,6 +389,10 @@ def _legacy_performance(
 
 
 def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
+    if "runtime_environments" in recipe.environment:
+        from .verification_upgrade import build_route as build_upgrade_route
+
+        return build_upgrade_route(recipe)
     if "gguf_quantization" in recipe.environment:
         from .verification_quantization import build_route as build_quantization_route
 
@@ -430,11 +434,13 @@ def verify_recipe(
     """Validate one qualified profile and retain its reference/candidate evidence."""
     resolve_capability_checks(capability_checks)
     route = _verification_route(recipe)
+    if (
+        route.isolated or route.run_executor is not None
+    ) and capability_checks is not None:
+        raise ValueError(
+            "qualified vLLM verification uses the built-in capability registry"
+        )
     if route.isolated:
-        if capability_checks is not None:
-            raise ValueError(
-                "qualified vLLM verification uses the built-in capability registry"
-            )
         from .verification_worker import verify_isolated
 
         return verify_isolated(recipe, output_dir, route)
@@ -499,6 +505,7 @@ def _verify_with_profile(
             analyses=analyses,
             record_sink=save_record,
             capability_checks=capability_checks,
+            _run_executor=route.run_executor,
         )
         comparison = execution.comparisons[0].report
         outcomes = execution.comparisons[0].analyses

@@ -57,12 +57,14 @@ def _mapping(value: Any) -> Mapping[str, Any]:
     return value if isinstance(value, Mapping) else {}
 
 
-def _validate_run(run: Any, config: Mapping[str, Any]) -> None:
+def _validate_run(
+    run: Any,
+    config: Mapping[str, Any],
+    *,
+    versions: frozenset[str] = QUALIFIED_VLLM_VERSIONS,
+) -> None:
     _model_source(run)
-    if (
-        run.runtime.get("name") != "vllm"
-        or run.runtime.get("version") not in QUALIFIED_VLLM_VERSIONS
-    ):
+    if run.runtime.get("name") != "vllm" or run.runtime.get("version") not in versions:
         raise ValueError(
             "prefix verification requires a qualified vLLM 0.30.0 CPU/CUDA wheel version"
         )

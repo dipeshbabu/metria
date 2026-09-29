@@ -157,6 +157,7 @@ def _add_recipe_parser(subparsers: Any) -> None:
 def _add_preparation_parser(subparsers: Any) -> None:
     _add_cpu_build_parser(subparsers)
     _add_quantization_parser(subparsers)
+    _add_upgrade_parser(subparsers)
     prepare = subparsers.add_parser(
         "prepare-vllm", help="prepare a pinned local vLLM prefix-cache recipe"
     )
@@ -246,7 +247,33 @@ def _add_quantization_parser(subparsers: Any) -> None:
     prepare.add_argument("--timeout", type=float, default=300)
 
 
+def _add_upgrade_parser(subparsers: Any) -> None:
+    prepare = subparsers.add_parser(
+        "prepare-vllm-upgrade",
+        help="pin separate vLLM CPU environments for a controlled upgrade",
+    )
+    for name in (
+        "reference-python",
+        "candidate-python",
+        "model",
+        "descriptor",
+        "workload",
+        "output",
+    ):
+        prepare.add_argument("--" + name, type=Path, required=True)
+    prepare.add_argument("--policy", type=Path)
+    prepare.add_argument("--context", type=int, default=512)
+    prepare.add_argument("--max-tokens", type=int, default=16)
+    prepare.add_argument("--warmup-trials", type=int, default=1)
+    prepare.add_argument("--measured-trials", type=int, default=3)
+    prepare.add_argument("--timeout", type=float, default=900)
+
+
 def _prepare_recipe_command(args: Any, out: TextIO) -> int:
+    if args.recipe_command == "prepare-vllm-upgrade":
+        from .preparation_upgrade import prepare_upgrade_command
+
+        return prepare_upgrade_command(args, out)
     if args.recipe_command == "prepare-gguf-quantization":
         from .preparation_quantization import prepare_quantization_command
 
@@ -570,6 +597,7 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
             "prepare-vllm",
             "prepare-llamacpp-build",
             "prepare-gguf-quantization",
+            "prepare-vllm-upgrade",
         }:
             return _prepare_recipe_command(args, out)
         if args.command == "compare":
