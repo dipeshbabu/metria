@@ -5,6 +5,9 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added `metria pilot record` to bind workload decisions, setup friction and
+  separately identified participant feedback to checked verification evidence.
+
 - Added separate-interpreter CPU runtime-upgrade verification with pinned
   environment contents, native worker placement, bounded process cleanup and
   checked run-record bindings through the shared study lifecycle.

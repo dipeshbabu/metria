@@ -45,6 +45,9 @@ def _parser() -> argparse.ArgumentParser:
         help="show the Metria core version and exit",
     )
     subparsers = parser.add_subparsers(dest="command")
+    from .pilot import add_pilot_parser
+
+    add_pilot_parser(subparsers)
 
     _add_recipe_parser(subparsers)
     demo = subparsers.add_parser(
@@ -589,10 +592,8 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
     try:
         if args.command == "verify":
             return _verify_command(args, out, err)
-        if args.command == "demo":
-            from .onboarding import demo_command
-
-            return demo_command(args, out, err)
+        if args.command in {"demo", "pilot"}:
+            return _guided_command(args, out, err)
         if args.command == "recipe" and args.recipe_command in {
             "prepare-vllm",
             "prepare-llamacpp-build",
@@ -647,6 +648,16 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
 
     err.write("metria: error: unsupported command\n")
     return 2
+
+
+def _guided_command(args: Any, out: TextIO, err: TextIO) -> int:
+    if args.command == "pilot":
+        from .pilot import pilot_command
+
+        return pilot_command(args, out)
+    from .onboarding import demo_command
+
+    return demo_command(args, out, err)
 
 
 def _verification_error(

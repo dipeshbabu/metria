@@ -61,7 +61,8 @@
     "src/metria/runtime_worker.py": 85,
     "src/metria/runtimes/vllm_placement.py": 90,
     "src/metria/verification_upgrade.py": 85,
-    "src/metria/preparation_upgrade.py": 85
+    "src/metria/preparation_upgrade.py": 85,
+    "src/metria/pilot.py": 95
   },
   "components": {
     "src/metria/integrations/turboquant_diagnostics.py": 90,
