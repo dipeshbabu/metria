@@ -693,6 +693,14 @@ class VLLMAdapter:
                 "vLLM is not installed in this environment; install it only in the "
                 "runtime-specific environment used for this adapter"
             )
+        elif not reasons and kv["dtype"].startswith("fp8"):
+            from .vllm_capability import fp8_cache_gap
+
+            hardware = native_hardware()
+            gap = fp8_cache_gap(installed_version, kv["dtype"], hardware)
+            if gap is not None:
+                reasons.append(gap)
+                evidence["unsupported_cache_hardware"] = hardware
         return SupportReport(
             status="unsupported" if reasons else "supported",
             reasons=tuple(reasons),

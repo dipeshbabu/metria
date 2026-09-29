@@ -24,6 +24,7 @@ generated evidence lives under [`artifacts/`](../artifacts/README.md).
 - [Verified model and data artifacts](guides/artifact-resolution.md)
 
 - [Verify a local vLLM prefix-cache change](guides/vllm-prefix-verification.md)
+- [FP8 KV-cache qualification status](guides/fp8-qualification-status.md)
 - [Verify a local llama.cpp CPU thread change](guides/metria-verify.md)
 - [Verify a llama.cpp CPU build change](guides/llamacpp-build-verification.md)
 - [Verify a GGUF Q8_0 weight-quantization change](guides/gguf-quantization-verification.md)

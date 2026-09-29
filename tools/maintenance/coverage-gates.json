@@ -38,6 +38,7 @@
     "src/metria/preparation.py": 88,
     "src/metria/runtimes/vllm_artifacts.py": 82,
     "src/metria/runtimes/vllm_hardware.py": 95,
+    "src/metria/runtimes/vllm_capability.py": 95,
     "src/metria/verification_route.py": 95,
     "src/metria/verification_vllm.py": 80,
     "src/metria/verification_worker.py": 82,
