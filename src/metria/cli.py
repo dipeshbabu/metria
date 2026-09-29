@@ -156,6 +156,7 @@ def _add_recipe_parser(subparsers: Any) -> None:
 
 def _add_preparation_parser(subparsers: Any) -> None:
     _add_cpu_build_parser(subparsers)
+    _add_quantization_parser(subparsers)
     prepare = subparsers.add_parser(
         "prepare-vllm", help="prepare a pinned local vLLM prefix-cache recipe"
     )
@@ -222,7 +223,34 @@ def _add_cpu_build_parser(subparsers: Any) -> None:
     )
 
 
+def _add_quantization_parser(subparsers: Any) -> None:
+    prepare = subparsers.add_parser(
+        "prepare-gguf-quantization",
+        help="convert GGUF Q8_0 and qualify a pinned CPU comparison",
+    )
+    for name in ("bin-dir", "model", "candidate-model", "workload", "output"):
+        prepare.add_argument("--" + name, type=Path, required=True)
+    prepare.add_argument(
+        "--model-sha256", required=True, help="trusted source GGUF SHA256"
+    )
+    prepare.add_argument(
+        "--quantizer", type=Path, help="native tool; defaults to bin-dir/llama-quantize"
+    )
+    prepare.add_argument(
+        "--quantizer-sha256", help="optional independently trusted tool SHA256"
+    )
+    prepare.add_argument("--policy", type=Path)
+    prepare.add_argument("--threads", type=int, default=2)
+    prepare.add_argument("--context", type=int, default=256)
+    prepare.add_argument("--max-tokens", type=int, default=16)
+    prepare.add_argument("--timeout", type=float, default=300)
+
+
 def _prepare_recipe_command(args: Any, out: TextIO) -> int:
+    if args.recipe_command == "prepare-gguf-quantization":
+        from .preparation_quantization import prepare_quantization_command
+
+        return prepare_quantization_command(args, out)
     if args.recipe_command == "prepare-llamacpp-build":
         from .preparation_cpu import prepare_build_command
 
@@ -541,6 +569,7 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
         if args.command == "recipe" and args.recipe_command in {
             "prepare-vllm",
             "prepare-llamacpp-build",
+            "prepare-gguf-quantization",
         }:
             return _prepare_recipe_command(args, out)
         if args.command == "compare":

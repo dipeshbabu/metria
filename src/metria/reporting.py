@@ -173,7 +173,7 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
 
 
 def _scope_label(manifest: Mapping[str, Any]) -> str:
-    from .verification_schema import LLAMACPP_BUILD_SCOPE
+    from .verification_schema import GGUF_QUANTIZATION_SCOPE, LLAMACPP_BUILD_SCOPE
 
     if manifest.get("fixture_only") is True:
         return "Scope: synthetic fixture; no real runtime or model qualification"
@@ -183,13 +183,17 @@ def _scope_label(manifest: Mapping[str, Any]) -> str:
         return "Scope: local vLLM prefix-cache comparison"
     if manifest.get("scope") == LLAMACPP_BUILD_SCOPE:
         return "Scope: local llama.cpp CPU build comparison"
+    if manifest.get("scope") == GGUF_QUANTIZATION_SCOPE:
+        return "Scope: local llama.cpp GGUF weight-quantization comparison"
     return "Scope: unrecognized verification contract"
 
 
 def _change_label(manifest: Mapping[str, Any]) -> str:
-    from .verification_schema import LLAMACPP_BUILD_SCOPE
+    from .verification_schema import GGUF_QUANTIZATION_SCOPE, LLAMACPP_BUILD_SCOPE
 
     change = manifest["change"]
+    if manifest.get("scope") == GGUF_QUANTIZATION_SCOPE:
+        return f"  Observed tensor storage: {dict(change['reference'])} -> {dict(change['candidate'])} (Q8_0 conversion; mixed storage retained)"
     if manifest.get("scope") == LLAMACPP_BUILD_SCOPE:
         return (
             f"  Capture provider SHA256: {change['reference']} -> {change['candidate']}"

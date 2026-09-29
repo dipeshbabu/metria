@@ -389,6 +389,10 @@ def _legacy_performance(
 
 
 def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
+    if "gguf_quantization" in recipe.environment:
+        from .verification_quantization import build_route as build_quantization_route
+
+        return build_quantization_route(recipe)
     if "llama_cpp_capture_providers" in recipe.environment:
         from .verification_build import build_route as build_llamacpp_route
 
