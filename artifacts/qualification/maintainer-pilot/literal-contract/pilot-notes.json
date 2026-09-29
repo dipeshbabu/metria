@@ -1,0 +1,13 @@
+{
+  "kind": "maintainer_validation",
+  "reporter": "automated maintainer validation",
+  "decision": "keep",
+  "rationale": "literal-contract: PASS. Decision applies only to the predeclared task checks and comparison evidence on this machine; no production or external-adoption inference.",
+  "acceptance_criteria": "All reference and candidate task checks must pass, with complete native identity/capture evidence and observed prefix reuse. Exact stripped labels/fields and JSON structure with declared keys are required.",
+  "setup_seconds": 353.395655574,
+  "friction": [
+    "Initial preparation rejected Hub revision-tree cache metadata as payload; the exact metadata-path fix was tested and installed before this retry. The failed attempt is retained separately."
+  ],
+  "would_reuse": null,
+  "permission_to_share": true
+}

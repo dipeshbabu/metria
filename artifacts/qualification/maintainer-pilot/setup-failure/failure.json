@@ -1,0 +1,10 @@
+{
+  "schema": "metria.pilot_setup_failure.v1",
+  "source_revision": "a0251ffd5b5c8c76ed2cf26efb27947522b8af9e",
+  "wheel_sha256": "6991d498a8900d4ff0e76af85dfa44905b34cdfc278a0e4f68a6c696e4418ee0",
+  "stage": "recipe preparation",
+  "exit_code": 2,
+  "native_inference_started": false,
+  "reason": "Hugging Face revision-tree cache metadata was misclassified as an extra model payload.",
+  "fix": "Recognize only the exact administrative tree-receipt path; retain strict checks for unknown JSON and weight files."
+}

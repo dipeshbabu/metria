@@ -62,6 +62,7 @@
     "src/metria/runtimes/vllm_placement.py": 90,
     "src/metria/verification_upgrade.py": 85,
     "src/metria/preparation_upgrade.py": 85,
+    "src/metria/pilot.py": 95,
     "src/metria/measurements/serving_impact.py": 85,
     "src/metria/measurements/serving_metrics.py": 95,
     "src/metria/measurements/serving_schema.py": 95,

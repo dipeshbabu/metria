@@ -1,0 +1,13 @@
+{
+  "kind": "maintainer_validation",
+  "reporter": "automated maintainer validation",
+  "decision": "reject",
+  "rationale": "representative-tasks: FAIL. Decision applies only to the predeclared task checks and comparison evidence on this machine; no production or external-adoption inference.",
+  "acceptance_criteria": "All reference and candidate task checks must pass, with complete native identity/capture evidence and observed prefix reuse. Exact stripped labels/fields and JSON structure with declared keys are required.",
+  "setup_seconds": 356.76316508699995,
+  "friction": [
+    "Retained verdict FAIL; inspect the task-check results and do not infer task quality from token agreement."
+  ],
+  "would_reuse": null,
+  "permission_to_share": true
+}

@@ -1,0 +1,3 @@
+Prepared /var/tmp/metria-pilot-159/qualification-attempt2/representative-tasks/study.json
+Recipe: 454643419d784d280b2e55a5be26519c9ad8d4a16f9ec7a01f9c5b8961ed23cf
+Next: metria verify /var/tmp/metria-pilot-159/qualification-attempt2/representative-tasks/study.json --output verification

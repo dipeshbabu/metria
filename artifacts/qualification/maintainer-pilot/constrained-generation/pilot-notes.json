@@ -1,0 +1,14 @@
+{
+  "kind": "maintainer_validation",
+  "reporter": "automated maintainer validation",
+  "decision": "reject",
+  "rationale": "constrained-generation: FAIL. Decision applies only to the predeclared task checks and comparison evidence on this machine; no production or external-adoption inference.",
+  "acceptance_criteria": "All reference and candidate task checks must pass, with complete native identity/capture evidence and observed prefix reuse. Exact stripped labels/fields and JSON structure with declared keys are required.",
+  "setup_seconds": 317.366662949,
+  "friction": [
+    "Retained verdict FAIL; inspect the task-check results and do not infer task quality from token agreement.",
+    "The predeclared one-token budget intentionally truncates structured and multi-token answers; this is a negative setup test."
+  ],
+  "would_reuse": null,
+  "permission_to_share": true
+}

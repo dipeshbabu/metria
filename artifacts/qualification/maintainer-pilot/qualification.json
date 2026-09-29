@@ -1,0 +1,354 @@
+{
+  "schema": "metria.maintainer_pilot.v1",
+  "source_revision": "75844a8d0d37887c69a383d415f8b79832a6cf78",
+  "metria_version": "0.2.0.dev0",
+  "wheel_sha256": "7c62bbaeab1d6efb6bb7eb947209ef9080e4029abce3c72f28ee72203dae9156",
+  "runtime_version": "0.30.0+cu129",
+  "model_revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+  "participant_feedback_collected": false,
+  "timing_scope": "Preparation through saved verification using already installed runtime/model; excludes initial runtime installation/model download and excludes pilot-record command.",
+  "cases": [
+    {
+      "name": "literal-contract",
+      "verdict": "PASS",
+      "decision": "keep",
+      "max_tokens": 32,
+      "comparison_valid": true,
+      "setup_seconds": 353.395655574,
+      "policy": {
+        "criteria": [
+          {
+            "criterion": {
+              "min": 1.0,
+              "target": "quality.reference_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "observed_source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "coverage": 1.0,
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "reference_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "raw_value": 1.0
+            },
+            "observed_value": 1.0,
+            "reason": null,
+            "result": "PASS",
+            "target_identity": {
+              "direction": "higher_is_better",
+              "kind": "number",
+              "name": "quality.reference_pass_rate",
+              "source": {
+                "aggregation": "mean",
+                "analysis": {
+                  "name": "metria.verification_impact",
+                  "version": "1"
+                },
+                "metric": {
+                  "direction": "higher_is_better",
+                  "method": "metria.task_check_comparison",
+                  "name": "reference_task_pass_rate",
+                  "unit": "fraction",
+                  "version": "1"
+                },
+                "normalization_divisor": 1.0
+              },
+              "unit": "fraction",
+              "version": "1"
+            }
+          },
+          {
+            "criterion": {
+              "min": 1.0,
+              "target": "quality.candidate_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "observed_source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "coverage": 1.0,
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "candidate_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "raw_value": 1.0
+            },
+            "observed_value": 1.0,
+            "reason": null,
+            "result": "PASS",
+            "target_identity": {
+              "direction": "higher_is_better",
+              "kind": "number",
+              "name": "quality.candidate_pass_rate",
+              "source": {
+                "aggregation": "mean",
+                "analysis": {
+                  "name": "metria.verification_impact",
+                  "version": "1"
+                },
+                "metric": {
+                  "direction": "higher_is_better",
+                  "method": "metria.task_check_comparison",
+                  "name": "candidate_task_pass_rate",
+                  "unit": "fraction",
+                  "version": "1"
+                },
+                "normalization_divisor": 1.0
+              },
+              "unit": "fraction",
+              "version": "1"
+            }
+          }
+        ],
+        "gate": "VERIFIED",
+        "policy_schema": "metria.verification_policy.v1",
+        "schema": "metria.policy_evaluation.v1",
+        "status": "PASS"
+      }
+    },
+    {
+      "name": "representative-tasks",
+      "verdict": "FAIL",
+      "decision": "reject",
+      "max_tokens": 32,
+      "comparison_valid": true,
+      "setup_seconds": 356.76316508699995,
+      "policy": {
+        "criteria": [
+          {
+            "criterion": {
+              "min": 1.0,
+              "target": "quality.reference_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "observed_source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "coverage": 1.0,
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "reference_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "raw_value": 0.5
+            },
+            "observed_value": 0.5,
+            "reason": null,
+            "result": "FAIL",
+            "target_identity": {
+              "direction": "higher_is_better",
+              "kind": "number",
+              "name": "quality.reference_pass_rate",
+              "source": {
+                "aggregation": "mean",
+                "analysis": {
+                  "name": "metria.verification_impact",
+                  "version": "1"
+                },
+                "metric": {
+                  "direction": "higher_is_better",
+                  "method": "metria.task_check_comparison",
+                  "name": "reference_task_pass_rate",
+                  "unit": "fraction",
+                  "version": "1"
+                },
+                "normalization_divisor": 1.0
+              },
+              "unit": "fraction",
+              "version": "1"
+            }
+          },
+          {
+            "criterion": {
+              "min": 1.0,
+              "target": "quality.candidate_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "observed_source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "coverage": 1.0,
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "candidate_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "raw_value": 0.5
+            },
+            "observed_value": 0.5,
+            "reason": null,
+            "result": "FAIL",
+            "target_identity": {
+              "direction": "higher_is_better",
+              "kind": "number",
+              "name": "quality.candidate_pass_rate",
+              "source": {
+                "aggregation": "mean",
+                "analysis": {
+                  "name": "metria.verification_impact",
+                  "version": "1"
+                },
+                "metric": {
+                  "direction": "higher_is_better",
+                  "method": "metria.task_check_comparison",
+                  "name": "candidate_task_pass_rate",
+                  "unit": "fraction",
+                  "version": "1"
+                },
+                "normalization_divisor": 1.0
+              },
+              "unit": "fraction",
+              "version": "1"
+            }
+          }
+        ],
+        "gate": "VERIFIED",
+        "policy_schema": "metria.verification_policy.v1",
+        "schema": "metria.policy_evaluation.v1",
+        "status": "FAIL"
+      }
+    },
+    {
+      "name": "constrained-generation",
+      "verdict": "FAIL",
+      "decision": "reject",
+      "max_tokens": 1,
+      "comparison_valid": true,
+      "setup_seconds": 317.366662949,
+      "policy": {
+        "criteria": [
+          {
+            "criterion": {
+              "min": 1.0,
+              "target": "quality.reference_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "observed_source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "coverage": 1.0,
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "reference_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "raw_value": 0.16666666666666666
+            },
+            "observed_value": 0.16666666666666666,
+            "reason": null,
+            "result": "FAIL",
+            "target_identity": {
+              "direction": "higher_is_better",
+              "kind": "number",
+              "name": "quality.reference_pass_rate",
+              "source": {
+                "aggregation": "mean",
+                "analysis": {
+                  "name": "metria.verification_impact",
+                  "version": "1"
+                },
+                "metric": {
+                  "direction": "higher_is_better",
+                  "method": "metria.task_check_comparison",
+                  "name": "reference_task_pass_rate",
+                  "unit": "fraction",
+                  "version": "1"
+                },
+                "normalization_divisor": 1.0
+              },
+              "unit": "fraction",
+              "version": "1"
+            }
+          },
+          {
+            "criterion": {
+              "min": 1.0,
+              "target": "quality.candidate_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "observed_source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "coverage": 1.0,
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "candidate_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "raw_value": 0.16666666666666666
+            },
+            "observed_value": 0.16666666666666666,
+            "reason": null,
+            "result": "FAIL",
+            "target_identity": {
+              "direction": "higher_is_better",
+              "kind": "number",
+              "name": "quality.candidate_pass_rate",
+              "source": {
+                "aggregation": "mean",
+                "analysis": {
+                  "name": "metria.verification_impact",
+                  "version": "1"
+                },
+                "metric": {
+                  "direction": "higher_is_better",
+                  "method": "metria.task_check_comparison",
+                  "name": "candidate_task_pass_rate",
+                  "unit": "fraction",
+                  "version": "1"
+                },
+                "normalization_divisor": 1.0
+              },
+              "unit": "fraction",
+              "version": "1"
+            }
+          }
+        ],
+        "gate": "VERIFIED",
+        "policy_schema": "metria.verification_policy.v1",
+        "schema": "metria.policy_evaluation.v1",
+        "status": "FAIL"
+      }
+    }
+  ]
+}

@@ -57,6 +57,38 @@ def test_extra_payload_cannot_silently_override_pinned_weights(model):
         artifacts.verify_model_files(directory, pins)
 
 
+def test_hub_download_tree_receipt_does_not_change_model_payload_identity(model):
+    directory, pins = model
+    expected = artifacts.verify_model_files(directory, pins)
+    receipt = directory / ".cache" / "huggingface" / "trees" / ("a" * 40 + ".json")
+    receipt.parent.mkdir(parents=True)
+    receipt.write_text('{"download": "administrative tree cache"}')
+    assert artifacts.verify_model_files(directory, pins) == expected
+    with pytest.raises(ValueError, match="payload"):
+        artifacts.validate_file_pins(
+            {**pins, receipt.relative_to(directory).as_posix(): "b" * 64}
+        )
+
+
+@pytest.mark.parametrize(
+    "relative",
+    [
+        ".cache/huggingface/trees/weights.bin",
+        ".cache/huggingface/trees/config.json",
+        ".cache/huggingface/trees/" + "A" * 40 + ".json",
+        ".cache/other/trees/" + "a" * 40 + ".json",
+        ".cache/huggingface/trees/" + "a" * 40 + ".safetensors",
+    ],
+)
+def test_unknown_cache_payloads_remain_part_of_strict_inventory(model, relative):
+    directory, pins = model
+    path = directory / relative
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b"untracked payload")
+    with pytest.raises(ValueError, match="inventory"):
+        artifacts.verify_model_files(directory, pins)
+
+
 def test_missing_tokenizer_pin_fails_before_content_verification(model):
     directory, pins = model
     del pins["tokenizer.json"]

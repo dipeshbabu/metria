@@ -5,6 +5,11 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added `metria pilot record` to bind workload decisions, setup friction and
+  separately identified participant feedback to checked verification evidence.
+  Model inventories recognize Hugging Face's exact revision-tree cache receipt
+  path while still rejecting unexpected weights/configuration files.
+
 - Added bounded local vLLM serving comparisons with observed streaming timing,
   concurrency, token/request throughput, native CUDA allocator/KV allocation
   evidence, and separate policy targets.

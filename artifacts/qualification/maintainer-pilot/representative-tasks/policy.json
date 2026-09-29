@@ -1,0 +1,17 @@
+{
+  "schema": "metria.verification_policy.v1",
+  "criteria": [
+    {
+      "target": "quality.reference_pass_rate",
+      "version": "1",
+      "unit": "fraction",
+      "min": 1.0
+    },
+    {
+      "target": "quality.candidate_pass_rate",
+      "version": "1",
+      "unit": "fraction",
+      "min": 1.0
+    }
+  ]
+}
