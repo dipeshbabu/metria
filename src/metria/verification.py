@@ -389,6 +389,13 @@ def _legacy_performance(
 
 
 def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
+    if recipe.study.runs and any(
+        run.trial_policy.get("method") == "metria.concurrent_serving_trials.v1"
+        for run in recipe.study.runs
+    ):
+        from .verification_serving import build_route as build_serving_route
+
+        return build_serving_route(recipe)
     if "runtime_environments" in recipe.environment:
         from .verification_upgrade import build_route as build_upgrade_route
 

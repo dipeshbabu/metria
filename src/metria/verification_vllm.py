@@ -293,11 +293,10 @@ def _workload_gaps(record: RunRecord, expected_trials: Mapping[str, Any]) -> lis
     return []
 
 
-def evidence_gaps(
+def identity_gaps(
     record: RunRecord,
     *,
     runtime_pin: str,
-    trials: Mapping[str, Any],
     quality_identity: Mapping[str, Any] | None = None,
 ) -> tuple[str, ...]:
     gaps = []
@@ -351,8 +350,26 @@ def evidence_gaps(
             or quality.get("check_count") != quality_identity["check_count"]
         ):
             gaps.append("declared task-check evidence is missing or inconsistent")
-    gaps.extend(_workload_gaps(record, trials))
     return tuple(dict.fromkeys(gaps))
+
+
+def evidence_gaps(
+    record: RunRecord,
+    *,
+    runtime_pin: str,
+    trials: Mapping[str, Any],
+    quality_identity: Mapping[str, Any] | None = None,
+) -> tuple[str, ...]:
+    return tuple(
+        dict.fromkeys(
+            (
+                *identity_gaps(
+                    record, runtime_pin=runtime_pin, quality_identity=quality_identity
+                ),
+                *_workload_gaps(record, trials),
+            )
+        )
+    )
 
 
 def build_route(recipe: StudyRecipe) -> VerificationRoute:

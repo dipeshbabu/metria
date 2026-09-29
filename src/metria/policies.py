@@ -173,6 +173,30 @@ _TARGETS = MappingProxyType(
 )
 
 
+def _serving_targets() -> dict[str, _Target]:
+    from .measurements.serving_schema import DEFINITIONS, NAME, SCHEMA, VERSION
+
+    return {
+        "serving." + name: _Target(
+            name="serving." + name,
+            kind="number",
+            unit=definition.unit,
+            metric=definition,
+            aggregation="derived",
+            version=VERSION,
+            analysis=NAME,
+            analysis_version=VERSION,
+            evidence_schema=SCHEMA,
+            domain_min=0,
+            domain_max=None,
+        )
+        for name, definition in DEFINITIONS.items()
+    }
+
+
+_TARGETS = MappingProxyType({**_TARGETS, **_serving_targets()})
+
+
 def _target(name: str, version: str) -> _Target:
     if not isinstance(name, str) or not isinstance(version, str):
         raise TypeError("policy target and version must be strings")

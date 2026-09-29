@@ -60,9 +60,11 @@ This delivery has explicit limits:
 - FP8 KV precision changes remain
   [staged templates](../../examples/verification/README.md) until the full intended
   change, observed identity, workload, and comparison path are qualified.
-- TTFT, decode throughput, inter-token latency, and device/KV memory remain
-  unavailable in the current CLI. Cold request latency includes model loading
-  and process startup; it is not a claim about steady-state serving.
+- A separate [local serving profile](../guides/serving-measurements.md) measures
+  streamed token delivery, bounded concurrency, throughput, and native CUDA
+  allocator/KV storage. It excludes HTTP/network overhead; individual-token
+  intervals remain unavailable when the runtime coalesces output chunks.
+  Cold-process latency retains its distinct startup/model-loading boundary.
 - `VERIFIED` means valid completed comparison and analysis. A policy is required
   for `PASS`/`FAIL`; no universal quality, safety, or performance threshold is implied.
 

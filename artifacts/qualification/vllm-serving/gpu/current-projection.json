@@ -1,0 +1,181 @@
+{
+  "schema": "metria.serving_report_projection.v1",
+  "source_revision": "e63d3301eed3fdb9f2fe3c1704737bd9f69bf4b4",
+  "native_source_revision": "48ec730100903b969c8000333c24a6ef75129d7e",
+  "note": "Current report projection from the unchanged native records. Corrects the inherited legacy unsupported-metrics summary; native measurements, policies and verdicts are unchanged.",
+  "performance": {
+    "schema": "metria.performance_impact.v1",
+    "available": true,
+    "unsupported_metrics": [],
+    "metric": {
+      "name": "request_latency_seconds",
+      "unit": "seconds",
+      "direction": "lower_is_better",
+      "method": "metria.vllm_serving_request_latency",
+      "version": "1"
+    },
+    "methodology": {
+      "workload_sha256": "b4fd07143be2cc9c2a40fde34374d9f5984fa3b13af1528e38bc3cefdd0a2d84",
+      "runtime_hardware": {
+        "capacity_bytes": 4294639616,
+        "compute_capability": [
+          7,
+          5
+        ],
+        "cuda_runtime": "12.9",
+        "device_type": "cuda",
+        "logical_device": 0,
+        "name": "NVIDIA GeForce GTX 1650",
+        "source": "vllm_native_platform_and_torch_cuda",
+        "status": "observed",
+        "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893"
+      },
+      "clock": "perf_counter_ns",
+      "boundaries": {
+        "transport": "local native serving API; excludes HTTP/network overhead",
+        "request_start": "admitted client request submitted to AsyncLLM.generate",
+        "first_token": "first streamed chunk containing native generated tokens",
+        "inter_token": "only when every observed chunk contains exactly one token",
+        "throughput": "completed requests and native output tokens divided by whole measured batch windows",
+        "memory": "native worker PyTorch allocator peaks and unique KV tensor storage; not device-wide memory usage"
+      },
+      "method": "metria.concurrent_serving_trials.v1",
+      "warmup_trials": 1,
+      "measured_trials": 2,
+      "isolation": "public prefix-cache reset before every trial; allocator peaks reset after warmup",
+      "schedule": "bounded concurrent requests in input order"
+    },
+    "reference": 0.9391778335000001,
+    "candidate": 0.985658637,
+    "absolute_delta": 0.046480803499999945,
+    "relative_delta": 0.04949095032064547,
+    "relative_baseline_floor_seconds": 1e-09,
+    "relative_unavailable_reason": null,
+    "direction": "regressed",
+    "limitations": "Local AsyncLLM serving API after warmup; excludes engine startup, resets and HTTP/network overhead. Single-device observations; no statistical speedup claim.",
+    "label": "Local serving request latency",
+    "metrics": {
+      "request_latency_seconds": {
+        "available": true,
+        "reference": 0.9391778335000001,
+        "candidate": 0.985658637,
+        "absolute_delta": 0.046480803499999945,
+        "ratio": 1.0494909503206455,
+        "unit": "seconds",
+        "method": "metria.vllm_serving_request_latency",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "mean",
+        "coverage": 1.0
+      },
+      "ttft_seconds": {
+        "available": true,
+        "reference": 0.135271503,
+        "candidate": 0.16131285275,
+        "absolute_delta": 0.026041349750000026,
+        "ratio": 1.192511720299286,
+        "unit": "seconds",
+        "method": "metria.vllm_stream_first_token_latency",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "mean",
+        "coverage": 1.0
+      },
+      "inter_token_latency_seconds": {
+        "available": true,
+        "reference": 0.053591782633333335,
+        "candidate": 0.0549544182,
+        "absolute_delta": 0.001362635566666666,
+        "ratio": 1.0254262034161021,
+        "unit": "seconds",
+        "method": "metria.vllm_stream_inter_token_latency",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "mean",
+        "coverage": 1.0
+      },
+      "decode_tokens_per_second": {
+        "available": true,
+        "reference": 18.659577100501487,
+        "candidate": 18.19689904386978,
+        "absolute_delta": -0.4626780566317059,
+        "ratio": 0.9752042581597805,
+        "unit": "tokens/second",
+        "method": "metria.vllm_stream_decode_rate",
+        "version": "1",
+        "direction": "higher_is_better",
+        "aggregation": "ratio_of_totals",
+        "coverage": 1.0
+      },
+      "output_tokens_per_second": {
+        "available": true,
+        "reference": 17.035105880453575,
+        "candidate": 32.41818985118823,
+        "absolute_delta": 15.383083970734656,
+        "ratio": 1.9030225041562858,
+        "unit": "tokens/second",
+        "method": "metria.vllm_serving_output_throughput",
+        "version": "1",
+        "direction": "higher_is_better",
+        "aggregation": "ratio_of_totals",
+        "coverage": 1.0
+      },
+      "requests_per_second": {
+        "available": true,
+        "reference": 1.0646941175283484,
+        "candidate": 2.0261368656992644,
+        "absolute_delta": 0.961442748170916,
+        "ratio": 1.9030225041562858,
+        "unit": "requests/second",
+        "method": "metria.vllm_serving_request_throughput",
+        "version": "1",
+        "direction": "higher_is_better",
+        "aggregation": "ratio_of_totals",
+        "coverage": 1.0
+      },
+      "peak_device_allocated_bytes": {
+        "available": true,
+        "reference": 1461576192.0,
+        "candidate": 1461677568.0,
+        "absolute_delta": 101376.0,
+        "ratio": 1.0000693607357283,
+        "unit": "bytes",
+        "method": "metria.vllm_torch_peak_allocated",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "max",
+        "coverage": 1.0
+      },
+      "peak_device_reserved_bytes": {
+        "available": true,
+        "reference": 1468006400.0,
+        "candidate": 1468006400.0,
+        "absolute_delta": 0.0,
+        "ratio": 1.0,
+        "unit": "bytes",
+        "method": "metria.vllm_torch_peak_reserved",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "max",
+        "coverage": 1.0
+      },
+      "allocated_kv_bytes": {
+        "available": true,
+        "reference": 1175224320.0,
+        "candidate": 1175224320.0,
+        "absolute_delta": 0.0,
+        "ratio": 1.0,
+        "unit": "bytes",
+        "method": "metria.vllm_kv_tensor_storage",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "max",
+        "coverage": 1.0
+      }
+    },
+    "conditions": {
+      "reference_concurrency": 1,
+      "candidate_concurrency": 2
+    }
+  }
+}

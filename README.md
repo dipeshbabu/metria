@@ -98,10 +98,12 @@ It reports prefix agreement, exact matches, first-divergence positions, category
 rates, and prompt identifiers that help locate drift without dumping prompt text.
 See [behavioral diagnostics](docs/guides/metria-trajectory-measurement.md).
 
-The current systems method reports compatible **cold-process request latency**,
-including startup and model loading. TTFT, decode-only throughput, and device/KV
-memory remain unavailable until an authoritative method is supported. The report
-retains trial policy and limitations; see [performance evidence](docs/guides/verification-performance.md).
+Systems measurements have distinct boundaries: llama.cpp cold-process latency,
+loaded-engine vLLM request latency, and
+[local serving measurements](docs/guides/serving-measurements.md) for streaming,
+concurrency and native CUDA allocator/KV storage. Reports retain method, workload,
+coverage and limitations; missing native measurements remain unavailable.
+See [performance evidence](docs/guides/verification-performance.md).
 
 `VERIFIED` means valid comparison and completed analysis. Add an
 [explicit acceptance policy](docs/guides/verification-policies.md) for PASS/FAIL.

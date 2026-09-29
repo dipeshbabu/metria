@@ -132,26 +132,7 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
             lines.append(
                 f"  {role} mean process wall time: {timing['mean_seconds']:.6g}s (includes startup and model loading)"
             )
-    performance = manifest.get("performance")
-    if performance is not None:
-        if performance["available"]:
-            lines.append(
-                f"  {performance.get('label', 'Cold-process request latency')}: {performance['absolute_delta']:+.6g}s ({performance['direction']})"
-            )
-            if performance["relative_delta"] is not None:
-                lines.append(
-                    f"    Relative change: {performance['relative_delta'] * 100:+.6g}%"
-                )
-            else:
-                lines.append(
-                    f"    Relative change unavailable: {performance['relative_unavailable_reason']}"
-                )
-            lines.append(f"    {performance['limitations']}")
-        else:
-            lines.append(f"  Performance impact unavailable: {performance['reason']}")
-        lines.append(
-            "  TTFT, decode throughput, inter-token latency, and device/KV memory: unavailable."
-        )
+    lines.extend(_render_performance(manifest))
     if not manifest["analyses"]:
         lines.append("  Behavioral impact unavailable: analysis did not complete.")
     if manifest.get("comparison_status") not in {None, "VALID"}:
@@ -172,6 +153,61 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _render_performance(manifest: Mapping[str, Any]) -> list[str]:
+    lines: list[str] = []
+    performance = manifest.get("performance")
+    if performance is not None:
+        if performance["available"]:
+            lines.append(
+                f"  {performance.get('label', 'Cold-process request latency')}: {performance['absolute_delta']:+.6g}s ({performance['direction']})"
+            )
+            if performance["relative_delta"] is not None:
+                lines.append(
+                    f"    Relative change: {performance['relative_delta'] * 100:+.6g}%"
+                )
+            else:
+                lines.append(
+                    f"    Relative change unavailable: {performance['relative_unavailable_reason']}"
+                )
+            lines.append(f"    {performance['limitations']}")
+        else:
+            lines.append(f"  Performance impact unavailable: {performance['reason']}")
+        if "metrics" in performance:
+            lines.extend(_serving_metrics(performance["metrics"]))
+        else:
+            lines.append(
+                "  TTFT, decode throughput, inter-token latency, and device/KV memory: unavailable."
+            )
+    return lines
+
+
+def _serving_metrics(metrics: Mapping[str, Any]) -> list[str]:
+    from .measurements.serving_metrics import DEFINITIONS
+
+    lines = []
+    for name, definition in DEFINITIONS.items():
+        row = metrics.get(name, {})
+        if row.get("available") is not True:
+            lines.append(f"    {name}: unavailable")
+        elif (row.get("unit"), row.get("method"), row.get("version")) == (
+            definition.unit,
+            definition.method,
+            definition.version,
+        ):
+            lines.append(
+                f"    {name}: {row['reference']:.6g} -> {row['candidate']:.6g} {definition.unit}"
+            )
+        else:
+            lines.append(f"    {name}: incompatible metric identity")
+    lines.append(
+        "    Memory: native worker PyTorch allocator peaks and allocated KV tensor storage; excludes other processes and non-PyTorch allocations."
+    )
+    lines.append(
+        "    Decode rate: generated tokens after the first divided by summed per-request stream intervals; unavailable when token chunks coalesce."
+    )
+    return lines
+
+
 def _scope_label(manifest: Mapping[str, Any]) -> str:
     from .verification_schema import (
         GGUF_QUANTIZATION_SCOPE,
@@ -179,6 +215,8 @@ def _scope_label(manifest: Mapping[str, Any]) -> str:
         VLLM_UPGRADE_SCOPE,
     )
 
+    if manifest.get("scope") == "local_vllm_serving_concurrency.v1":
+        return "Scope: local vLLM streaming serving API; no HTTP/network timing"
     if manifest.get("fixture_only") is True:
         return "Scope: synthetic fixture; no real runtime or model qualification"
     if manifest.get("scope") == VERIFICATION_SCOPE:
@@ -202,6 +240,8 @@ def _change_label(manifest: Mapping[str, Any]) -> str:
     )
 
     change = manifest["change"]
+    if manifest.get("scope") == "local_vllm_serving_concurrency.v1":
+        return f"  Client concurrency: {change['reference']} -> {change['candidate']}; fixed engine capacity: {change['engine_capacity']}"
     if manifest.get("scope") == VLLM_UPGRADE_SCOPE:
         return f"  vLLM runtime environment: {change['reference']} -> {change['candidate']}; controlled CPU IDs: {list(change['cpu_binding'])}"
     if manifest.get("scope") == GGUF_QUANTIZATION_SCOPE:
@@ -220,7 +260,7 @@ def _change_label(manifest: Mapping[str, Any]) -> str:
 def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
     from .verification_schema import VLLM_UPGRADE_SCOPE
 
-    if scope == VLLM_UPGRADE_SCOPE:
+    if scope in {VLLM_UPGRADE_SCOPE, "local_vllm_serving_concurrency.v1"}:
         return f"    Observed runtime: {facts['runtime_version']}; context: {facts['context']}"
     if scope == VLLM_VERIFICATION_SCOPE:
         return f"    Observed prefix caching: {facts['prefix_caching']}; context: {facts['context']}"

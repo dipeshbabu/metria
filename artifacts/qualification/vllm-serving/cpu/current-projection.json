@@ -1,0 +1,149 @@
+{
+  "schema": "metria.serving_report_projection.v1",
+  "source_revision": "e63d3301eed3fdb9f2fe3c1704737bd9f69bf4b4",
+  "native_source_revision": "48ec730100903b969c8000333c24a6ef75129d7e",
+  "note": "Current report projection from the unchanged native records. Corrects the inherited legacy unsupported-metrics summary; native measurements, policies and verdicts are unchanged.",
+  "performance": {
+    "schema": "metria.performance_impact.v1",
+    "available": true,
+    "unsupported_metrics": [
+      "peak_device_allocated_bytes",
+      "peak_device_reserved_bytes",
+      "allocated_kv_bytes"
+    ],
+    "metric": {
+      "name": "request_latency_seconds",
+      "unit": "seconds",
+      "direction": "lower_is_better",
+      "method": "metria.vllm_serving_request_latency",
+      "version": "1"
+    },
+    "methodology": {
+      "workload_sha256": "b4fd07143be2cc9c2a40fde34374d9f5984fa3b13af1528e38bc3cefdd0a2d84",
+      "runtime_hardware": {
+        "device_type": "cpu",
+        "source": "vllm_native_platform",
+        "status": "observed"
+      },
+      "clock": "perf_counter_ns",
+      "boundaries": {
+        "transport": "local native serving API; excludes HTTP/network overhead",
+        "request_start": "admitted client request submitted to AsyncLLM.generate",
+        "first_token": "first streamed chunk containing native generated tokens",
+        "inter_token": "only when every observed chunk contains exactly one token",
+        "throughput": "completed requests and native output tokens divided by whole measured batch windows",
+        "memory": "native worker PyTorch allocator peaks and unique KV tensor storage; not device-wide memory usage"
+      },
+      "method": "metria.concurrent_serving_trials.v1",
+      "warmup_trials": 1,
+      "measured_trials": 2,
+      "isolation": "public prefix-cache reset before every trial; allocator peaks reset after warmup",
+      "schedule": "bounded concurrent requests in input order"
+    },
+    "reference": 1.549692552,
+    "candidate": 3.0799320375,
+    "absolute_delta": 1.5302394854999999,
+    "relative_delta": 0.9874471446127205,
+    "relative_baseline_floor_seconds": 1e-09,
+    "relative_unavailable_reason": null,
+    "direction": "regressed",
+    "limitations": "Local AsyncLLM serving API after warmup; excludes engine startup, resets and HTTP/network overhead. Single-device observations; no statistical speedup claim.",
+    "label": "Local serving request latency",
+    "metrics": {
+      "request_latency_seconds": {
+        "available": true,
+        "reference": 1.549692552,
+        "candidate": 3.0799320375,
+        "absolute_delta": 1.5302394854999999,
+        "ratio": 1.9874471446127204,
+        "unit": "seconds",
+        "method": "metria.vllm_serving_request_latency",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "mean",
+        "coverage": 1.0
+      },
+      "ttft_seconds": {
+        "available": true,
+        "reference": 0.0946992395,
+        "candidate": 0.2528656445,
+        "absolute_delta": 0.15816640499999998,
+        "ratio": 2.670197203642802,
+        "unit": "seconds",
+        "method": "metria.vllm_stream_first_token_latency",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "mean",
+        "coverage": 1.0
+      },
+      "inter_token_latency_seconds": {
+        "available": true,
+        "reference": 0.09699762131666667,
+        "candidate": 0.18846978941666667,
+        "absolute_delta": 0.0914721681,
+        "ratio": 1.9430351678560467,
+        "unit": "seconds",
+        "method": "metria.vllm_stream_inter_token_latency",
+        "version": "1",
+        "direction": "lower_is_better",
+        "aggregation": "mean",
+        "coverage": 1.0
+      },
+      "decode_tokens_per_second": {
+        "available": true,
+        "reference": 10.309531166082055,
+        "candidate": 5.3058901540406165,
+        "absolute_delta": -5.003641012041438,
+        "ratio": 0.5146587239094619,
+        "unit": "tokens/second",
+        "method": "metria.vllm_stream_decode_rate",
+        "version": "1",
+        "direction": "higher_is_better",
+        "aggregation": "ratio_of_totals",
+        "coverage": 1.0
+      },
+      "output_tokens_per_second": {
+        "available": true,
+        "reference": 10.324173926632895,
+        "candidate": 10.389172040758641,
+        "absolute_delta": 0.0649981141257463,
+        "ratio": 1.0062957205668603,
+        "unit": "tokens/second",
+        "method": "metria.vllm_serving_output_throughput",
+        "version": "1",
+        "direction": "higher_is_better",
+        "aggregation": "ratio_of_totals",
+        "coverage": 1.0
+      },
+      "requests_per_second": {
+        "available": true,
+        "reference": 0.6452608704145559,
+        "candidate": 0.6493232525474151,
+        "absolute_delta": 0.004062382132859144,
+        "ratio": 1.0062957205668603,
+        "unit": "requests/second",
+        "method": "metria.vllm_serving_request_throughput",
+        "version": "1",
+        "direction": "higher_is_better",
+        "aggregation": "ratio_of_totals",
+        "coverage": 1.0
+      },
+      "peak_device_allocated_bytes": {
+        "available": false,
+        "reason": "complete compatible native measurements are unavailable"
+      },
+      "peak_device_reserved_bytes": {
+        "available": false,
+        "reason": "complete compatible native measurements are unavailable"
+      },
+      "allocated_kv_bytes": {
+        "available": false,
+        "reason": "complete compatible native measurements are unavailable"
+      }
+    },
+    "conditions": {
+      "reference_concurrency": 1,
+      "candidate_concurrency": 2
+    }
+  }
+}
