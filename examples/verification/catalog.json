@@ -25,9 +25,8 @@
     },
     {
       "name": "quantization-treatment",
-      "status": "staged",
-      "recipe": "staged/quantization.json",
-      "blocker": "qualified treatment application and CLI route"
+      "status": "qualified-local",
+      "entry": "../../tools/qualification/prepare_gguf_quantization.py"
     },
     {
       "name": "llamacpp-build-regression",

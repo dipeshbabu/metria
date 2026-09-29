@@ -42,7 +42,6 @@ def test_staged_catalog_recipes_validate_without_advertising_runtime_support():
     assert {entry["name"] for entry in staged} == {
         "vllm-runtime-upgrade",
         "vllm-kv-precision",
-        "quantization-treatment",
     }
     for entry in staged:
         recipe = load_study_recipe(folder / entry["recipe"])

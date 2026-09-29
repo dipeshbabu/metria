@@ -1,0 +1,3 @@
+{"id": "story", "prompt": "Once upon a time", "checks": [{"id": "completion-present", "kind": "nonempty"}]}
+{"id": "dog", "prompt": "The little dog", "checks": [{"id": "completion-present", "kind": "nonempty"}]}
+{"id": "sun", "prompt": "The sun was", "checks": [{"id": "completion-present", "kind": "nonempty"}]}

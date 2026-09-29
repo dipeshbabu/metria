@@ -86,17 +86,22 @@ def prepare_llamacpp_build_recipe(
     return recipe
 
 
-def _qualify_providers(recipe: StudyRecipe, paths: Sequence[Path]) -> None:
+def qualify_cpu_providers(
+    recipe: StudyRecipe,
+    paths: Sequence[Path],
+    *,
+    providers: Mapping[str, str] | None = None,
+) -> None:
     """Retain each real qualification immediately, including failed attempts."""
     from .verification import _evidence_gaps, _write_atomic
 
-    pins = recipe.environment[PROVIDERS_KEY]
+    pins = recipe.environment[PROVIDERS_KEY] if providers is None else providers
     for role, run, output in zip(
         ("reference", "candidate"), recipe.study.runs, paths, strict=True
     ):
         pin = pins[run.runtime["bin_dir"]]
         record = execute_run(
-            study_name="llamacpp-build-provider-qualification",
+            study_name="llamacpp-capture-provider-qualification",
             run_id=role,
             spec=run,
             adapter=LlamaCppAdapter(),
@@ -142,7 +147,7 @@ def prepare_build_command(args: Any, stdout: TextIO) -> int:
     if args.policy is not None:
         recipe = replace(recipe, policy=policy_from_data(_json(_read(args.policy))))
     output.parent.mkdir(parents=True, exist_ok=True)
-    _qualify_providers(recipe, qualifications)
+    qualify_cpu_providers(recipe, qualifications)
     _write_atomic(output, study_recipe_to_json(recipe) + "\n")
     stdout.write(f"Prepared {output}\nRecipe: {study_recipe_digest(recipe)}\n")
     stdout.write("Both provider qualification records are saved beside the recipe.\n")

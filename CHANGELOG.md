@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added controlled GGUF Q8_0 preparation and verification with pinned native
+  conversion, observed tensor storage, unchanged tokenizer/model controls,
+  retained failure evidence, task checks and explicit policy decisions.
+
 - Added installed preparation and strict verification for independently pinned
   llama.cpp CPU builds, preserving model/workload controls, provider capture
   qualification records, task policies and method-aware latency reporting.

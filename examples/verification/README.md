@@ -72,7 +72,6 @@ their unsupported routes. They are planning templates, not runnable support clai
 |---|---|---|
 | Runtime upgrade | pinned vLLM build A / pinned build B | Separate qualified environments, immutable model/tokenizer, matching generation/workload/hardware, and a verifier route that executes both builds. |
 | KV-cache precision | auto cache / FP8 cache | Qualified hardware/engine support plus authoritative applied-cache readback and compatible systems measurement. |
-| Quantization/inference treatment | reference configuration / declared candidate treatment | Qualified treatment application and unchanged unrelated controls; no guessed or relabeled precision. |
 
 Do not enable a template merely because a fixture passes or a runtime imports.
 The public CLI stays narrow until the new route meets its evidence contract.
@@ -86,7 +85,7 @@ and summary after preparing an appropriate runner and recipe.
 The 0.2 development verifier also supports a pinned local vLLM prefix-cache change.
 Use [vllm-prefix-workload.jsonl](vllm-prefix-workload.jsonl) and the
 [preparation/verification guide](../../docs/guides/vllm-prefix-verification.md).
-Runtime upgrades, FP8 KV precision and quantization examples remain staged.
+Runtime upgrades and FP8 KV precision remain staged.
 
 ## llama.cpp build regression
 
@@ -96,3 +95,12 @@ generation settings and thread counts fixed. The
 [build guide](../../docs/guides/llamacpp-build-verification.md) provides the installed
 commands. [Retained native evidence](../../artifacts/qualification/llamacpp-builds/README.md)
 includes both provider qualification records and a completed policy decision.
+
+## GGUF weight quantization
+
+Use `metria recipe prepare-gguf-quantization` for the qualified CPU Q8_0 path.
+It pins the native quantizer, preserves model/tokenizer controls, observes actual
+tensor storage and qualifies both model/provider combinations before verification.
+The [guide](../../docs/guides/gguf-quantization-verification.md) includes installed
+commands and the [native qualification](../../artifacts/qualification/gguf-q8-quantization/README.md)
+retains the conversion receipt, run records and explicit policy result.

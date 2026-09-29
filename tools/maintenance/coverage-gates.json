@@ -49,7 +49,12 @@
     "src/metria/verification_build.py": 85,
     "src/metria/runtimes/llamacpp_qualified.py": 85,
     "src/metria/preparation_cpu.py": 85,
-    "src/metria/measurements/checked_trajectory.py": 85
+    "src/metria/measurements/checked_trajectory.py": 85,
+    "src/metria/runtimes/gguf_identity.py": 85,
+    "src/metria/runtimes/llamacpp_quantized.py": 90,
+    "src/metria/verification_quantization.py": 85,
+    "src/metria/verification_evidence.py": 95,
+    "src/metria/preparation_quantization.py": 85
   },
   "components": {
     "src/metria/integrations/turboquant_diagnostics.py": 90,

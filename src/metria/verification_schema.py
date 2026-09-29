@@ -6,3 +6,4 @@ VERIFICATION_ROLES = ("reference", "candidate")
 
 VLLM_VERIFICATION_SCOPE = "local_vllm_prefix_cache.v1"
 LLAMACPP_BUILD_SCOPE = "local_llamacpp_cpu_builds.v1"
+GGUF_QUANTIZATION_SCOPE = "local_llamacpp_gguf_quantization.v1"
