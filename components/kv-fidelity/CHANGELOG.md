@@ -12,7 +12,7 @@ milestones. The standalone 0.3.5 publication plan is retired.
 
 ---
 
-## Included in Metria 0.2.0
+## Included in Metria 0.1.2
 
 - The implementation and packaged assets now live in `metria.fidelity` and ship
   in the Metria wheel. `metria fidelity` exposes the retained expert commands.
@@ -31,7 +31,7 @@ milestones. The standalone 0.3.5 publication plan is retired.
   archive/member hashes through Metria's shared artifact API. Cached defaults
   are verified before use; unsafe, oversized, or unexpected archive entries
   are rejected before promotion. JSON reports retain input artifact provenance.
-  The source-only compatibility bridge now requires the stable Metria 0.2 line.
+  The source-only compatibility bridge now requires the stable Metria 0.1.2 line.
 
 - Removed the unnecessary Accelerate dependency from the optional benchmark
   stack to address GHSA-4j2p-28q2-5m79, which has no patched release.

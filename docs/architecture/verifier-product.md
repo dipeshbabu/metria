@@ -46,7 +46,7 @@ retains the same result and stable exit codes.
 
 This delivery has explicit limits:
 
-- The 0.2 development line also qualifies a [local vLLM prefix-cache comparison](../guides/vllm-prefix-verification.md),
+- Metria 0.1.2 also qualifies a [local vLLM prefix-cache comparison](../guides/vllm-prefix-verification.md),
   backed by retained installed-wheel CPU/CUDA evidence. That scope does not
   qualify runtime upgrades, FP8 precision, or arbitrary vLLM recipes.
 - Independently qualified [llama.cpp CPU builds](../guides/llamacpp-build-verification.md)

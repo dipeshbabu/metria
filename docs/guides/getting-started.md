@@ -11,7 +11,7 @@ model download. They are labeled test evidence and do not qualify a real runtime
 Install the unified package with Python 3.10–3.14:
 
 ```bash
-python -m pip install metria==0.2.0
+python -m pip install metria==0.1.2
 ```
 
 For a real comparison, follow the [local llama.cpp guide](metria-verify.md) to
@@ -31,10 +31,10 @@ must meet numeric or exact criteria. Metria does not choose universal behavior o
 safety thresholds. Use the [CI guide](verification-ci.md) to run the same check in
 code review and retain artifacts on failure.
 
-Metria 0.2 also supports scoped build/quantization comparisons,
+Metria 0.1.2 also supports scoped build/quantization comparisons,
 [vLLM prefix-cache verification](vllm-prefix-verification.md), isolated CPU
 runtime upgrades, and [local serving measurements](serving-measurements.md).
-The [release notes](../releases/0.2.0.md) list qualified boundaries and deferred
+The [release notes](../releases/0.1.2.md) list qualified boundaries and deferred
 FP8 work. The same package includes [unified fidelity tools](unified-fidelity.md)
 and [pilot decision records](verifier-pilot.md).
 

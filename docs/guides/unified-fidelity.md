@@ -1,11 +1,11 @@
 # Fidelity methods in one Metria installation
 
-Metria 0.2 includes KV Fidelity's implementation, bundled prompts and report
+Metria 0.1.2 includes KV Fidelity's implementation, bundled prompts and report
 examples. Install one public distribution and use the `metria` CLI. Metria 0.1.1
-retains its original command surface; upgrade to 0.2 for the unified tools.
+retains its original command surface; upgrade to 0.1.2 for the unified tools.
 
 ```bash
-python -m pip install metria==0.2.0
+python -m pip install metria==0.1.2
 metria verify --help
 metria fidelity --help
 metria fidelity score --help

@@ -40,7 +40,7 @@ classifiers = [
 
 # Shared artifact/comparison infrastructure comes from the stdlib-only Metria core.
 # Backend extras opt into the libraries needed by each inference engine.
-dependencies = ["metria>=0.2.0,<0.3"]
+dependencies = ["metria>=0.1.2,<0.2"]
 
 [project.optional-dependencies]
 mlx = [

@@ -44,7 +44,7 @@ uses neither `continue-on-error` nor shell constructs that replace a failed exit
 status. Add your controlled runtime/model provisioning before verification and
 enable a pull-request trigger only for an appropriate runner and workload.
 
-For an external repository, pin `metria==0.2.0` or an immutable Metria source
+For an external repository, pin `metria==0.1.2` or an immutable Metria source
 revision and copy the small summary adapter with the workflow. Use the matching
 recipe profile and explicit runtime/model pins on the controlled runner.
 

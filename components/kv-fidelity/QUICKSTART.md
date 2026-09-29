@@ -49,7 +49,7 @@ Metal, fail-loud (any single broken axis tanks the composite). Replaces
 KV Fidelity methods ship in the single `metria` package:
 
 ```bash
-python -m pip install metria==0.2.0
+python -m pip install metria==0.1.2
 metria fidelity --help
 ```
 

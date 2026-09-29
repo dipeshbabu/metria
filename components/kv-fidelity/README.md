@@ -10,10 +10,10 @@ full-precision reference.
 
 ## Install
 
-KV Fidelity ships through Metria 0.2. Install the unified public package:
+KV Fidelity ships through Metria 0.1.2. Install the unified public package:
 
 ```bash
-python -m pip install metria==0.2.0
+python -m pip install metria==0.1.2
 metria fidelity --help
 ```
 

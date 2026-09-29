@@ -1,9 +1,9 @@
 # From installation to an inference-change decision
 
-Install Metria 0.2 with Python 3.10–3.14:
+Install Metria 0.1.2 with Python 3.10–3.14:
 
 ```bash
-python -m pip install metria==0.2.0
+python -m pip install metria==0.1.2
 ```
 
 The same package includes verification, fidelity methods and pilot records.

@@ -37,7 +37,7 @@ Python callers can use `measure_invocation_performance()` and
 `RunRecord`/`MeasurementResult` objects. These functions reuse retained runtime
 evidence and do not schedule another inference workload.
 
-The 0.2 [vLLM prefix-cache profile](vllm-prefix-verification.md) uses the distinct
+The Metria 0.1.2 [vLLM prefix-cache profile](vllm-prefix-verification.md) uses the distinct
 `metria.runtime_call_latency` method after engine loading, with explicit cache
 isolation, warmup and repetitions. Its values are not method-compatible with the
 llama.cpp cold-process metric described above.

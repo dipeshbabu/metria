@@ -1,7 +1,7 @@
 # Separate drift, task checks and systems impact
 
 Token disagreement detects a behavioral change. It does not establish that an
-answer became worse. The 0.2 vLLM workload can retain deterministic task checks,
+answer became worse. The Metria 0.1.2 vLLM workload can retain deterministic task checks,
 reference-repeatability evidence and compatible latency alongside trajectories.
 `metria.verification_impact` version `1` keeps these results separate.
 

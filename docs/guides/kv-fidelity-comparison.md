@@ -2,11 +2,11 @@
 
 `metria fidelity compare` uses Metria's `RunRecord`, `ComparisonPlan`, and
 `compare_runs` APIs. It checks retained evidence before treating report scores as
-directly comparable. KV Fidelity ships in Metria 0.2; the standalone publication
+directly comparable. KV Fidelity ships in Metria 0.1.2; the standalone publication
 plan is retired.
 
 ```bash
-python -m pip install metria==0.2.0
+python -m pip install metria==0.1.2
 metria fidelity compare run-a.json run-b.json --json-out comparison.json
 ```
 

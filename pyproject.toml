@@ -4,7 +4,7 @@
 
 [project]
 name = "metria"
-version = "0.2.0"
+version = "0.1.2"
 description = "Verify reference-vs-candidate LLM inference changes with reproducible evidence."
 readme = "README.md"
 license = "Apache-2.0"

@@ -1,6 +1,6 @@
 # Verify a local llama.cpp CPU thread change
 
-This guide covers the llama.cpp CPU profile. Metria 0.2 also
+This guide covers the llama.cpp CPU profile. Metria 0.1.2 also
 supports a [qualified vLLM prefix-cache profile](vllm-prefix-verification.md)
 through the same `metria verify` command, lifecycle and report schema.
 
@@ -115,7 +115,7 @@ rejected before execution. See the [verification contract](../architecture/verif
 | `INSUFFICIENT_EVIDENCE` | Required model/provider identity, runtime readback, or token captures are absent or inconsistent with the request. |
 | `EXECUTION_FAILED` | Execution, timeout, interruption, or behavioral analysis prevented completion. |
 
-In Metria 0.2, exit status is `0` for `VERIFIED` or `PASS`, `1` for
+In Metria 0.1.2, exit status is `0` for `VERIFIED` or `PASS`, `1` for
 policy `FAIL`, `2` for invalid input/configuration, `3` for `NOT_COMPARABLE`, `4`
 for `INSUFFICIENT_EVIDENCE`, `5` for execution/preflight or persistence failure,
 and `130` for interruption. See [CI integration](verification-ci.md) for
@@ -155,7 +155,7 @@ The JSON manifest uses `metria.verification.v1` and records the scoped contract,
 recipe digest, run/evidence digests, hardware evidence, observed facts, comparison
 issues, analysis identity, diagnostics, and process wall-time method.
 
-In Metria 0.2, `verification.json` is the canonical result and
+In Metria 0.1.2, `verification.json` is the canonical result and
 `report.md` is a deterministic projection of it. The report leads with the
 verdict and separates Change, Evidence, Comparison, Impact, and Verdict.
 `lifecycle.status`, `comparison_status`, and `policy_status` distinguish execution

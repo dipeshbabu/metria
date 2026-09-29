@@ -3,7 +3,7 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
-## 0.2.0
+## 0.1.2
 
 - Added `metria pilot record` to bind workload decisions, setup friction and
   separately identified participant feedback to checked verification evidence.
@@ -45,7 +45,7 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 - Unify KV Fidelity's implementation, prompt assets and report tools under
   `metria.fidelity` and `metria fidelity`. Retire separate KV package publication;
   keep source-only compatibility imports and preserved report/method identities.
-- Promote the unified 0.2 line to a public release version, update installation
+- Release the unified implementation as 0.1.2, update installation
   and migration guidance, and pin README/release-note links so they work on PyPI
   and GitHub Releases. Retained native evidence states its exact source/wheel
   identity; FP8 hardware qualification and actual participant feedback remain open.
