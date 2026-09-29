@@ -59,3 +59,7 @@ Each bundle retains native token trajectories, finished-request observations,
 stream chunk counts and timing offsets, observed concurrency, reset evidence,
 native memory receipts, method/version identities and workload hashes. Comparison
 requires matching methods, units, complete coverage and fixed controls.
+
+The [retained CPU/CUDA qualification](../../artifacts/qualification/vllm-serving/README.md)
+uses the installed wheel and the existing GTX 1650 with automatic cache dtype.
+It does not qualify FP8 or represent external participant feedback.

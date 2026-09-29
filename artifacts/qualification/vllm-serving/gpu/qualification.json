@@ -1,0 +1,16 @@
+{
+  "schema": "metria.serving_qualification.v1",
+  "source_revision": "48ec730100903b969c8000333c24a6ef75129d7e",
+  "metria_version": "0.2.0.dev0",
+  "metria_wheel_sha256": "f2be41887bf7de15df54f86731a1c2ee1f9e459c32e5897d00f82b48083934dc",
+  "verdict": "PASS",
+  "exit_code": 0,
+  "runtime_version": "0.30.0+cu129",
+  "mode": "gpu",
+  "limitations": [
+    "Tiny-model maintainer contract qualification, not external pilot feedback or a production benchmark.",
+    "Native AsyncLLM API timing excludes HTTP/network overhead, startup, resets and client admission waiting.",
+    "Decode timing is available only if every native streamed chunk contains one token.",
+    "Memory is the native worker PyTorch allocator peak and allocated KV tensor storage, not device-wide or live KV usage."
+  ]
+}

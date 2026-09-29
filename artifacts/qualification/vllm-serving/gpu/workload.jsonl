@@ -1,0 +1,2 @@
+{"id": "story", "prompt": "Once upon a time", "checks": [{"id": "present", "kind": "nonempty"}]}
+{"id": "dog", "prompt": "The little dog", "checks": [{"id": "present", "kind": "nonempty"}]}

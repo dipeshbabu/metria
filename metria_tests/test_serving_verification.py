@@ -345,3 +345,35 @@ def test_serving_measurements_reject_mismatched_identity_and_workloads(
         not row["available"]
         for row in compare_serving(left, changed, True)["metrics"].values()
     )
+
+
+@pytest.mark.parametrize("mode", ["cpu", "gpu"])
+def test_retained_native_serving_evidence_reproduces_current_metrics(mode):
+    import hashlib
+    import json
+    from pathlib import Path
+
+    from metria.recipes import load_study_recipe
+
+    root = Path(__file__).parents[1] / "artifacts/qualification/vllm-serving"
+    hashes = json.loads((root / "sha256.json").read_text())
+    for name, digest in hashes.items():
+        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
+    case = root / mode
+    recipe = load_study_recipe(case / "study.json")
+    records = [
+        load_run_record(case / f"verification/{role}.run.json")
+        for role in ("reference", "candidate")
+    ]
+    for record in records:
+        assert not evidence_gaps(
+            record,
+            runtime_pin=recipe.environment["vllm_distribution_sha256"],
+            config=recipe.measurement_configs[TokenTrajectoryProtocol.name],
+        )
+    current = compare_serving(*records, True)
+    projected = json.loads((case / "current-projection.json").read_text())
+    assert current == projected["performance"]
+    assert current["metrics"]["allocated_kv_bytes"]["available"] is (mode == "gpu")
+    assert current["metrics"]["ttft_seconds"]["available"] is True
+    assert "ttft_seconds" not in current["unsupported_metrics"]
