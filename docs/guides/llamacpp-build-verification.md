@@ -1,6 +1,6 @@
 # Verify a llama.cpp build change
 
-Metria's 0.2 development CLI compares two independently qualified CPU capture
+Metria's 0.2 CLI compares two independently qualified CPU capture
 providers with the same immutable GGUF, workload, generation settings and thread
 counts. Only the provider directory and its binary identities may vary. This
 scope does not qualify GPU offload, different model files or arbitrary runtime

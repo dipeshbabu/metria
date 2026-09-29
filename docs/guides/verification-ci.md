@@ -12,7 +12,7 @@ llama.cpp CPU thread workflow described in [the verification guide](metria-verif
 
 ## Stable exit codes
 
-The development version distinguishes these outcomes:
+Metria distinguishes these outcomes:
 
 | Exit | Outcome |
 |---|---|
@@ -44,9 +44,9 @@ uses neither `continue-on-error` nor shell constructs that replace a failed exit
 status. Add your controlled runtime/model provisioning before verification and
 enable a pull-request trigger only for an appropriate runner and workload.
 
-The source checkout must contain the current development features. For an external
-repository, pin the Metria source revision you install and copy the small summary
-adapter with the workflow. Do not assume the published 0.1.0 wheel has these features.
+For an external repository, pin `metria==0.2.0` or an immutable Metria source
+revision and copy the small summary adapter with the workflow. Use the matching
+recipe profile and explicit runtime/model pins on the controlled runner.
 
 `tools/ci/write_verification_summary.py` is a thin provider adapter around canonical
 JSON. Core verification does not inspect GitHub environment variables. Other CI

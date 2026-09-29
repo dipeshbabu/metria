@@ -1,6 +1,6 @@
 # Performance impact within verification
 
-The development verifier reports a method-identified performance delta only
+The verifier reports a method-identified performance delta only
 after the reference/candidate comparison and required evidence gates pass.
 The first measurement is **cold-process request latency** for local llama.cpp:
 the adapter's monotonic duration includes process startup, model loading, prompt

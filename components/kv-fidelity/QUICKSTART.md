@@ -46,9 +46,14 @@ Metal, fail-loud (any single broken axis tanks the composite). Replaces
 
 ### Unified installation
 
-KV Fidelity methods are part of Metria's 0.2 development line. Use the checkout
-instructions below until that Metria version is published, then use the single
-`metria` package. The root `metria fidelity` command provides the expert method
+KV Fidelity methods ship in the single `metria` package:
+
+```bash
+python -m pip install metria==0.2.0
+metria fidelity --help
+```
+
+The root `metria fidelity` command provides the expert method
 tools; `metria verify` remains the qualified reference/candidate workflow.
 See the [migration guide](../../docs/guides/unified-fidelity.md).
 
@@ -66,16 +71,17 @@ uv sync --locked --all-packages
 uv run metria fidelity --help
 ```
 
-Every later command (`metria fidelity ...`) assumes you installed
-the component and are running from `components/kv-fidelity/`.
+Commands accept explicit model and output paths. Examples using repository-relative
+model or research paths assume a checkout containing those inputs.
 
 The llamacpp backend needs compatible patched binaries on `PATH` /
 `LD_LIBRARY_PATH`, or in the directory named by `LLAMA_CPP_BIN_DIR`. The source
 used for the cited TurboQuant experiments is a
 [historical fork whose public URL is unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks).
 
-The standard vLLM adapter runs on CUDA / ROCm, but new installations are
-paused until upstream publishes a build compatible with patched PyTorch.
+Use a separately installed, pinned vLLM environment from the
+[qualification guide](../../docs/guides/vllm-qualification.md). The root package
+does not choose an engine installation or qualify every expert scoring axis.
 Fork-specific TurboQuant schemes require the
 [historical vLLM implementation](../../docs/reference/historical-forks.md#vllm-experimental-forks),
 which does not currently have a public source URL.
@@ -87,7 +93,7 @@ for the in-container patches that image needs).
 
 ## Prereqs
 
-Once KV Fidelity is installed and you're inside `components/kv-fidelity/`, you need:
+For the expert scoring examples, you need:
 
   - Python 3.10 through 3.14
   - One of:

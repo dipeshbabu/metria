@@ -1,6 +1,6 @@
 # Verification acceptance policies
 
-The development version of Metria supports optional, user-defined acceptance
+Metria 0.2 supports optional, user-defined acceptance
 policies. Published Metria 0.1.0 reports `VERIFIED` when comparison and analysis
 complete; it does not evaluate these policies. Use the current workspace for this
 feature until the next root release is published.

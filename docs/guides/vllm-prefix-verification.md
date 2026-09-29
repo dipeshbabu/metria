@@ -1,6 +1,6 @@
 # Verify a vLLM prefix-cache change
 
-The Metria 0.2 development line supports a local reference with prefix caching
+The Metria 0.2 line supports a local reference with prefix caching
 disabled and a candidate with it enabled. Both use the same pinned model,
 tokenizer, installed vLLM content, generation settings, workload, and device.
 This is a sequential offline comparison with greedy plain completion, one device,

@@ -12,24 +12,22 @@ and evaluates the result against your explicit acceptance criteria.
 
 **Test inference changes before you ship them.**
 
-The current end-to-end CLI verifies a local llama.cpp CPU thread-count change.
-It holds the pinned model, qualified capture provider, prompt workload, and other
-settings fixed, checks native readback, and retains both runs with a reviewable
-report. The Python runtime adapters and research components support additional
-building blocks; their presence does not establish a qualified CLI workflow.
+Metria 0.2 (Alpha) verifies scoped llama.cpp CPU configuration, build and GGUF Q8_0
+changes, plus pinned vLLM prefix-cache, CPU runtime-upgrade and local serving
+concurrency changes. Each profile checks its native evidence and fixed controls,
+then retains both runs and a reviewable report. FP8 qualification awaits a
+supported GPU; arbitrary runtime recipes are not implicitly qualified.
 
 ## Start with one change
 
-For the current development features, install a checkout with Python 3.10–3.14:
+Install the unified package with Python 3.10–3.14:
 
 ```bash
-git clone https://github.com/dipeshbabu/metria.git
-cd metria
-python -m pip install .
+python -m pip install metria==0.2.0
 ```
 
 Prepare the pinned runtime, model, and reference/candidate recipe using the
-[local verification guide](docs/guides/metria-verify.md), then run:
+[local verification guide](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/metria-verify.md), then run:
 
 ```bash
 metria verify study.json --output verification --json
@@ -38,30 +36,30 @@ metria verify study.json --output verification --json
 The root Python package has no runtime dependencies. Native engines and models
 are installed separately. Each output directory must be new.
 
-Published [Metria 0.1.1](https://github.com/dipeshbabu/metria/releases/tag/metria-v0.1.1)
-includes canonical results, diagnostics, explicit policies, compatible performance
-deltas, and CI integration. The 0.2 development checkout also unifies fidelity
-methods under `metria.fidelity` and `metria fidelity`; see the
-[migration guide](docs/guides/unified-fidelity.md). It also provides
-[qualified vLLM prefix-cache verification](docs/guides/vllm-prefix-verification.md)
-with retained CPU/CUDA evidence, cache isolation and loaded-engine latency.
+[Metria 0.2](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/releases/0.2.0.md) includes canonical results, diagnostics,
+explicit policies, compatible systems measurements and CI integration. Fidelity
+methods use `metria.fidelity` and `metria fidelity`; see the
+[migration guide](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/unified-fidelity.md).
 
-In the 0.2 development checkout, try the report flow without a model:
+Try the report flow without a model:
 
 ```bash
-uv run metria demo --case pass --output demo-pass
-uv run metria recipe prepare-vllm --help
+metria demo --case pass --output demo-pass
+metria recipe prepare-vllm --help
+metria recipe prepare-vllm-serving --help
 ```
 
-The demo is explicitly synthetic. Use the [installed workflow](docs/guides/installed-workflow.md)
+The demo is explicitly synthetic. Use the [installed workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/installed-workflow.md)
 for your own pinned runtime/model and workload, then add
-[task checks and an acceptance policy](docs/guides/verification-decisions.md).
+[task checks and an acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/verification-decisions.md).
 
-Start with the [copyable workflows](examples/verification/README.md): a qualified
+Start with the [copyable workflows](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/examples/verification/README.md): a qualified
 local configuration change, synthetic PASS/FAIL/invalid-comparison fixtures,
-and clearly staged templates for runtime upgrades, KV precision, quantization,
-and build regressions. Synthetic examples require no model or GPU and are
-labeled as test evidence throughout.
+plus pinned runtime-upgrade, quantization and build comparisons. FP8 precision
+remains staged. Synthetic examples require no model or GPU and are labeled as
+test evidence throughout. The [pilot workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/verifier-pilot.md)
+records task acceptance and keep/reject decisions separately from participant
+feedback.
 
 ## Read the decision
 
@@ -96,17 +94,17 @@ undeclared tokenizer or generation change prevents comparison.
 The first behavioral method is KV Fidelity-compatible token-trajectory analysis.
 It reports prefix agreement, exact matches, first-divergence positions, category
 rates, and prompt identifiers that help locate drift without dumping prompt text.
-See [behavioral diagnostics](docs/guides/metria-trajectory-measurement.md).
+See [behavioral diagnostics](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/metria-trajectory-measurement.md).
 
 Systems measurements have distinct boundaries: llama.cpp cold-process latency,
 loaded-engine vLLM request latency, and
-[local serving measurements](docs/guides/serving-measurements.md) for streaming,
+[local serving measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/serving-measurements.md) for streaming,
 concurrency and native CUDA allocator/KV storage. Reports retain method, workload,
 coverage and limitations; missing native measurements remain unavailable.
-See [performance evidence](docs/guides/verification-performance.md).
+See [performance evidence](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/verification-performance.md).
 
 `VERIFIED` means valid comparison and completed analysis. Add an
-[explicit acceptance policy](docs/guides/verification-policies.md) for PASS/FAIL.
+[explicit acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/verification-policies.md) for PASS/FAIL.
 Metria supplies no universal behavior or safety threshold; PASS means your stated
 criteria were met after the evidence gates passed.
 
@@ -119,9 +117,9 @@ Run the same command as a job step and preserve its exit status:
   run: metria verify .metria/change.json --output metria-verification --json
 ```
 
-The [CI guide](docs/guides/verification-ci.md) defines distinct failure exits,
+The [CI guide](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/verification-ci.md) defines distinct failure exits,
 retained artifacts, and a GitHub Actions summary adapter. The
-[copyable workflow](examples/verification/github-actions.yml) keeps the report
+[copyable workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/examples/verification/github-actions.yml) keeps the report
 and records even when verification fails. A real CI workload needs the same
 qualified runtime/model provisioning as local use.
 
@@ -135,7 +133,7 @@ qualified runtime/model provisioning as local use.
 | KV Fidelity | Independently versioned behavioral methodology/component consumed by Metria's verification path |
 | TurboQuant Reference | Portable research/reference implementation with its own lifecycle |
 
-See [runtime qualification](docs/guides/runtime-qualification.md). A mocked
+See [runtime qualification](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/runtime-qualification.md). A mocked
 contract test, installed engine, or visible GPU is not a real-engine qualification.
 New routes must prove their identity, requested change, and required captures.
 
@@ -147,10 +145,10 @@ The product decision is tracked in [#50](https://github.com/dipeshbabu/metria/is
 
 ## Supporting APIs and repository
 
-Use the [recipe CLI](docs/guides/metria-recipe-cli.md),
-[inspection guide](docs/guides/metria-inspection.md), and
-[saved-record comparison](docs/guides/metria-run-records.md) to prepare or debug
-a verification. The [core architecture](docs/architecture/metria-core.md) documents
+Use the [recipe CLI](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/metria-recipe-cli.md),
+[inspection guide](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/metria-inspection.md), and
+[saved-record comparison](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/guides/metria-run-records.md) to prepare or debug
+a verification. The [core architecture](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/architecture/metria-core.md) documents
 the reusable study/run/evidence machinery behind that workflow.
 
 `src/metria/` owns verification and shared evidence contracts.
@@ -158,7 +156,7 @@ the reusable study/run/evidence machinery behind that workflow.
 `components/turboquant-reference/` owns the research reference implementation.
 Current guidance lives in `docs/`; dated investigations in `research/`; retained
 evidence in `artifacts/`. Historical results keep their original scope and known
-gaps under the [provenance policy](docs/maintainers/third-party-material.md).
+gaps under the [provenance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/docs/maintainers/third-party-material.md).
 
 For development:
 
@@ -168,9 +166,9 @@ uv run pre-commit install
 uv run python -m pytest
 ```
 
-See [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and
-[Support](SUPPORT.md). Cite [CITATION.cff](CITATION.cff) and the specific retained
+See [Contributing](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/CONTRIBUTING.md), [Governance](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/GOVERNANCE.md), and
+[Support](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/SUPPORT.md). Cite [CITATION.cff](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/CITATION.cff) and the specific retained
 report when relying on an experimental result.
 
-Original software uses Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Original software uses Apache-2.0; see [LICENSE](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/LICENSE) and [NOTICE](https://github.com/dipeshbabu/metria/blob/metria-v0.2.0/NOTICE).
 Third-party/model-derived material retains its separately documented rights.
