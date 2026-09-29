@@ -1,0 +1,21 @@
+{
+  "schema": "metria.quantization_qualification.v1",
+  "source_revision": "3eedaaa75ff6b5c33b27ebef7afbeb96c364cabb",
+  "metria_version": "0.2.0.dev0",
+  "metria_wheel_sha256": "fbe8e51646a63f471216f0ddfb3bff9606bf921ac724e44ced01db26f98dc832",
+  "source_model_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+  "candidate_model_sha256": "ff8701a45da28293b7af11a695ab33575b692e9b109a2eae6238c906c31415da",
+  "candidate_model_size_bytes": 379168,
+  "quantizer_sha256": "7b890eb928d55e96fb2b4d4b5e9a456be853f924de7f9d61a0ad7fab83359c91",
+  "provider_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+  "native_source_revision": "434ddbbc0e30522e897670681e503b797c12b7c1",
+  "capture_patch_sha256": "75eb5872101ab933c192355c93acdc4126cb5e70f5f928aee04f555bb36f6997",
+  "verdict": "PASS",
+  "exit_code": 0,
+  "limitations": [
+    "Tiny-model maintainer contract qualification, not external pilot feedback or a production performance benchmark.",
+    "The strict sampled-trajectory and completion-presence policy was fixed before this run; a policy failure is retained as evidence.",
+    "The candidate contains mixed tensor storage; no all-tensors-eight-bit or runtime-memory-saving claim.",
+    "Model weights remain outside the repository; hashes and the native conversion receipt identify the actual artifacts."
+  ]
+}

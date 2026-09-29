@@ -58,3 +58,8 @@ Interpret drift, declared task-check outcomes and compatible cold-process latenc
 separately. A policy PASS applies only to your checks and workload. The default
 comparison alone cannot establish answer quality, useful memory savings at
 runtime, or a production performance improvement.
+
+The [retained installed-wheel qualification](../../artifacts/qualification/gguf-q8-quantization/README.md)
+includes the actual conversion receipt, both probes, run records and a policy
+declared before execution. It passed on the tiny pinned workload; its scope and
+limitations are recorded alongside the original evidence.

@@ -26,5 +26,6 @@ git -C "$workspace/source" apply "$script_dir/llamacpp-capture.patch"
     -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF \
     -DGGML_BACKEND_DL=OFF -DGGML_OPENMP=OFF -DLLAMA_CURL=OFF \
     -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
-"$cmake_bin" --build "$workspace/build" --target llama-completion -j 2
+"$cmake_bin" --build "$workspace/build" --target llama-completion llama-quantize -j 2
 echo "Capture provider: $workspace/build/bin/llama-completion"
+echo "Quantizer: $workspace/build/bin/llama-quantize"

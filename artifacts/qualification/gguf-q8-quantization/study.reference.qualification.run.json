@@ -1,0 +1,403 @@
+{
+  "record": {
+    "artifacts": [],
+    "events": [
+      {
+        "kind": "supported",
+        "stage": "preflight"
+      },
+      {
+        "kind": "completed",
+        "stage": "launch"
+      },
+      {
+        "kind": "completed",
+        "stage": "measurement"
+      },
+      {
+        "kind": "completed",
+        "stage": "observe"
+      },
+      {
+        "kind": "completed",
+        "stage": "close"
+      }
+    ],
+    "evidence": {
+      "measurements": {
+        "kv_fidelity.decode_time_trajectory": {
+          "method": "kv_fidelity.decode_time_trajectory",
+          "method_version": "0.3.4",
+          "n_prompts": 1,
+          "prompts": [
+            {
+              "category": null,
+              "id": "capture-probe",
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+              "token_count": 1,
+              "token_ids": [
+                432
+              ]
+            }
+          ],
+          "schema": "metria.trajectory_capture.v1"
+        }
+      }
+    },
+    "metrics": {
+      "trajectory_mean_steps": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "descriptive",
+          "method": "kv_fidelity.decode_time_trajectory",
+          "name": "trajectory_mean_steps",
+          "unit": "tokens",
+          "version": "0.3.4"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_id": "capture-probe",
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+            },
+            "value": 1.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 1.0
+      },
+      "trajectory_nonempty_capture_rate": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "descriptive",
+          "method": "kv_fidelity.decode_time_trajectory",
+          "name": "trajectory_nonempty_capture_rate",
+          "unit": "fraction",
+          "version": "0.3.4"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_id": "capture-probe",
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+            },
+            "value": 1.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 1.0
+      }
+    },
+    "observed": {
+      "closed": false,
+      "configured": {
+        "kv_cache": {
+          "attention_rotation_disable": null,
+          "attention_rotation_k": null,
+          "attention_rotation_v": null,
+          "key_dtype": "f16",
+          "value_dtype": "f16"
+        }
+      },
+      "environment": {
+        "llama_cpp_token_ids_capture_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42"
+      },
+      "identity": {
+        "applied": {
+          "fields": {
+            "chat_template_applied": false,
+            "context": 256,
+            "threads": 2,
+            "threads_batch": 1,
+            "vocab_size": 512
+          },
+          "invocation_count": 1,
+          "source": "qualified_runtime_capture",
+          "status": "partial"
+        },
+        "chat_template": {
+          "mode": "disabled",
+          "source": "qualified_runtime_capture",
+          "status": "verified"
+        },
+        "endpoint": {},
+        "model": {
+          "mtime_ns": 1789016105532409418,
+          "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+          "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+          "size_bytes": 1185376,
+          "source": "verified_local_file_sha256",
+          "status": "verified"
+        },
+        "reasons": [
+          "llama.cpp tokenizer identity is embedded in the model and not independently inspected",
+          "only context, thread counts, vocabulary size and template mode were read back"
+        ],
+        "runtime": {
+          "cli_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+          "completion_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+          "name": "llamacpp",
+          "source": "resolved_binary_content_hash",
+          "status": "verified"
+        },
+        "schema": "metria.runtime_identity.v1",
+        "status": "partial",
+        "tokenizer": {
+          "source": "embedded_in_model_uninspected",
+          "status": "unknown"
+        }
+      },
+      "invocations": [
+        {
+          "argv": [
+            "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+            "-m",
+            "/var/tmp/metria-local-verification/stories260K.gguf",
+            "-p",
+            "<redacted>",
+            "-n",
+            "1",
+            "-c",
+            "256",
+            "-ngl",
+            "0",
+            "--seed",
+            "42",
+            "--temp",
+            "0.0",
+            "-no-cnv",
+            "--no-display-prompt",
+            "-fa",
+            "off",
+            "-ctk",
+            "f16",
+            "-ctv",
+            "f16",
+            "-t",
+            "2",
+            "-tb",
+            "1"
+          ],
+          "binary": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "capture": "token_ids",
+          "duration_seconds": 0.015494599999996694,
+          "generation": {
+            "chat_template": false,
+            "context": 256,
+            "max_tokens": 1,
+            "reasoning": "off",
+            "seed": 42,
+            "temperature": 0.0,
+            "timeout": 300.0
+          },
+          "managed_env": {},
+          "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+          "returncode": 0,
+          "runtime_capture": {
+            "chat_template_applied": false,
+            "context": 256,
+            "schema": "metria.llamacpp_capture.v1",
+            "threads": 2,
+            "threads_batch": 1,
+            "vocab_size": 512
+          },
+          "system_sha256": null,
+          "token_capture_observed": true
+        }
+      ],
+      "model": {
+        "mtime_ns": 1789016105532409418,
+        "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+        "requested_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+        "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+        "size_bytes": 1185376
+      },
+      "reset_count": 0,
+      "runtime": {
+        "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+        "cli": {
+          "mtime_ns": 1790634255782231470,
+          "path": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+          "size_bytes": 10435008
+        },
+        "completion": {
+          "mtime_ns": 1790634255782231470,
+          "path": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+          "size_bytes": 10435008
+        },
+        "extra_args": [],
+        "flash_attention": false,
+        "n_gpu_layers": 0,
+        "name": "llamacpp",
+        "threads": 2,
+        "threads_batch": 1
+      }
+    },
+    "provenance": {
+      "capabilities": {
+        "allowed": true,
+        "blocking": [],
+        "capabilities": {
+          "model.geometry": {
+            "evidence": {
+              "source": "requested_model_metadata"
+            },
+            "reasons": [
+              "model.geometry was not provided"
+            ],
+            "status": "unknown"
+          }
+        },
+        "checks": {
+          "turboquant.kv_cache.geometry": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          }
+        }
+      },
+      "environment": {
+        "llama_cpp_token_ids_capture_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42"
+      },
+      "executor": {
+        "name": "metria.execute_run",
+        "version": "1"
+      },
+      "measurement": {
+        "name": "kv_fidelity.decode_time_trajectory",
+        "version": "0.3.4"
+      },
+      "preflight": {
+        "captures": {
+          "evidence": {
+            "captures": {
+              "token_ids": {
+                "expected_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+                "observed_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+                "probe_evidence_key": "token_ids_capture",
+                "probe_marker": "binary_present_unverified",
+                "qualification": "sha256",
+                "status": "supported"
+              }
+            },
+            "mechanism": "runtime_probe_evidence"
+          },
+          "reasons": [],
+          "required": [
+            {
+              "kind": "token_ids",
+              "options": {}
+            }
+          ],
+          "status": "supported"
+        },
+        "evidence": {
+          "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+          "llama_cli": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "llama_completion": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "model": "/var/tmp/metria-local-verification/stories260K.gguf",
+          "n_gpu_layers": 0,
+          "runtime": "llamacpp",
+          "token_ids_capture": "binary_present_unverified"
+        },
+        "reasons": [],
+        "status": "supported"
+      }
+    },
+    "requested": {
+      "environment_selector": {},
+      "measurements": [
+        "kv_fidelity.decode_time_trajectory"
+      ],
+      "model": {
+        "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+        "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+      },
+      "runtime": {
+        "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+        "flash_attention": false,
+        "n_gpu_layers": 0,
+        "name": "llamacpp",
+        "threads": 2,
+        "threads_batch": 1
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 256,
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0.0,
+        "timeout": 300
+      },
+      "treatments": [],
+      "trial_policy": {}
+    },
+    "resolved": {
+      "kv_cache": {
+        "attention_rotation_disable": null,
+        "attention_rotation_k": null,
+        "attention_rotation_v": null,
+        "key_dtype": "f16",
+        "value_dtype": "f16"
+      },
+      "model": {
+        "mtime_ns": 1789016105532409418,
+        "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+        "requested_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+        "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+        "size_bytes": 1185376
+      },
+      "runtime": {
+        "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+        "cli": {
+          "mtime_ns": 1790634255782231470,
+          "path": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+          "size_bytes": 10435008
+        },
+        "completion": {
+          "mtime_ns": 1790634255782231470,
+          "path": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+          "sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+          "size_bytes": 10435008
+        },
+        "extra_args": [],
+        "flash_attention": false,
+        "n_gpu_layers": 0,
+        "name": "llamacpp",
+        "threads": 2,
+        "threads_batch": 1
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 256,
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0.0,
+        "timeout": 300
+      },
+      "support": {
+        "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+        "llama_cli": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+        "llama_completion": "/var/tmp/metria-build-regression-163/candidate/bin/llama-completion",
+        "model": "/var/tmp/metria-local-verification/stories260K.gguf",
+        "n_gpu_layers": 0,
+        "runtime": "llamacpp",
+        "token_ids_capture": "binary_present_unverified"
+      }
+    },
+    "run_id": "reference",
+    "status": "completed",
+    "study_name": "llamacpp-capture-provider-qualification"
+  },
+  "schema": "metria.run_record.v1"
+}

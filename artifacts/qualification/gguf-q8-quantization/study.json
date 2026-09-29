@@ -1,0 +1,204 @@
+{
+  "environment": {
+    "gguf_quantization": {
+      "candidate": {
+        "gguf": {
+          "architecture": "llama",
+          "controls_sha256": "4362f4aa39936f9810d14124783d5031030d197667a11984c72377888fbd5033",
+          "file_type": 7,
+          "format": "GGUFv3-little-endian",
+          "quantization_version": 2,
+          "schema": "metria.gguf_identity.v1",
+          "tensor_count": 48,
+          "tensor_layout_sha256": "bb8c7ed6bbacf55978da704d0a8d5ffc593efd75858aff1dcb910c4b5cafb869",
+          "tensor_types": {
+            "F16": 5,
+            "F32": 11,
+            "Q8_0": 32
+          },
+          "tokenizer_sha256": "5555fa42cb550ac64d5d66614ceb346167443ea3e86ac2c22c06c4235d87154f",
+          "vocab_size": 512
+        },
+        "sha256": "ff8701a45da28293b7af11a695ab33575b692e9b109a2eae6238c906c31415da"
+      },
+      "format": "Q8_0",
+      "quantizer_sha256": "7b890eb928d55e96fb2b4d4b5e9a456be853f924de7f9d61a0ad7fab83359c91",
+      "schema": "metria.gguf_quantization.v1",
+      "source": {
+        "gguf": {
+          "architecture": "llama",
+          "controls_sha256": "4362f4aa39936f9810d14124783d5031030d197667a11984c72377888fbd5033",
+          "file_type": null,
+          "format": "GGUFv3-little-endian",
+          "quantization_version": null,
+          "schema": "metria.gguf_identity.v1",
+          "tensor_count": 48,
+          "tensor_layout_sha256": "bb8c7ed6bbacf55978da704d0a8d5ffc593efd75858aff1dcb910c4b5cafb869",
+          "tensor_types": {
+            "F32": 48
+          },
+          "tokenizer_sha256": "5555fa42cb550ac64d5d66614ceb346167443ea3e86ac2c22c06c4235d87154f",
+          "vocab_size": 512
+        },
+        "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+      }
+    },
+    "llama_cpp_token_ids_capture_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42"
+  },
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "prompts": [
+        {
+          "checks": [
+            {
+              "id": "completion-present",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "story",
+          "prompt": "Once upon a time"
+        },
+        {
+          "checks": [
+            {
+              "id": "completion-present",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "dog",
+          "prompt": "The little dog"
+        },
+        {
+          "checks": [
+            {
+              "id": "completion-present",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "sun",
+          "prompt": "The sun was"
+        }
+      ]
+    }
+  },
+  "policy": {
+    "criteria": [
+      {
+        "min": 1.0,
+        "target": "quality.candidate_pass_rate",
+        "unit": "fraction",
+        "version": "1"
+      },
+      {
+        "min": 0.99,
+        "target": "behavior.trajectory_agreement",
+        "unit": "fraction",
+        "version": "0.3.4"
+      }
+    ],
+    "schema": "metria.verification_policy.v1"
+  },
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "comparison": {
+      "analyses": [
+        "kv_fidelity.trajectory_match",
+        "metria.verification_impact"
+      ],
+      "block_by": [],
+      "control": [
+        "measurements",
+        "observed.gguf.controls_sha256",
+        "observed.gguf.tensor_layout_sha256",
+        "observed.gguf.tokenizer_sha256",
+        "runtime",
+        "scenario"
+      ],
+      "vary": [
+        "model.path",
+        "model.sha256",
+        "observed.gguf.file_type",
+        "observed.gguf.quantization_version",
+        "observed.gguf.tensor_types",
+        "observed.identity.model.mtime_ns",
+        "observed.identity.model.path",
+        "observed.identity.model.sha256",
+        "observed.identity.model.size_bytes",
+        "observed.model.mtime_ns",
+        "observed.model.path",
+        "observed.model.requested_sha256",
+        "observed.model.sha256",
+        "observed.model.size_bytes",
+        "resolved.gguf.file_type",
+        "resolved.gguf.quantization_version",
+        "resolved.gguf.tensor_types",
+        "resolved.model.mtime_ns",
+        "resolved.model.path",
+        "resolved.model.requested_sha256",
+        "resolved.model.sha256",
+        "resolved.model.size_bytes"
+      ]
+    },
+    "constants": {},
+    "metadata": {},
+    "name": "llamacpp-gguf-q8-weight-change",
+    "runs": [
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "path": "/var/tmp/metria-local-verification/stories260K.gguf",
+          "sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d"
+        },
+        "runtime": {
+          "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+          "flash_attention": false,
+          "n_gpu_layers": 0,
+          "name": "llamacpp",
+          "threads": 2,
+          "threads_batch": 1
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 256,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0,
+          "timeout": 300
+        },
+        "treatments": [],
+        "trial_policy": {}
+      },
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "path": "/var/tmp/metria-quantization-162/qualification/candidate.gguf",
+          "sha256": "ff8701a45da28293b7af11a695ab33575b692e9b109a2eae6238c906c31415da"
+        },
+        "runtime": {
+          "bin_dir": "/var/tmp/metria-build-regression-163/candidate/bin",
+          "flash_attention": false,
+          "n_gpu_layers": 0,
+          "name": "llamacpp",
+          "threads": 2,
+          "threads_batch": 1
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 256,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0,
+          "timeout": 300
+        },
+        "treatments": [],
+        "trial_policy": {}
+      }
+    ]
+  }
+}

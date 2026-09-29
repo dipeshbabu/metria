@@ -1,0 +1,733 @@
+{
+  "acceptance_policy_evaluated": true,
+  "analyses": [
+    {
+      "diagnostics": {
+        "all_trajectories_match": true,
+        "comparison_steps": 48,
+        "divergence": {
+          "by_category": [],
+          "compared_prompts": 3,
+          "diverged_prompts": 0,
+          "divergence_rate": 0.0,
+          "earliest_first_divergence": null,
+          "exact_match_rate": 1.0,
+          "exact_matches": 3,
+          "first_divergence_positions": [],
+          "length_mismatches": 0,
+          "mean_prefix_steps": 16.0,
+          "median_first_divergence": null,
+          "most_divergent": [],
+          "n_prompts": 3,
+          "position_origin": 0,
+          "ranking": "prefix_fraction_ascending,first_divergence_ascending,id_ascending",
+          "schema": "metria.trajectory_divergence.v1",
+          "status": "complete",
+          "top_limit": 10,
+          "unavailable_prompts": 0,
+          "uncategorized_prompts": 3
+        },
+        "mean_candidate_steps": 16.0,
+        "mean_reference_steps": 16.0,
+        "median_first_divergence": null,
+        "method": "kv_fidelity.trajectory_match",
+        "method_version": "0.3.4",
+        "n_prompts": 3,
+        "notes": [],
+        "per_prompt": [
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": null,
+            "id": "story",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": null,
+            "id": "dog",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": null,
+            "id": "sun",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "90d36f2f24070bbb5b70c041118703503d994b20ac227d26a2d6bb56bcd1e7b4",
+            "reference_steps": 16
+          }
+        ],
+        "prefix_agreement_steps": 48,
+        "schema": "metria.trajectory_comparison.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "trajectory_agreement_score": {
+          "aggregation": "weighted_by_max_trajectory_length",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_agreement_score",
+            "unit": "score_0_100",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "sun",
+                "prompt_sha256": "90d36f2f24070bbb5b70c041118703503d994b20ac227d26a2d6bb56bcd1e7b4"
+              },
+              "value": 100.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 100.0
+        },
+        "trajectory_divergence_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_divergence_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "sun",
+                "prompt_sha256": "90d36f2f24070bbb5b70c041118703503d994b20ac227d26a2d6bb56bcd1e7b4"
+              },
+              "value": 0.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.0
+        },
+        "trajectory_full_match_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_full_match_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "sun",
+                "prompt_sha256": "90d36f2f24070bbb5b70c041118703503d994b20ac227d26a2d6bb56bcd1e7b4"
+              },
+              "value": 1.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "trajectory_mean_prefix_steps": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "descriptive",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_mean_prefix_steps",
+            "unit": "tokens",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "sun",
+                "prompt_sha256": "90d36f2f24070bbb5b70c041118703503d994b20ac227d26a2d6bb56bcd1e7b4"
+              },
+              "value": 16.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 16.0
+        }
+      },
+      "name": "kv_fidelity.trajectory_match",
+      "reason": null,
+      "status": "completed",
+      "version": "0.3.4"
+    },
+    {
+      "diagnostics": {
+        "method": "metria.verification_impact",
+        "method_version": "1",
+        "performance": {
+          "absolute_delta": -0.00043803333333395506,
+          "available": true,
+          "candidate": 0.019024033333333062,
+          "direction": "improved",
+          "limitations": "One cold invocation per prompt; no statistical speedup claim.",
+          "methodology": {
+            "aggregation": "arithmetic mean across prompts",
+            "clock": "monotonic",
+            "isolation": "fresh process per prompt",
+            "sample_count": 3,
+            "scope": "process startup, model loading, prompt evaluation and generation",
+            "source": "llamacpp.observed.invocations.duration_seconds",
+            "trials_per_prompt": 1,
+            "warmup_trials": 0,
+            "workload_sha256": "3d48121293a2be70631615f8456474f73930be0fb986cc153361325a9de5a22d"
+          },
+          "metric": {
+            "direction": "lower_is_better",
+            "method": "metria.llamacpp_process_request_latency",
+            "name": "request_latency_seconds",
+            "unit": "seconds",
+            "version": "1"
+          },
+          "reference": 0.019462066666667017,
+          "relative_baseline_floor_seconds": 1e-09,
+          "relative_delta": -0.022507030771001392,
+          "relative_unavailable_reason": null,
+          "schema": "metria.performance_impact.v1",
+          "unsupported_metrics": [
+            "ttft",
+            "inter_token_latency",
+            "decode_throughput",
+            "peak_device_memory",
+            "kv_memory"
+          ]
+        },
+        "quality": {
+          "candidate_passed": 3,
+          "check_count_per_role": 3,
+          "configured_prompts": 3,
+          "failed_candidate_checks": [],
+          "reference_passed": 3,
+          "status": "available",
+          "total_prompts": 3,
+          "workload_sha256": "ef5e5a2b19ed360b712f5b91daac7af24900aaa8f84b99e9b7f08a2fa713b6f0"
+        },
+        "reference_variability": {
+          "reason": "at least two retained reference trials per prompt are required",
+          "status": "unavailable"
+        },
+        "schema": "metria.verification_impact.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "candidate_latency_seconds": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.compatible_latency_impact",
+            "name": "candidate_latency_seconds",
+            "unit": "seconds",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.019024033333333062
+        },
+        "candidate_task_pass_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "candidate_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "latency_ratio": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.compatible_latency_impact",
+            "name": "latency_ratio",
+            "unit": "ratio",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.9774929692289986
+        },
+        "reference_task_pass_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "reference_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "task_pass_rate_delta": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "task_pass_rate_delta",
+            "unit": "fraction_delta",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.0
+        }
+      },
+      "name": "metria.verification_impact",
+      "reason": null,
+      "status": "completed",
+      "version": "1"
+    }
+  ],
+  "change": {
+    "candidate": {
+      "F16": 5,
+      "F32": 11,
+      "Q8_0": 32
+    },
+    "format": "Q8_0",
+    "parameter": "model.weight_storage",
+    "reference": {
+      "F32": 48
+    }
+  },
+  "comparison": {
+    "comparable_metrics": [
+      "task_check_pass_rate",
+      "trajectory_mean_steps",
+      "trajectory_nonempty_capture_rate"
+    ],
+    "compatible": true,
+    "incompatible_metrics": {},
+    "issues": [],
+    "waived_differences": []
+  },
+  "comparison_plan": {
+    "block_by": [],
+    "control": [
+      "measurements",
+      "observed.gguf.controls_sha256",
+      "observed.gguf.tensor_layout_sha256",
+      "observed.gguf.tokenizer_sha256",
+      "runtime",
+      "scenario"
+    ],
+    "vary": [
+      "model.path",
+      "model.sha256",
+      "observed.gguf.file_type",
+      "observed.gguf.quantization_version",
+      "observed.gguf.tensor_types",
+      "observed.identity.model.mtime_ns",
+      "observed.identity.model.path",
+      "observed.identity.model.sha256",
+      "observed.identity.model.size_bytes",
+      "observed.model.mtime_ns",
+      "observed.model.path",
+      "observed.model.requested_sha256",
+      "observed.model.sha256",
+      "observed.model.size_bytes",
+      "resolved.gguf.file_type",
+      "resolved.gguf.quantization_version",
+      "resolved.gguf.tensor_types",
+      "resolved.model.mtime_ns",
+      "resolved.model.path",
+      "resolved.model.requested_sha256",
+      "resolved.model.sha256",
+      "resolved.model.size_bytes"
+    ]
+  },
+  "comparison_status": "VALID",
+  "controls": [
+    {
+      "dimension": "measurements",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "observed.gguf.controls_sha256",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "observed.gguf.tensor_layout_sha256",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "observed.gguf.tokenizer_sha256",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "runtime",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "scenario",
+      "role": "control",
+      "status": "matched"
+    }
+  ],
+  "exit_code": 0,
+  "hardware": {
+    "accelerators": [],
+    "host": {
+      "cpu_count": 12,
+      "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+    },
+    "metadata": {
+      "accelerator_detection": "runtime_or_adapter_required"
+    },
+    "platform": {
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "release": "5.15.167.4-microsoft-standard-WSL2",
+      "system": "Linux",
+      "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+    },
+    "software": {
+      "python_executable": "python",
+      "python_implementation": "CPython",
+      "python_version": "3.12.3"
+    }
+  },
+  "implementation": {
+    "name": "metria.verify",
+    "source_sha256": "3ae85ed6a43305db4234256ccaeb5392e98beebccb7a8363d0102dde8398e3dd",
+    "version": "0.2.0.dev0"
+  },
+  "lifecycle": {
+    "records": {
+      "candidate": "completed",
+      "reference": "completed"
+    },
+    "status": "completed"
+  },
+  "performance": {
+    "absolute_delta": -0.00043803333333395506,
+    "available": true,
+    "candidate": 0.019024033333333062,
+    "direction": "improved",
+    "limitations": "One cold invocation per prompt; no statistical speedup claim.",
+    "methodology": {
+      "aggregation": "arithmetic mean across prompts",
+      "clock": "monotonic",
+      "isolation": "fresh process per prompt",
+      "sample_count": 3,
+      "scope": "process startup, model loading, prompt evaluation and generation",
+      "source": "llamacpp.observed.invocations.duration_seconds",
+      "trials_per_prompt": 1,
+      "warmup_trials": 0,
+      "workload_sha256": "3d48121293a2be70631615f8456474f73930be0fb986cc153361325a9de5a22d"
+    },
+    "metric": {
+      "direction": "lower_is_better",
+      "method": "metria.llamacpp_process_request_latency",
+      "name": "request_latency_seconds",
+      "unit": "seconds",
+      "version": "1"
+    },
+    "reference": 0.019462066666667017,
+    "relative_baseline_floor_seconds": 1e-09,
+    "relative_delta": -0.022507030771001392,
+    "relative_unavailable_reason": null,
+    "schema": "metria.performance_impact.v1",
+    "unsupported_metrics": [
+      "ttft",
+      "inter_token_latency",
+      "decode_throughput",
+      "peak_device_memory",
+      "kv_memory"
+    ]
+  },
+  "policy": {
+    "criteria": [
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "quality.candidate_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {
+          "aggregation": "mean",
+          "analysis": {
+            "name": "metria.verification_impact",
+            "version": "1"
+          },
+          "coverage": 1.0,
+          "metric": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "candidate_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "raw_value": 1.0
+        },
+        "observed_value": 1.0,
+        "reason": null,
+        "result": "PASS",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "quality.candidate_pass_rate",
+          "source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "candidate_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "min": 0.99,
+          "target": "behavior.trajectory_agreement",
+          "unit": "fraction",
+          "version": "0.3.4"
+        },
+        "observed_source": {
+          "aggregation": "weighted_by_max_trajectory_length",
+          "analysis": {
+            "name": "kv_fidelity.trajectory_match",
+            "version": "0.3.4"
+          },
+          "coverage": 1.0,
+          "metric": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_agreement_score",
+            "unit": "score_0_100",
+            "version": "0.3.4"
+          },
+          "raw_value": 100.0
+        },
+        "observed_value": 1.0,
+        "reason": null,
+        "result": "PASS",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "behavior.trajectory_agreement",
+          "source": {
+            "aggregation": "weighted_by_max_trajectory_length",
+            "analysis": {
+              "name": "kv_fidelity.trajectory_match",
+              "version": "0.3.4"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "kv_fidelity.trajectory_match",
+              "name": "trajectory_agreement_score",
+              "unit": "score_0_100",
+              "version": "0.3.4"
+            },
+            "normalization_divisor": 100.0
+          },
+          "unit": "fraction",
+          "version": "0.3.4"
+        }
+      }
+    ],
+    "gate": "VERIFIED",
+    "policy_schema": "metria.verification_policy.v1",
+    "schema": "metria.policy_evaluation.v1",
+    "status": "PASS"
+  },
+  "policy_status": "PASS",
+  "recipe_digest": "face5af93c5136e52dd3d8f702edbd0a8a491529eba5927100b5b4f914a6d4fb",
+  "records": {
+    "candidate": {
+      "evidence_digest": "f3a3f87726d8c98713f95370446f2c68e81ac5622d6e6cb600fd6f25eeb41c3c",
+      "evidence_gaps": [],
+      "observed": {
+        "chat_template_applied": false,
+        "context": 256,
+        "model_sha256": "ff8701a45da28293b7af11a695ab33575b692e9b109a2eae6238c906c31415da",
+        "provider_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+        "tensor_types": {
+          "F16": 5,
+          "F32": 11,
+          "Q8_0": 32
+        },
+        "threads": 2,
+        "threads_batch": 1,
+        "tokenizer_sha256": "5555fa42cb550ac64d5d66614ceb346167443ea3e86ac2c22c06c4235d87154f",
+        "vocab_size": 512
+      },
+      "path": "candidate.run.json",
+      "record_digest": "24942f633210d88842ef2c2a7e61986ebdbee79a69c61a89a228eb093d63d59b",
+      "run_id": "run-0001",
+      "status": "completed"
+    },
+    "reference": {
+      "evidence_digest": "54ed39e7260ac56f396105dccc42bb0f70a46fe30fe9598a0087019cdbf7ca90",
+      "evidence_gaps": [],
+      "observed": {
+        "chat_template_applied": false,
+        "context": 256,
+        "model_sha256": "270cba1bd5109f42d03350f60406024560464db173c0e387d91f0426d3bd256d",
+        "provider_sha256": "0fe6d5edf465771841c16dcdb52119a61c1a9d7300655f1ca8701dcd11141f42",
+        "tensor_types": {
+          "F32": 48
+        },
+        "threads": 2,
+        "threads_batch": 1,
+        "tokenizer_sha256": "5555fa42cb550ac64d5d66614ceb346167443ea3e86ac2c22c06c4235d87154f",
+        "vocab_size": 512
+      },
+      "path": "reference.run.json",
+      "record_digest": "c0425e807c6032e01100e3a5ab52253ae03313bf8d95e2330eaed30dd96f7c13",
+      "run_id": "run-0000",
+      "status": "completed"
+    }
+  },
+  "schema": "metria.verification.v1",
+  "scope": "local_llamacpp_gguf_quantization.v1",
+  "study": "llamacpp-gguf-q8-weight-change",
+  "systems": {
+    "candidate": {
+      "available": true,
+      "includes": "process startup, model loading, prompt evaluation and generation",
+      "mean_seconds": 0.019024033333333062,
+      "method": "llamacpp.subprocess_monotonic.v1",
+      "samples_seconds": [
+        0.01892790000000133,
+        0.01870050000000134,
+        0.01944369999999651
+      ]
+    },
+    "reference": {
+      "available": true,
+      "includes": "process startup, model loading, prompt evaluation and generation",
+      "mean_seconds": 0.019462066666667017,
+      "method": "llamacpp.subprocess_monotonic.v1",
+      "samples_seconds": [
+        0.01917259999999743,
+        0.018809799999999655,
+        0.02040380000000397
+      ]
+    }
+  },
+  "verdict": "PASS"
+}

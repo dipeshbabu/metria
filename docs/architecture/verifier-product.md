@@ -51,7 +51,10 @@ This delivery has explicit limits:
   qualify runtime upgrades, FP8 precision, or arbitrary vLLM recipes.
 - Independently qualified [llama.cpp CPU builds](../guides/llamacpp-build-verification.md)
   can be compared with the same model, generation, workload and thread controls.
-- Runtime upgrades, KV precision changes, and quantization examples remain
+- A [GGUF Q8_0 weight conversion](../guides/gguf-quantization-verification.md)
+  can be verified on CPU with unchanged tokenizer, model layout, runtime and workload.
+  Reports retain the actual mixed tensor-storage inventory.
+- Runtime upgrades and KV precision changes remain
   [staged templates](../../examples/verification/README.md) until the full intended
   change, observed identity, workload, and comparison path are qualified.
 - TTFT, decode throughput, inter-token latency, and device/KV memory remain

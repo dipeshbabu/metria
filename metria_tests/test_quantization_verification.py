@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import io
 import json
 import os
@@ -541,3 +542,19 @@ def test_unqualified_candidate_inspection_is_not_trusted(quant_case, field, valu
     with pytest.raises(ValueError):
         verify_recipe(recipe, quant_case["output"])
     assert not quant_case["calls"]
+
+
+def test_retained_quantization_evidence_matches_original_files_and_records():
+    from metria.records import load_run_record, run_record_digest
+
+    root = Path(__file__).parents[1] / "artifacts/qualification/gguf-q8-quantization"
+    index = json.loads((root / "files-sha256.json").read_text())
+    for relative, expected in index["files"].items():
+        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
+    assert not list(root.rglob("*.gguf"))
+    result = json.loads((root / "verification/verification.json").read_text())
+    assert result["verdict"] == "PASS"
+    assert result["change"]["candidate"] == {"F16": 5, "F32": 11, "Q8_0": 32}
+    for role in ("reference", "candidate"):
+        record = load_run_record(root / "verification" / f"{role}.run.json")
+        assert run_record_digest(record) == result["records"][role]["record_digest"]
