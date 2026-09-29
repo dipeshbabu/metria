@@ -42,3 +42,13 @@ deployment; output token agreement alone is insufficient.
 Actual participant feedback is still outstanding in
 [issue #159](https://github.com/dipeshbabu/metria/issues/159). Use the
 [pilot protocol](verifier-pilot.md) to collect it with permission.
+
+## Retained results
+
+The [installed-package pilot](../../artifacts/qualification/maintainer-pilot/README.md)
+completed all three native comparisons. Literal tasks passed; representative
+tasks passed only 50% of checks for both roles, and the one-token case passed
+16.7%. Both negative cases failed the unchanged policy despite 100% exact token
+agreement. These results demonstrate why output agreement must remain separate
+from task acceptance. They do not establish external adoption or production
+performance.

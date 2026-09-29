@@ -1,0 +1,3 @@
+Prepared /var/tmp/metria-pilot-159/qualification-attempt2/constrained-generation/study.json
+Recipe: 9603a8622f2c98221b27fe0c574be0caf9c9126d11969e761b4409f4fc10aed1
+Next: metria verify /var/tmp/metria-pilot-159/qualification-attempt2/constrained-generation/study.json --output verification

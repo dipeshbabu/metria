@@ -1,0 +1,993 @@
+{
+  "record": {
+    "artifacts": [],
+    "events": [
+      {
+        "kind": "supported",
+        "stage": "preflight"
+      },
+      {
+        "kind": "completed",
+        "stage": "launch"
+      },
+      {
+        "kind": "completed",
+        "stage": "measurement"
+      },
+      {
+        "kind": "completed",
+        "stage": "observe"
+      },
+      {
+        "kind": "completed",
+        "stage": "close"
+      }
+    ],
+    "evidence": {
+      "measurements": {
+        "kv_fidelity.decode_time_trajectory": {
+          "method": "kv_fidelity.decode_time_trajectory",
+          "method_version": "0.3.4",
+          "n_prompts": 4,
+          "prompts": [
+            {
+              "category": "literal",
+              "id": "0:blue",
+              "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+              "token_count": 2,
+              "token_ids": [
+                16591,
+                2
+              ]
+            },
+            {
+              "category": "literal",
+              "id": "0:green",
+              "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+              "token_count": 2,
+              "token_ids": [
+                9298,
+                2
+              ]
+            },
+            {
+              "category": "literal",
+              "id": "1:blue",
+              "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+              "token_count": 2,
+              "token_ids": [
+                16591,
+                2
+              ]
+            },
+            {
+              "category": "literal",
+              "id": "1:green",
+              "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+              "token_count": 2,
+              "token_ids": [
+                9298,
+                2
+              ]
+            }
+          ],
+          "schema": "metria.trajectory_capture.v1",
+          "task_checks": {
+            "check_count": 4,
+            "checks": [
+              {
+                "check_id": "exact",
+                "definition_sha256": "372933cdfd3da2be89550c07d4871e98c7901521baa90751b251cef129167089",
+                "kind": "exact_text",
+                "output_sha256": "16477688c0e00699c6cfa4497a3612d7e83c532062b64b250fed8908128ed548",
+                "passed": true,
+                "prompt_id": "0:blue",
+                "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193"
+              },
+              {
+                "check_id": "exact",
+                "definition_sha256": "ce59eb76f6ca4407820f3261bfec6d6d32c56f2ee48d46b6cc8d6aa10343a646",
+                "kind": "exact_text",
+                "output_sha256": "ba4788b226aa8dc2e6dc74248bb9f618cfa8c959e0c26c147be48f6839a0b088",
+                "passed": true,
+                "prompt_id": "0:green",
+                "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443"
+              },
+              {
+                "check_id": "exact",
+                "definition_sha256": "372933cdfd3da2be89550c07d4871e98c7901521baa90751b251cef129167089",
+                "kind": "exact_text",
+                "output_sha256": "16477688c0e00699c6cfa4497a3612d7e83c532062b64b250fed8908128ed548",
+                "passed": true,
+                "prompt_id": "1:blue",
+                "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193"
+              },
+              {
+                "check_id": "exact",
+                "definition_sha256": "ce59eb76f6ca4407820f3261bfec6d6d32c56f2ee48d46b6cc8d6aa10343a646",
+                "kind": "exact_text",
+                "output_sha256": "ba4788b226aa8dc2e6dc74248bb9f618cfa8c959e0c26c147be48f6839a0b088",
+                "passed": true,
+                "prompt_id": "1:green",
+                "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443"
+              }
+            ],
+            "configured_prompts": 2,
+            "method": "metria.task_checks",
+            "method_version": "1",
+            "passed": 4,
+            "schema": "metria.task_checks.v1",
+            "status": "available",
+            "total_prompts": 2,
+            "workload_sha256": "cd4e68f5e5dff2fd1d226d0f4f3b571deef9e3ea1896706d1acb635d861f3911"
+          },
+          "workload": {
+            "clock": "perf_counter_ns",
+            "isolation": "public prefix-cache reset before every warmup/measured trial",
+            "measured_trials": 2,
+            "method": "metria.prefix_cache_trials.v1",
+            "samples": [
+              {
+                "cached_tokens": 0,
+                "measured": false,
+                "prompt_index": 0,
+                "prompt_tokens": 82,
+                "seconds": 0.693425403,
+                "trial": -1
+              },
+              {
+                "cached_tokens": 64,
+                "measured": false,
+                "prompt_index": 1,
+                "prompt_tokens": 82,
+                "seconds": 0.190060978,
+                "trial": -1
+              },
+              {
+                "cached_tokens": 0,
+                "measured": true,
+                "prompt_index": 0,
+                "prompt_tokens": 82,
+                "seconds": 0.338502057,
+                "trial": 0
+              },
+              {
+                "cached_tokens": 64,
+                "measured": true,
+                "prompt_index": 1,
+                "prompt_tokens": 82,
+                "seconds": 0.216642886,
+                "trial": 0
+              },
+              {
+                "cached_tokens": 0,
+                "measured": true,
+                "prompt_index": 0,
+                "prompt_tokens": 82,
+                "seconds": 0.334813912,
+                "trial": 1
+              },
+              {
+                "cached_tokens": 64,
+                "measured": true,
+                "prompt_index": 1,
+                "prompt_tokens": 82,
+                "seconds": 0.21364539,
+                "trial": 1
+              }
+            ],
+            "schedule": "sequential prompts in declared order",
+            "timing_boundary": "session.infer call after engine launch",
+            "timing_excludes": [
+              "engine startup",
+              "warmup",
+              "cache reset"
+            ],
+            "warmup_trials": 1
+          }
+        }
+      }
+    },
+    "metrics": {
+      "request_latency_seconds": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "lower_is_better",
+          "method": "metria.runtime_call_latency",
+          "name": "request_latency_seconds",
+          "unit": "seconds",
+          "version": "1"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_index": 0,
+              "trial": 0
+            },
+            "value": 0.338502057
+          },
+          {
+            "metadata": {
+              "prompt_index": 1,
+              "trial": 0
+            },
+            "value": 0.216642886
+          },
+          {
+            "metadata": {
+              "prompt_index": 0,
+              "trial": 1
+            },
+            "value": 0.334813912
+          },
+          {
+            "metadata": {
+              "prompt_index": 1,
+              "trial": 1
+            },
+            "value": 0.21364539
+          }
+        ],
+        "uncertainty": {},
+        "value": 0.27590106125
+      },
+      "task_check_pass_rate": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "higher_is_better",
+          "method": "metria.task_checks",
+          "name": "task_check_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "check_id": "exact",
+              "definition_sha256": "372933cdfd3da2be89550c07d4871e98c7901521baa90751b251cef129167089",
+              "prompt_id": "0:blue"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "check_id": "exact",
+              "definition_sha256": "ce59eb76f6ca4407820f3261bfec6d6d32c56f2ee48d46b6cc8d6aa10343a646",
+              "prompt_id": "0:green"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "check_id": "exact",
+              "definition_sha256": "372933cdfd3da2be89550c07d4871e98c7901521baa90751b251cef129167089",
+              "prompt_id": "1:blue"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "check_id": "exact",
+              "definition_sha256": "ce59eb76f6ca4407820f3261bfec6d6d32c56f2ee48d46b6cc8d6aa10343a646",
+              "prompt_id": "1:green"
+            },
+            "value": 1.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 1.0
+      },
+      "trajectory_mean_steps": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "descriptive",
+          "method": "kv_fidelity.decode_time_trajectory",
+          "name": "trajectory_mean_steps",
+          "unit": "tokens",
+          "version": "0.3.4"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_id": "0:blue",
+              "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193"
+            },
+            "value": 2.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "0:green",
+              "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443"
+            },
+            "value": 2.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "1:blue",
+              "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193"
+            },
+            "value": 2.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "1:green",
+              "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443"
+            },
+            "value": 2.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 2.0
+      },
+      "trajectory_nonempty_capture_rate": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "descriptive",
+          "method": "kv_fidelity.decode_time_trajectory",
+          "name": "trajectory_nonempty_capture_rate",
+          "unit": "fraction",
+          "version": "0.3.4"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_id": "0:blue",
+              "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "0:green",
+              "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "1:blue",
+              "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "1:green",
+              "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443"
+            },
+            "value": 1.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 1.0
+      }
+    },
+    "observed": {
+      "applied": {
+        "fields": {
+          "cache.cache_dtype": "auto",
+          "cache.enable_prefix_caching": true,
+          "cache.gpu_memory_utilization": 0.35,
+          "model.dtype": "torch.float16",
+          "model.max_model_len": 512,
+          "model.model": "/var/tmp/metria-pilot-159/model",
+          "model.revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+          "model.tokenizer": "/var/tmp/metria-pilot-159/model",
+          "model.tokenizer_revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+          "parallel.tensor_parallel_size": 1
+        },
+        "status": "introspected"
+      },
+      "artifacts": {
+        "model": {
+          "files": [
+            {
+              "path": "config.json",
+              "sha256": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+              "size_bytes": 846
+            },
+            {
+              "path": "generation_config.json",
+              "sha256": "87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013",
+              "size_bytes": 132
+            },
+            {
+              "path": "merges.txt",
+              "sha256": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+              "size_bytes": 466391
+            },
+            {
+              "path": "model.safetensors",
+              "sha256": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+              "size_bytes": 723674912
+            },
+            {
+              "path": "special_tokens_map.json",
+              "sha256": "2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52",
+              "size_bytes": 655
+            },
+            {
+              "path": "tokenizer.json",
+              "sha256": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+              "size_bytes": 2104556
+            },
+            {
+              "path": "tokenizer_config.json",
+              "sha256": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df",
+              "size_bytes": 3764
+            },
+            {
+              "path": "vocab.json",
+              "sha256": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79",
+              "size_bytes": 800662
+            }
+          ],
+          "sha256": "0f70a464c0b727a2262f859a1500c72c000a037e2458e35b420b7a0b17cbb3ad",
+          "source": "hashed_local_model_and_tokenizer_payloads",
+          "status": "verified"
+        },
+        "runtime": {
+          "dependencies": {
+            "tokenizers": "0.23.2",
+            "torch": "2.13.0+cu129",
+            "transformers": "5.17.0"
+          },
+          "file_count": 5092,
+          "sha256": "57799343b4a0f0dcf4af8be4c0edb6837d5d04c806024bbe2b4a4d014dc199ad",
+          "source": "hashed_installed_vllm_wheel_and_dependency_versions",
+          "status": "verified",
+          "version": "0.30.0+cu129"
+        }
+      },
+      "cleanup": {},
+      "closed": false,
+      "configured": {
+        "kv_cache": {
+          "dtype": "auto"
+        },
+        "runtime": {
+          "dtype": "float16",
+          "enable_prefix_caching": true,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.35,
+          "max_model_len": 512,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false
+        }
+      },
+      "environment": {
+        "verification_timeout_s": 900.0,
+        "vllm_distribution_sha256": "57799343b4a0f0dcf4af8be4c0edb6837d5d04c806024bbe2b4a4d014dc199ad"
+      },
+      "hardware": {
+        "capacity_bytes": 4294639616,
+        "compute_capability": [
+          7,
+          5
+        ],
+        "cuda_runtime": "12.9",
+        "device_type": "cuda",
+        "logical_device": 0,
+        "name": "NVIDIA GeForce GTX 1650",
+        "source": "vllm_native_platform_and_torch_cuda",
+        "status": "observed",
+        "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893"
+      },
+      "identity": {
+        "applied": {
+          "checked_fields": [
+            "model.max_model_len",
+            "cache.cache_dtype",
+            "cache.gpu_memory_utilization",
+            "cache.enable_prefix_caching",
+            "parallel.tensor_parallel_size"
+          ],
+          "fields": {
+            "cache.cache_dtype": "auto",
+            "cache.enable_prefix_caching": true,
+            "cache.gpu_memory_utilization": 0.35,
+            "model.dtype": "torch.float16",
+            "model.max_model_len": 512,
+            "model.model": "/var/tmp/metria-pilot-159/model",
+            "model.revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+            "model.tokenizer": "/var/tmp/metria-pilot-159/model",
+            "model.tokenizer_revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+            "parallel.tensor_parallel_size": 1
+          },
+          "missing_fields": [],
+          "source": "vllm_engine_introspection",
+          "status": "partial"
+        },
+        "chat_template": {
+          "sha256": "872be49dbb638044ad01b60388f48d469ff2980e5f0dccdc22ec907db54d0788",
+          "source": "tokenizer.chat_template",
+          "status": "verified"
+        },
+        "endpoint": {},
+        "model": {
+          "identifier": "/var/tmp/metria-pilot-159/model",
+          "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+          "source": "vllm.model_config",
+          "status": "verified"
+        },
+        "reasons": [
+          "applied configuration contains only fields exposed by the vLLM engine"
+        ],
+        "runtime": {
+          "distribution_version": "0.30.0+cu129",
+          "local_build_label_source": "distribution_metadata",
+          "module_version": "0.30.0",
+          "name": "vllm",
+          "source": "loaded_module_and_distribution",
+          "status": "verified",
+          "version": "0.30.0+cu129"
+        },
+        "schema": "metria.runtime_identity.v1",
+        "status": "partial",
+        "tokenizer": {
+          "identifier": "/var/tmp/metria-pilot-159/model",
+          "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+          "source": "vllm.model_config_or_tokenizer",
+          "status": "verified"
+        }
+      },
+      "invocations": [
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 32,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 2,
+          "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+          "prompt_tokens": 82,
+          "rendered_prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 64,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 32,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 2,
+          "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+          "prompt_tokens": 82,
+          "rendered_prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 32,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 2,
+          "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+          "prompt_tokens": 82,
+          "rendered_prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 64,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 32,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 2,
+          "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+          "prompt_tokens": 82,
+          "rendered_prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 32,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 2,
+          "prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+          "prompt_tokens": 82,
+          "rendered_prompt_sha256": "e4dd7f498f26d6e2a47aa6cb25e7b826d636073d021b4785de4a1fe50fff4193",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 64,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 32,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 2,
+          "prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+          "prompt_tokens": 82,
+          "rendered_prompt_sha256": "76554a529c9fa160abdecfa58f2c49b7ec5b858bc2cd424f1068c735451c4443",
+          "system_sha256": null
+        }
+      ],
+      "model": {
+        "artifact_files": {
+          "config.json": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+          "generation_config.json": "87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013",
+          "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+          "model.safetensors": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+          "special_tokens_map.json": "2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52",
+          "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+          "tokenizer_config.json": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df",
+          "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+        },
+        "artifacts": {
+          "files": [
+            {
+              "path": "config.json",
+              "sha256": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+              "size_bytes": 846
+            },
+            {
+              "path": "generation_config.json",
+              "sha256": "87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013",
+              "size_bytes": 132
+            },
+            {
+              "path": "merges.txt",
+              "sha256": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+              "size_bytes": 466391
+            },
+            {
+              "path": "model.safetensors",
+              "sha256": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+              "size_bytes": 723674912
+            },
+            {
+              "path": "special_tokens_map.json",
+              "sha256": "2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52",
+              "size_bytes": 655
+            },
+            {
+              "path": "tokenizer.json",
+              "sha256": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+              "size_bytes": 2104556
+            },
+            {
+              "path": "tokenizer_config.json",
+              "sha256": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df",
+              "size_bytes": 3764
+            },
+            {
+              "path": "vocab.json",
+              "sha256": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79",
+              "size_bytes": 800662
+            }
+          ],
+          "sha256": "0f70a464c0b727a2262f859a1500c72c000a037e2458e35b420b7a0b17cbb3ad",
+          "source": "hashed_local_model_and_tokenizer_payloads",
+          "status": "verified"
+        },
+        "model": "/var/tmp/metria-pilot-159/model",
+        "requested_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+        "requested_path": "/var/tmp/metria-pilot-159/model",
+        "requested_tokenizer_id": null,
+        "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+        "source_kind": "local",
+        "tokenizer": "/var/tmp/metria-pilot-159/model",
+        "tokenizer_revision": "a10cc1512eabd3dde888204e902eca88bddb4951"
+      },
+      "reset_count": 3,
+      "reset_events": [
+        {
+          "mode": "public_prefix_cache_reset",
+          "scope": "prefix-cache"
+        },
+        {
+          "mode": "public_prefix_cache_reset",
+          "scope": "prefix-cache"
+        },
+        {
+          "mode": "public_prefix_cache_reset",
+          "scope": "prefix-cache"
+        }
+      ],
+      "runtime": {
+        "name": "vllm",
+        "version": "0.30.0+cu129"
+      }
+    },
+    "provenance": {
+      "capabilities": {
+        "allowed": true,
+        "blocking": [],
+        "capabilities": {
+          "model.geometry": {
+            "evidence": {
+              "source": "requested_model_metadata"
+            },
+            "reasons": [
+              "model.geometry was not provided"
+            ],
+            "status": "unknown"
+          }
+        },
+        "checks": {
+          "turboquant.kv_cache.geometry": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          }
+        }
+      },
+      "environment": {
+        "verification_timeout_s": 900.0,
+        "vllm_distribution_sha256": "57799343b4a0f0dcf4af8be4c0edb6837d5d04c806024bbe2b4a4d014dc199ad"
+      },
+      "executor": {
+        "name": "metria.execute_run",
+        "version": "1"
+      },
+      "measurement": {
+        "name": "kv_fidelity.decode_time_trajectory",
+        "version": "0.3.4"
+      },
+      "preflight": {
+        "captures": {
+          "evidence": {
+            "captures": {
+              "token_ids": {
+                "probe_evidence_key": "token_ids_capture",
+                "probe_marker": "native_output_token_ids",
+                "status": "supported"
+              }
+            },
+            "mechanism": "runtime_probe_evidence"
+          },
+          "reasons": [],
+          "required": [
+            {
+              "kind": "token_ids",
+              "options": {}
+            }
+          ],
+          "status": "supported"
+        },
+        "evidence": {
+          "kv_cache_dtype": "auto",
+          "max_model_len": 512,
+          "requested_runtime_version": "0.30.0+cu129",
+          "runtime": "vllm",
+          "runtime_version": "0.30.0+cu129",
+          "token_ids_capture": "native_output_token_ids",
+          "vllm_version": "0.30.0+cu129"
+        },
+        "reasons": [],
+        "status": "supported"
+      },
+      "verification": {
+        "hardware": {
+          "accelerators": [],
+          "host": {
+            "cpu_count": 12,
+            "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+          },
+          "metadata": {
+            "accelerator_detection": "runtime_or_adapter_required"
+          },
+          "platform": {
+            "machine": "x86_64",
+            "processor": "x86_64",
+            "release": "5.15.167.4-microsoft-standard-WSL2",
+            "system": "Linux",
+            "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+          },
+          "software": {
+            "python_executable": "python",
+            "python_implementation": "CPython",
+            "python_version": "3.12.3"
+          }
+        },
+        "implementation": {
+          "name": "metria.verify",
+          "source_sha256": "1e931cab3ddcf11f0924b8bc51c016cc677f44931b19cb8a17f6ccc8b7abee49",
+          "version": "0.2.0.dev0"
+        },
+        "recipe_digest": "6aac97c1bf34a2f7311fd75a4d5f276e0a6c0f51ad382b4526e8cdd7e1b2cee9",
+        "scope": "local_vllm_prefix_cache.v1"
+      }
+    },
+    "requested": {
+      "environment_selector": {},
+      "measurements": [
+        "kv_fidelity.decode_time_trajectory"
+      ],
+      "model": {
+        "files": {
+          "config.json": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+          "generation_config.json": "87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013",
+          "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+          "model.safetensors": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+          "special_tokens_map.json": "2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52",
+          "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+          "tokenizer_config.json": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df",
+          "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+        },
+        "id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+        "path": "/var/tmp/metria-pilot-159/model",
+        "revision": "a10cc1512eabd3dde888204e902eca88bddb4951"
+      },
+      "runtime": {
+        "dtype": "float16",
+        "enable_prefix_caching": true,
+        "enforce_eager": true,
+        "gpu_memory_utilization": 0.35,
+        "max_model_len": 512,
+        "max_num_seqs": 1,
+        "name": "vllm",
+        "tensor_parallel_size": 1,
+        "trust_remote_code": false,
+        "version": "0.30.0+cu129"
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 512,
+        "max_tokens": 32,
+        "seed": 42,
+        "temperature": 0.0
+      },
+      "treatments": [],
+      "trial_policy": {
+        "isolation": "reset_prefix_cache_before_each_trial",
+        "measured_trials": 2,
+        "method": "metria.prefix_cache_trials.v1",
+        "schedule": "sequential",
+        "warmup_trials": 1
+      }
+    },
+    "resolved": {
+      "kv_cache": {
+        "dtype": "auto"
+      },
+      "model": {
+        "artifact_files": {
+          "config.json": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+          "generation_config.json": "87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013",
+          "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+          "model.safetensors": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+          "special_tokens_map.json": "2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52",
+          "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+          "tokenizer_config.json": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df",
+          "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+        },
+        "artifacts": {
+          "files": [
+            {
+              "path": "config.json",
+              "sha256": "224f72354f10d617a359cc82ad15a3c96e866b9b2ffadb81997eeea9e88e22ee",
+              "size_bytes": 846
+            },
+            {
+              "path": "generation_config.json",
+              "sha256": "87b916edaaab66b3899b9d0dd0752727dff6666686da0504d89ae0a6e055a013",
+              "size_bytes": 132
+            },
+            {
+              "path": "merges.txt",
+              "sha256": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+              "size_bytes": 466391
+            },
+            {
+              "path": "model.safetensors",
+              "sha256": "e6bffe7435d7ddc10fd3b9a9efd429dafbacb1cb17015fb5562664e7532bf86e",
+              "size_bytes": 723674912
+            },
+            {
+              "path": "special_tokens_map.json",
+              "sha256": "2b7379f3ae813529281a5c602bc5a11c1d4e0a99107aaa597fe936c1e813ca52",
+              "size_bytes": 655
+            },
+            {
+              "path": "tokenizer.json",
+              "sha256": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+              "size_bytes": 2104556
+            },
+            {
+              "path": "tokenizer_config.json",
+              "sha256": "4ec77d44f62efeb38d7e044a1db318f6a939438425312dfa333b8382dbad98df",
+              "size_bytes": 3764
+            },
+            {
+              "path": "vocab.json",
+              "sha256": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79",
+              "size_bytes": 800662
+            }
+          ],
+          "sha256": "0f70a464c0b727a2262f859a1500c72c000a037e2458e35b420b7a0b17cbb3ad",
+          "source": "hashed_local_model_and_tokenizer_payloads",
+          "status": "verified"
+        },
+        "model": "/var/tmp/metria-pilot-159/model",
+        "requested_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+        "requested_path": "/var/tmp/metria-pilot-159/model",
+        "requested_tokenizer_id": null,
+        "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+        "source_kind": "local",
+        "tokenizer": "/var/tmp/metria-pilot-159/model",
+        "tokenizer_revision": "a10cc1512eabd3dde888204e902eca88bddb4951"
+      },
+      "runtime": {
+        "artifact": {
+          "dependencies": {
+            "tokenizers": "0.23.2",
+            "torch": "2.13.0+cu129",
+            "transformers": "5.17.0"
+          },
+          "file_count": 5092,
+          "sha256": "57799343b4a0f0dcf4af8be4c0edb6837d5d04c806024bbe2b4a4d014dc199ad",
+          "source": "hashed_installed_vllm_wheel_and_dependency_versions",
+          "status": "verified",
+          "version": "0.30.0+cu129"
+        },
+        "name": "vllm",
+        "requested_version": "0.30.0+cu129",
+        "settings": {
+          "dtype": "float16",
+          "enable_prefix_caching": true,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.35,
+          "max_model_len": 512,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false
+        },
+        "version": "0.30.0+cu129"
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 512,
+        "max_tokens": 32,
+        "seed": 42,
+        "temperature": 0.0
+      },
+      "support": {
+        "kv_cache_dtype": "auto",
+        "max_model_len": 512,
+        "requested_runtime_version": "0.30.0+cu129",
+        "runtime": "vllm",
+        "runtime_version": "0.30.0+cu129",
+        "token_ids_capture": "native_output_token_ids",
+        "vllm_version": "0.30.0+cu129"
+      }
+    },
+    "run_id": "run-0001",
+    "status": "completed",
+    "study_name": "vllm-prefix-cache-change"
+  },
+  "schema": "metria.run_record.v1"
+}

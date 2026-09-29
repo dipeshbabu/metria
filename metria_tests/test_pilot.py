@@ -54,6 +54,7 @@ def test_pilot_decision_binds_original_records_and_report_without_inventing_feed
         ("rationale", 0),
         ("setup_seconds", -1),
         ("setup_seconds", float("inf")),
+        ("setup_seconds", 10**1000),
         ("setup_seconds", True),
         ("would_reuse", "yes"),
         ("permission_to_share", None),
@@ -181,3 +182,50 @@ def test_symlinked_evidence_cannot_escape_bundle(bundle, tmp_path):
         pytest.skip("symlink creation unavailable on this host")
     with pytest.raises(ValueError, match="within"):
         record_pilot(bundle, notes())
+
+
+@pytest.mark.parametrize(
+    "name,verdict,rate",
+    [
+        ("literal-contract", "PASS", 1.0),
+        ("representative-tasks", "FAIL", 0.5),
+        ("constrained-generation", "FAIL", 1 / 6),
+    ],
+)
+def test_retained_native_pilot_decisions_keep_negative_quality_results(
+    name, verdict, rate
+):
+    from pathlib import Path
+
+    from metria.measurements import TokenTrajectoryProtocol
+    from metria.recipes import load_study_recipe
+    from metria.records import load_run_record
+    from metria.verification_evidence import task_check_identity
+    from metria.verification_vllm import evidence_gaps, trial_identity
+
+    root = Path(__file__).parents[1] / "artifacts/qualification/maintainer-pilot"
+    for filename, digest in json.loads((root / "sha256.json").read_text()).items():
+        assert hashlib.sha256((root / filename).read_bytes()).hexdigest() == digest
+    case = root / name
+    saved = json.loads((case / "pilot-record.json").read_text())
+    current = record_pilot(case / "verification", saved["notes"])
+    assert current["notes"] == saved["notes"]
+    assert current["evidence"] == saved["evidence"]
+    assert saved["evidence"]["verification_verdict"] == verdict
+    assert saved["notes"]["kind"] == "maintainer_validation"
+    assert saved["notes"]["would_reuse"] is None
+    recipe = load_study_recipe(case / "study.json")
+    config = recipe.measurement_configs[TokenTrajectoryProtocol.name]
+    for role in ("reference", "candidate"):
+        record = load_run_record(case / f"verification/{role}.run.json")
+        assert not evidence_gaps(
+            record,
+            runtime_pin=recipe.environment["vllm_distribution_sha256"],
+            trials=trial_identity(config),
+            quality_identity=task_check_identity(config, config["measured_trials"]),
+        )
+        assert record.metrics["task_check_pass_rate"].value == rate
+    summary = json.loads((root / "qualification.json").read_text())
+    assert summary["participant_feedback_collected"] is False
+    failure = json.loads((root / "setup-failure/failure.json").read_text())
+    assert failure["exit_code"] == 2 and failure["native_inference_started"] is False

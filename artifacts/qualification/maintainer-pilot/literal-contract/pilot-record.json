@@ -1,0 +1,137 @@
+{
+  "schema": "metria.pilot_record.v1",
+  "recorded_at": "2026-09-29T04:16:15.930521+00:00",
+  "notes": {
+    "kind": "maintainer_validation",
+    "reporter": "automated maintainer validation",
+    "decision": "keep",
+    "rationale": "literal-contract: PASS. Decision applies only to the predeclared task checks and comparison evidence on this machine; no production or external-adoption inference.",
+    "acceptance_criteria": "All reference and candidate task checks must pass, with complete native identity/capture evidence and observed prefix reuse. Exact stripped labels/fields and JSON structure with declared keys are required.",
+    "setup_seconds": 353.395655574,
+    "friction": [
+      "Initial preparation rejected Hub revision-tree cache metadata as payload; the exact metadata-path fix was tested and installed before this retry. The failed attempt is retained separately."
+    ],
+    "would_reuse": null,
+    "permission_to_share": true
+  },
+  "evidence": {
+    "files_sha256": {
+      "verification.json": "50dc0235c1650f7e17d03e1a21d3ab40ec8bc717f40588fe3a064b37a3b9ecd9",
+      "reference.run.json": "4682d027269d346b739403503f535cd85ca993c4c1bddae14412cc78d5ca4d2d",
+      "candidate.run.json": "f67e355a68134dce050e8c3651a4feb3b369367997d88332b6fecfed4439e7bf",
+      "report.md": "59285e5842d68241d96584c52e85d5e84a77ed1f5e0b4b7d4f84b107bb09a0a0"
+    },
+    "recipe_digest": "6aac97c1bf34a2f7311fd75a4d5f276e0a6c0f51ad382b4526e8cdd7e1b2cee9",
+    "scope": "local_vllm_prefix_cache.v1",
+    "verification_verdict": "PASS",
+    "comparison_status": "VALID",
+    "policy": {
+      "criteria": [
+        {
+          "criterion": {
+            "min": 1.0,
+            "target": "quality.reference_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "observed_source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "coverage": 1.0,
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "reference_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "raw_value": 1.0
+          },
+          "observed_value": 1.0,
+          "reason": null,
+          "result": "PASS",
+          "target_identity": {
+            "direction": "higher_is_better",
+            "kind": "number",
+            "name": "quality.reference_pass_rate",
+            "source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "reference_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "normalization_divisor": 1.0
+            },
+            "unit": "fraction",
+            "version": "1"
+          }
+        },
+        {
+          "criterion": {
+            "min": 1.0,
+            "target": "quality.candidate_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "observed_source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "coverage": 1.0,
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "candidate_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "raw_value": 1.0
+          },
+          "observed_value": 1.0,
+          "reason": null,
+          "result": "PASS",
+          "target_identity": {
+            "direction": "higher_is_better",
+            "kind": "number",
+            "name": "quality.candidate_pass_rate",
+            "source": {
+              "aggregation": "mean",
+              "analysis": {
+                "name": "metria.verification_impact",
+                "version": "1"
+              },
+              "metric": {
+                "direction": "higher_is_better",
+                "method": "metria.task_check_comparison",
+                "name": "candidate_task_pass_rate",
+                "unit": "fraction",
+                "version": "1"
+              },
+              "normalization_divisor": 1.0
+            },
+            "unit": "fraction",
+            "version": "1"
+          }
+        }
+      ],
+      "gate": "VERIFIED",
+      "policy_schema": "metria.verification_policy.v1",
+      "schema": "metria.policy_evaluation.v1",
+      "status": "PASS"
+    },
+    "fixture_only": false
+  },
+  "interpretation": "Operator-supplied decision and feedback provenance; hashes bind retained evidence, not independent re-evaluation or proof of external adoption."
+}

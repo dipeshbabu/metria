@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
+import sys
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
@@ -56,8 +56,7 @@ def validate_notes(value: Any) -> dict[str, Any]:
     if (
         isinstance(seconds, bool)
         or not isinstance(seconds, (int, float))
-        or not math.isfinite(seconds)
-        or seconds < 0
+        or not 0 <= seconds <= sys.float_info.max
     ):
         raise ValueError("pilot setup_seconds must be finite and nonnegative")
     if value["would_reuse"] is not None and not isinstance(value["would_reuse"], bool):

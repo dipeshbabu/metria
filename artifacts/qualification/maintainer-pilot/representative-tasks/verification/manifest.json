@@ -1,0 +1,1244 @@
+{
+  "acceptance_policy_evaluated": true,
+  "analyses": [
+    {
+      "diagnostics": {
+        "all_trajectories_match": true,
+        "comparison_steps": 96,
+        "divergence": {
+          "by_category": [
+            {
+              "category": "classification",
+              "diverged_prompts": 0,
+              "divergence_rate": 0.0,
+              "n_prompts": 4
+            },
+            {
+              "category": "extraction",
+              "diverged_prompts": 0,
+              "divergence_rate": 0.0,
+              "n_prompts": 4
+            },
+            {
+              "category": "structured-output",
+              "diverged_prompts": 0,
+              "divergence_rate": 0.0,
+              "n_prompts": 4
+            }
+          ],
+          "compared_prompts": 12,
+          "diverged_prompts": 0,
+          "divergence_rate": 0.0,
+          "earliest_first_divergence": null,
+          "exact_match_rate": 1.0,
+          "exact_matches": 12,
+          "first_divergence_positions": [],
+          "length_mismatches": 0,
+          "mean_prefix_steps": 8.0,
+          "median_first_divergence": null,
+          "most_divergent": [],
+          "n_prompts": 12,
+          "position_origin": 0,
+          "ranking": "prefix_fraction_ascending,first_divergence_ascending,id_ascending",
+          "schema": "metria.trajectory_divergence.v1",
+          "status": "complete",
+          "top_limit": 10,
+          "unavailable_prompts": 0,
+          "uncategorized_prompts": 0
+        },
+        "mean_candidate_steps": 8.0,
+        "mean_reference_steps": 8.0,
+        "median_first_divergence": null,
+        "method": "kv_fidelity.trajectory_match",
+        "method_version": "0.3.4",
+        "n_prompts": 12,
+        "notes": [],
+        "per_prompt": [
+          {
+            "candidate_steps": 2,
+            "category": "classification",
+            "first_divergence": null,
+            "id": "0:positive",
+            "matched": true,
+            "prefix_agreement_steps": 2,
+            "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc",
+            "reference_steps": 2
+          },
+          {
+            "candidate_steps": 2,
+            "category": "classification",
+            "first_divergence": null,
+            "id": "0:negative",
+            "matched": true,
+            "prefix_agreement_steps": 2,
+            "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e",
+            "reference_steps": 2
+          },
+          {
+            "candidate_steps": 13,
+            "category": "extraction",
+            "first_divergence": null,
+            "id": "0:order-id",
+            "matched": true,
+            "prefix_agreement_steps": 13,
+            "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785",
+            "reference_steps": 13
+          },
+          {
+            "candidate_steps": 2,
+            "category": "extraction",
+            "first_divergence": null,
+            "id": "0:day",
+            "matched": true,
+            "prefix_agreement_steps": 2,
+            "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da",
+            "reference_steps": 2
+          },
+          {
+            "candidate_steps": 11,
+            "category": "structured-output",
+            "first_divergence": null,
+            "id": "0:status-json",
+            "matched": true,
+            "prefix_agreement_steps": 11,
+            "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57",
+            "reference_steps": 11
+          },
+          {
+            "candidate_steps": 18,
+            "category": "structured-output",
+            "first_divergence": null,
+            "id": "0:ticket-json",
+            "matched": true,
+            "prefix_agreement_steps": 18,
+            "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce",
+            "reference_steps": 18
+          },
+          {
+            "candidate_steps": 2,
+            "category": "classification",
+            "first_divergence": null,
+            "id": "1:positive",
+            "matched": true,
+            "prefix_agreement_steps": 2,
+            "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc",
+            "reference_steps": 2
+          },
+          {
+            "candidate_steps": 2,
+            "category": "classification",
+            "first_divergence": null,
+            "id": "1:negative",
+            "matched": true,
+            "prefix_agreement_steps": 2,
+            "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e",
+            "reference_steps": 2
+          },
+          {
+            "candidate_steps": 13,
+            "category": "extraction",
+            "first_divergence": null,
+            "id": "1:order-id",
+            "matched": true,
+            "prefix_agreement_steps": 13,
+            "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785",
+            "reference_steps": 13
+          },
+          {
+            "candidate_steps": 2,
+            "category": "extraction",
+            "first_divergence": null,
+            "id": "1:day",
+            "matched": true,
+            "prefix_agreement_steps": 2,
+            "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da",
+            "reference_steps": 2
+          },
+          {
+            "candidate_steps": 11,
+            "category": "structured-output",
+            "first_divergence": null,
+            "id": "1:status-json",
+            "matched": true,
+            "prefix_agreement_steps": 11,
+            "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57",
+            "reference_steps": 11
+          },
+          {
+            "candidate_steps": 18,
+            "category": "structured-output",
+            "first_divergence": null,
+            "id": "1:ticket-json",
+            "matched": true,
+            "prefix_agreement_steps": 18,
+            "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce",
+            "reference_steps": 18
+          }
+        ],
+        "prefix_agreement_steps": 96,
+        "schema": "metria.trajectory_comparison.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "trajectory_agreement_score": {
+          "aggregation": "weighted_by_max_trajectory_length",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_agreement_score",
+            "unit": "score_0_100",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "0:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "0:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "0:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "1:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "1:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "1:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 100.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 100.0
+        },
+        "trajectory_divergence_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_divergence_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "0:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "0:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "0:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "1:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "1:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "1:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 0.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.0
+        },
+        "trajectory_full_match_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_full_match_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "0:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "0:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "0:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "1:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "1:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "1:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 1.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "trajectory_mean_prefix_steps": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "descriptive",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_mean_prefix_steps",
+            "unit": "tokens",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 2.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 2.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "0:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 13.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "0:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 2.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "0:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 11.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "0:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 18.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:positive",
+                "prompt_sha256": "a03e15315fd590c0e7efea6e0629072dcc610e19094f54ee37ee691a59d287dc"
+              },
+              "value": 2.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:negative",
+                "prompt_sha256": "5b22a450dd4c0c3b56ada485c74699f4361e59b1520eeec80a492f40e76d3d5e"
+              },
+              "value": 2.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 13,
+                "prefix_steps": 13,
+                "prompt_id": "1:order-id",
+                "prompt_sha256": "6b7dd55c7b41b288cd1490ffe2345e48f7a7a262100a94be6b583423cef56785"
+              },
+              "value": 13.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 2,
+                "prefix_steps": 2,
+                "prompt_id": "1:day",
+                "prompt_sha256": "18ec38a3d8c08348942dc329212dea1f9243f2e2735ff544909f2e2c345df6da"
+              },
+              "value": 2.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 11,
+                "prefix_steps": 11,
+                "prompt_id": "1:status-json",
+                "prompt_sha256": "41803baf8466fd904c57228964b0a1beeb1a361ac393b4eb37bab852f2f2bc57"
+              },
+              "value": 11.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 18,
+                "prefix_steps": 18,
+                "prompt_id": "1:ticket-json",
+                "prompt_sha256": "044441dca0d6c2791308579c08018f3c329cacfecdbab1fd6c2861fd42f386ce"
+              },
+              "value": 18.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 8.0
+        }
+      },
+      "name": "kv_fidelity.trajectory_match",
+      "reason": null,
+      "status": "completed",
+      "version": "0.3.4"
+    },
+    {
+      "diagnostics": {
+        "method": "metria.verification_impact",
+        "method_version": "1",
+        "performance": {
+          "absolute_delta": 1.3025625300833332,
+          "available": true,
+          "candidate": 2.1587216823333333,
+          "direction": "regressed",
+          "label": "Loaded-engine request latency",
+          "limitations": "Sequential synchronous request calls after engine warmup; includes prompt evaluation and generation, excludes engine startup and cache reset. No streaming TTFT, serving-throughput, or statistical speedup claim.",
+          "methodology": {
+            "aggregation": "arithmetic mean across complete measured request calls",
+            "clock": "perf_counter_ns",
+            "excluded": [
+              "engine startup",
+              "warmup",
+              "cache reset"
+            ],
+            "isolation": "public prefix-cache reset before every warmup/measured trial",
+            "runtime_hardware": {
+              "capacity_bytes": 4294639616,
+              "compute_capability": [
+                7,
+                5
+              ],
+              "cuda_runtime": "12.9",
+              "device_type": "cuda",
+              "logical_device": 0,
+              "name": "NVIDIA GeForce GTX 1650",
+              "source": "vllm_native_platform_and_torch_cuda",
+              "status": "observed",
+              "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893"
+            },
+            "sample_count": 12,
+            "schedule": "sequential prompts in declared order",
+            "scope": "session.infer call after engine launch",
+            "source": "sequential session.infer calls",
+            "trials_per_prompt": 2,
+            "warmup_trials": 1,
+            "workload_sha256": "8e700081519708697b45e5a22b7a80be78ff946d58101c411a4eafdc85a508c0"
+          },
+          "metric": {
+            "direction": "lower_is_better",
+            "method": "metria.runtime_call_latency",
+            "name": "request_latency_seconds",
+            "unit": "seconds",
+            "version": "1"
+          },
+          "reference": 0.85615915225,
+          "relative_baseline_floor_seconds": 1e-09,
+          "relative_delta": 1.5214023311672578,
+          "relative_unavailable_reason": null,
+          "schema": "metria.performance_impact.v1",
+          "unsupported_metrics": [
+            "ttft",
+            "inter_token_latency",
+            "decode_throughput",
+            "peak_device_memory",
+            "kv_memory"
+          ]
+        },
+        "quality": {
+          "candidate_passed": 6,
+          "check_count_per_role": 12,
+          "configured_prompts": 6,
+          "failed_candidate_checks": [
+            {
+              "check_id": "sentiment",
+              "definition_sha256": "c9d31db7375d05d36234d010deae949964d422aedb3eb5ff7cf1cd224dffd0c3",
+              "kind": "exact_text",
+              "output_sha256": "14e9f4e33cfe528659fd19eb54f49e70abc9232c0439e52e8ecbc0a160f8285f",
+              "prompt_id": "0:positive"
+            },
+            {
+              "check_id": "sentiment",
+              "definition_sha256": "8b7e241eadc411c3184cf0189f10ce509f6aa162988cdff6e2011e78f711814a",
+              "kind": "exact_text",
+              "output_sha256": "9f7bdabb344db3f84c06366f045184d9a2ae82b8bf97c4b2ee6e413fe4ee5e68",
+              "prompt_id": "0:negative"
+            },
+            {
+              "check_id": "order",
+              "definition_sha256": "58971a2699f2f628dd8a7054cf6a9c7637d261f15544d0723b494b953229490f",
+              "kind": "exact_text",
+              "output_sha256": "424a3685c1ddc95755e27ae94118c7db2f0659cb43c2ddcf7fd05b39548a70b2",
+              "prompt_id": "0:order-id"
+            },
+            {
+              "check_id": "sentiment",
+              "definition_sha256": "c9d31db7375d05d36234d010deae949964d422aedb3eb5ff7cf1cd224dffd0c3",
+              "kind": "exact_text",
+              "output_sha256": "14e9f4e33cfe528659fd19eb54f49e70abc9232c0439e52e8ecbc0a160f8285f",
+              "prompt_id": "1:positive"
+            },
+            {
+              "check_id": "sentiment",
+              "definition_sha256": "8b7e241eadc411c3184cf0189f10ce509f6aa162988cdff6e2011e78f711814a",
+              "kind": "exact_text",
+              "output_sha256": "9f7bdabb344db3f84c06366f045184d9a2ae82b8bf97c4b2ee6e413fe4ee5e68",
+              "prompt_id": "1:negative"
+            },
+            {
+              "check_id": "order",
+              "definition_sha256": "58971a2699f2f628dd8a7054cf6a9c7637d261f15544d0723b494b953229490f",
+              "kind": "exact_text",
+              "output_sha256": "424a3685c1ddc95755e27ae94118c7db2f0659cb43c2ddcf7fd05b39548a70b2",
+              "prompt_id": "1:order-id"
+            }
+          ],
+          "reference_passed": 6,
+          "status": "available",
+          "total_prompts": 6,
+          "workload_sha256": "697d42ae2aba4c0db59b04f494e1276cafc8beafdc793bd511fdae85a3e8d574"
+        },
+        "reference_variability": {
+          "compared_pairs": 6,
+          "different_pairs": 0,
+          "limitation": "Observed sample repeatability; not a statistical guarantee or a quality score.",
+          "reference_trials_per_prompt": 2,
+          "status": "available",
+          "unique_prompts": 6
+        },
+        "schema": "metria.verification_impact.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "candidate_latency_seconds": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.compatible_latency_impact",
+            "name": "candidate_latency_seconds",
+            "unit": "seconds",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 2.1587216823333333
+        },
+        "candidate_task_pass_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "candidate_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.5
+        },
+        "latency_ratio": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.compatible_latency_impact",
+            "name": "latency_ratio",
+            "unit": "ratio",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 2.5214023311672578
+        },
+        "reference_repeatability": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.observed_reference_repeatability",
+            "name": "reference_repeatability",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "reference_task_pass_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "reference_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.5
+        },
+        "task_pass_rate_delta": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "task_pass_rate_delta",
+            "unit": "fraction_delta",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.0
+        }
+      },
+      "name": "metria.verification_impact",
+      "reason": null,
+      "status": "completed",
+      "version": "1"
+    }
+  ],
+  "change": {
+    "candidate": true,
+    "parameter": "enable_prefix_caching",
+    "reference": false
+  },
+  "comparison": {
+    "comparable_metrics": [
+      "request_latency_seconds",
+      "task_check_pass_rate",
+      "trajectory_mean_steps",
+      "trajectory_nonempty_capture_rate"
+    ],
+    "compatible": true,
+    "incompatible_metrics": {},
+    "issues": [],
+    "waived_differences": []
+  },
+  "comparison_plan": {
+    "block_by": [],
+    "control": [
+      "measurements",
+      "model",
+      "scenario",
+      "trial_policy"
+    ],
+    "vary": [
+      "observed.applied.fields.cache.enable_prefix_caching",
+      "observed.configured.runtime.enable_prefix_caching",
+      "observed.identity.applied.fields.cache.enable_prefix_caching",
+      "resolved.runtime.settings.enable_prefix_caching",
+      "runtime.enable_prefix_caching"
+    ]
+  },
+  "comparison_status": "VALID",
+  "controls": [
+    {
+      "dimension": "measurements",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "model",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "scenario",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "trial_policy",
+      "role": "control",
+      "status": "matched"
+    }
+  ],
+  "execution_boundary": {
+    "configured_engine_start_method": "spawn",
+    "elapsed_seconds": 346.358959578,
+    "includes_startup_and_cleanup": true,
+    "log_hash_scope": "retained bounded process output",
+    "mode": "bounded_native_worker",
+    "stderr_sha256": "a24411f4a6587f5b11f450f814746aee6c7eb71b9440457fc45ef1fc2fbd2147",
+    "stderr_truncated": false,
+    "stdout_sha256": "314d1a2b0c83f7349b45963b810e07fd5d7a1117882f588b52138d7b2a82c940",
+    "stdout_truncated": false,
+    "timeout_seconds": 900.0
+  },
+  "exit_code": 1,
+  "hardware": {
+    "accelerators": [],
+    "host": {
+      "cpu_count": 12,
+      "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+    },
+    "metadata": {
+      "accelerator_detection": "runtime_or_adapter_required"
+    },
+    "platform": {
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "release": "5.15.167.4-microsoft-standard-WSL2",
+      "system": "Linux",
+      "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+    },
+    "software": {
+      "python_executable": "python",
+      "python_implementation": "CPython",
+      "python_version": "3.12.3"
+    }
+  },
+  "implementation": {
+    "name": "metria.verify",
+    "source_sha256": "1e931cab3ddcf11f0924b8bc51c016cc677f44931b19cb8a17f6ccc8b7abee49",
+    "version": "0.2.0.dev0"
+  },
+  "lifecycle": {
+    "records": {
+      "candidate": "completed",
+      "reference": "completed"
+    },
+    "status": "completed"
+  },
+  "performance": {
+    "absolute_delta": 1.3025625300833332,
+    "available": true,
+    "candidate": 2.1587216823333333,
+    "direction": "regressed",
+    "label": "Loaded-engine request latency",
+    "limitations": "Sequential synchronous request calls after engine warmup; includes prompt evaluation and generation, excludes engine startup and cache reset. No streaming TTFT, serving-throughput, or statistical speedup claim.",
+    "methodology": {
+      "aggregation": "arithmetic mean across complete measured request calls",
+      "clock": "perf_counter_ns",
+      "excluded": [
+        "engine startup",
+        "warmup",
+        "cache reset"
+      ],
+      "isolation": "public prefix-cache reset before every warmup/measured trial",
+      "runtime_hardware": {
+        "capacity_bytes": 4294639616,
+        "compute_capability": [
+          7,
+          5
+        ],
+        "cuda_runtime": "12.9",
+        "device_type": "cuda",
+        "logical_device": 0,
+        "name": "NVIDIA GeForce GTX 1650",
+        "source": "vllm_native_platform_and_torch_cuda",
+        "status": "observed",
+        "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893"
+      },
+      "sample_count": 12,
+      "schedule": "sequential prompts in declared order",
+      "scope": "session.infer call after engine launch",
+      "source": "sequential session.infer calls",
+      "trials_per_prompt": 2,
+      "warmup_trials": 1,
+      "workload_sha256": "8e700081519708697b45e5a22b7a80be78ff946d58101c411a4eafdc85a508c0"
+    },
+    "metric": {
+      "direction": "lower_is_better",
+      "method": "metria.runtime_call_latency",
+      "name": "request_latency_seconds",
+      "unit": "seconds",
+      "version": "1"
+    },
+    "reference": 0.85615915225,
+    "relative_baseline_floor_seconds": 1e-09,
+    "relative_delta": 1.5214023311672578,
+    "relative_unavailable_reason": null,
+    "schema": "metria.performance_impact.v1",
+    "unsupported_metrics": [
+      "ttft",
+      "inter_token_latency",
+      "decode_throughput",
+      "peak_device_memory",
+      "kv_memory"
+    ]
+  },
+  "policy": {
+    "criteria": [
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "quality.reference_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {
+          "aggregation": "mean",
+          "analysis": {
+            "name": "metria.verification_impact",
+            "version": "1"
+          },
+          "coverage": 1.0,
+          "metric": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "reference_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "raw_value": 0.5
+        },
+        "observed_value": 0.5,
+        "reason": null,
+        "result": "FAIL",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "quality.reference_pass_rate",
+          "source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "reference_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "quality.candidate_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {
+          "aggregation": "mean",
+          "analysis": {
+            "name": "metria.verification_impact",
+            "version": "1"
+          },
+          "coverage": 1.0,
+          "metric": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "candidate_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "raw_value": 0.5
+        },
+        "observed_value": 0.5,
+        "reason": null,
+        "result": "FAIL",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "quality.candidate_pass_rate",
+          "source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "candidate_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      }
+    ],
+    "gate": "VERIFIED",
+    "policy_schema": "metria.verification_policy.v1",
+    "schema": "metria.policy_evaluation.v1",
+    "status": "FAIL"
+  },
+  "policy_status": "FAIL",
+  "recipe_digest": "454643419d784d280b2e55a5be26519c9ad8d4a16f9ec7a01f9c5b8961ed23cf",
+  "records": {
+    "candidate": {
+      "evidence_digest": "e04d3ac88f733a018564dfba8d843a22f9ea6b12c7929aa3a051549c02f63998",
+      "evidence_gaps": [],
+      "observed": {
+        "context": 512,
+        "model_sha256": "0f70a464c0b727a2262f859a1500c72c000a037e2458e35b420b7a0b17cbb3ad",
+        "prefix_caching": true,
+        "provider_sha256": "57799343b4a0f0dcf4af8be4c0edb6837d5d04c806024bbe2b4a4d014dc199ad",
+        "runtime_hardware": {
+          "capacity_bytes": 4294639616,
+          "compute_capability": [
+            7,
+            5
+          ],
+          "cuda_runtime": "12.9",
+          "device_type": "cuda",
+          "logical_device": 0,
+          "name": "NVIDIA GeForce GTX 1650",
+          "source": "vllm_native_platform_and_torch_cuda",
+          "status": "observed",
+          "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893"
+        },
+        "runtime_version": "0.30.0+cu129"
+      },
+      "path": "candidate.run.json",
+      "record_digest": "8e8f687b669ad846f32cac54af44662e2d233ae20e2719bdc347d8e4ad9b4db8",
+      "run_id": "run-0001",
+      "status": "completed"
+    },
+    "reference": {
+      "evidence_digest": "1721fca97ea285c30beaa9e4dcec07ae6436b1253ca295a31066d77710edcd0d",
+      "evidence_gaps": [],
+      "observed": {
+        "context": 512,
+        "model_sha256": "0f70a464c0b727a2262f859a1500c72c000a037e2458e35b420b7a0b17cbb3ad",
+        "prefix_caching": false,
+        "provider_sha256": "57799343b4a0f0dcf4af8be4c0edb6837d5d04c806024bbe2b4a4d014dc199ad",
+        "runtime_hardware": {
+          "capacity_bytes": 4294639616,
+          "compute_capability": [
+            7,
+            5
+          ],
+          "cuda_runtime": "12.9",
+          "device_type": "cuda",
+          "logical_device": 0,
+          "name": "NVIDIA GeForce GTX 1650",
+          "source": "vllm_native_platform_and_torch_cuda",
+          "status": "observed",
+          "uuid_sha256": "fbacc1a7825c5704f3bec0cd314956de65a2e93743f5e4c4069463608a24f893"
+        },
+        "runtime_version": "0.30.0+cu129"
+      },
+      "path": "reference.run.json",
+      "record_digest": "ebd5d9d508d82ef455208ee5c966fe7750133ca8734c3fcf38298488698f9b0a",
+      "run_id": "run-0000",
+      "status": "completed"
+    }
+  },
+  "schema": "metria.verification.v1",
+  "scope": "local_vllm_prefix_cache.v1",
+  "study": "vllm-prefix-cache-change",
+  "systems": {
+    "candidate": {
+      "available": false
+    },
+    "reference": {
+      "available": false
+    }
+  },
+  "verdict": "FAIL"
+}
