@@ -1,0 +1,3 @@
+Prepared /var/tmp/metria-runtime-comparison-160/qualification/study.json
+Recipe: c13fad665c1e7fc9d4ea9f93bd1db5cd4c2a520c7b8221e54d95c8e0a378cdf7
+Both interpreter and runtime installations are pinned; verification retains each environment's native evidence.

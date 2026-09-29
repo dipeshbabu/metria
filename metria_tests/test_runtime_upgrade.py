@@ -372,3 +372,18 @@ def test_installed_preparation_pins_both_environments_without_launching_models(
     assert main(arguments, stdout=out, stderr=err) == 0, err.getvalue()
     assert output.is_file() and not upgrade_case["calls"]
     assert main(arguments, stdout=out, stderr=err) == 2
+
+
+def test_retained_upgrade_evidence_keeps_original_digests_and_placement():
+    from metria.records import load_run_record
+
+    root = Path(__file__).parents[1] / "artifacts/qualification/vllm-cpu-upgrade"
+    index = json.loads((root / "files-sha256.json").read_text())
+    for relative, expected in index["files"].items():
+        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
+    result = json.loads((root / "verification/verification.json").read_text())
+    assert result["verdict"] == "PASS"
+    for role in ("reference", "candidate"):
+        record = load_run_record(root / "verification" / f"{role}.run.json")
+        assert run_record_digest(record) == result["records"][role]["record_digest"]
+        assert tuple(record.observed["worker_placement"]["cpu_affinity"]) == (0, 1)

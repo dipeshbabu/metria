@@ -13,9 +13,8 @@
     },
     {
       "name": "vllm-runtime-upgrade",
-      "status": "staged",
-      "recipe": "staged/runtime-upgrade.json",
-      "blocker": "qualified separate runtime environments and CLI execution route"
+      "status": "qualified-local",
+      "entry": "../../tools/qualification/prepare_vllm_upgrade.py"
     },
     {
       "name": "vllm-kv-precision",

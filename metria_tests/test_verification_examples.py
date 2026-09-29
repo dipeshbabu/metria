@@ -40,7 +40,6 @@ def test_staged_catalog_recipes_validate_without_advertising_runtime_support():
     catalog = json.loads((folder / "catalog.json").read_text())
     staged = [entry for entry in catalog["examples"] if entry["status"] == "staged"]
     assert {entry["name"] for entry in staged} == {
-        "vllm-runtime-upgrade",
         "vllm-kv-precision",
     }
     for entry in staged:

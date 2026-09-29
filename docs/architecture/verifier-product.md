@@ -54,7 +54,10 @@ This delivery has explicit limits:
 - A [GGUF Q8_0 weight conversion](../guides/gguf-quantization-verification.md)
   can be verified on CPU with unchanged tokenizer, model layout, runtime and workload.
   Reports retain the actual mixed tensor-storage inventory.
-- Runtime upgrades and KV precision changes remain
+- A [pinned vLLM CPU runtime-stack upgrade](../guides/runtime-upgrade-verification.md)
+  uses separate interpreters, independently checked environment identities and
+  native CPU placement with fixed model/tokenizer and workload controls.
+- FP8 KV precision changes remain
   [staged templates](../../examples/verification/README.md) until the full intended
   change, observed identity, workload, and comparison path are qualified.
 - TTFT, decode throughput, inter-token latency, and device/KV memory remain

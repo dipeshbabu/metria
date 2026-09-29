@@ -56,3 +56,9 @@ profiles. Compatible loaded-engine request latency excludes engine startup,
 warmup and cache reset. It does not become TTFT or serving throughput merely
 because two runtime versions are being compared. Retain both run records and
 interpret missing measurements as unavailable.
+
+[Retained installed-wheel qualification](../../artifacts/qualification/vllm-cpu-upgrade/README.md)
+includes the two pinned native environments, actual worker placement, both run
+records and the policy result. The first qualified version pair uses the tiny
+local model as contract evidence; broader version/device pairs need their own
+qualification.
