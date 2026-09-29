@@ -10,16 +10,11 @@ full-precision reference.
 
 ## Install
 
-### Installation
-
-KV Fidelity ships through Metria's 0.2 development line. Until that root release
-is published, install the current repository checkout:
+KV Fidelity ships through Metria 0.1.2. Install the unified public package:
 
 ```bash
-git clone https://github.com/dipeshbabu/metria.git
-cd metria
-uv sync --locked --all-packages
-uv run metria fidelity --help
+python -m pip install metria==0.1.2
+metria fidelity --help
 ```
 
 Use `metria verify` for the qualified reference/candidate workflow and
@@ -67,7 +62,7 @@ two-phase orchestrator that launches them sequentially. See
 `../../research/papers/cross-engine-mi300x.md` §6 for a working orchestrator.
 
 Friend-tester input on Windows is welcome — open an issue with your
-`kv-fidelity selftest` output.
+`metria fidelity selftest` output.
 
 ## Where do I go?
 

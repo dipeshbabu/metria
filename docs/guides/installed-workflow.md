@@ -1,8 +1,13 @@
 # From installation to an inference-change decision
 
-These commands are part of the Metria 0.2 development line. Published 0.1.1 keeps
-its earlier command surface. Until 0.2 is released, install a built Metria wheel
-from this checkout; no component package is needed for the commands below.
+Install Metria 0.1.2 with Python 3.10–3.14:
+
+```bash
+python -m pip install metria==0.1.2
+```
+
+The same package includes verification, fidelity methods and pilot records.
+Native inference engines and model files are installed separately.
 
 ## See the result format without a model
 

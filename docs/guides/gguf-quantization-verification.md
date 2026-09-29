@@ -1,6 +1,6 @@
 # Verify a GGUF weight-quantization change
 
-The Metria 0.2 development CLI prepares a CPU comparison between an immutable
+The Metria 0.1.2 CLI prepares a CPU comparison between an immutable
 F32/F16 GGUF and a Q8_0 conversion made with a pinned native `llama-quantize`.
 Both runs use the same qualified capture provider, workload, generation settings
 and thread counts. This scope covers single-file, little-endian GGUF version 3.

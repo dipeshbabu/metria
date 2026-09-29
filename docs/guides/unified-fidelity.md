@@ -1,16 +1,15 @@
 # Fidelity methods in one Metria installation
 
-The Metria 0.2 development line includes KV Fidelity's implementation, bundled
-prompts and report examples. Users install one public distribution and use one
-CLI. The previously published Metria 0.1.1 retains its original command surface;
-use this checkout until the new root release is published.
+Metria 0.1.2 includes KV Fidelity's implementation, bundled prompts and report
+examples. Install one public distribution and use the `metria` CLI. Metria 0.1.1
+retains its original command surface; upgrade to 0.1.2 for the unified tools.
 
 ```bash
-uv sync --locked --all-packages
-uv run metria verify --help
-uv run metria fidelity --help
-uv run metria fidelity score --help
-uv run metria fidelity compare --help
+python -m pip install metria==0.1.2
+metria verify --help
+metria fidelity --help
+metria fidelity score --help
+metria fidelity compare --help
 ```
 
 `metria verify` is the primary reference/candidate workflow, with explicit

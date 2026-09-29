@@ -59,6 +59,8 @@ def main() -> int:
             (["recipe", "prepare-llamacpp-build", "--help"], "--reference-bin-dir"),
             (["recipe", "prepare-gguf-quantization", "--help"], "--candidate-model"),
             (["recipe", "prepare-vllm-upgrade", "--help"], "--reference-python"),
+            (["recipe", "prepare-vllm-serving", "--help"], "--workload"),
+            (["pilot", "record", "--help"], "--evidence"),
             (["demo", "--help"], "not-comparable"),
             (["compare", "--help"], "compare"),
         ]:
@@ -71,6 +73,7 @@ def main() -> int:
             )
             assert expected in result.stdout, result.stdout
         _check_demos(cli, Path(directory))
+        _check_pilot(cli, Path(directory))
     print(f"Installed Metria {args.version}: metadata, SDK, and CLI passed")
     return 0
 
@@ -101,6 +104,48 @@ def _check_demos(cli: Path, directory: Path) -> None:
         data = json.loads((output / "verification.json").read_text(encoding="utf-8"))
         assert data["fixture_only"] is True and data["scope"] == "synthetic_fixture.v1"
         assert data["exit_code"] == code
+
+
+def _check_pilot(cli: Path, directory: Path) -> None:
+    notes = directory / "pilot-notes.json"
+    notes.write_text(
+        json.dumps(
+            {
+                "kind": "maintainer_validation",
+                "reporter": "installed-package synthetic smoke test",
+                "decision": "inconclusive",
+                "rationale": "Synthetic evidence tests the installed workflow only.",
+                "acceptance_criteria": "Retain the synthetic bundle's declared policy.",
+                "setup_seconds": 0,
+                "friction": [],
+                "would_reuse": None,
+                "permission_to_share": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = directory / "pilot-record.json"
+    subprocess.run(
+        [
+            str(cli),
+            "pilot",
+            "record",
+            "--evidence",
+            str(directory / "pass"),
+            "--notes",
+            str(notes),
+            "--output",
+            str(output),
+        ],
+        cwd=directory,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    receipt = json.loads(output.read_text(encoding="utf-8"))
+    assert receipt["schema"] == "metria.pilot_record.v1"
+    assert receipt["evidence"]["fixture_only"] is True
+    assert receipt["notes"]["permission_to_share"] is False
 
 
 if __name__ == "__main__":

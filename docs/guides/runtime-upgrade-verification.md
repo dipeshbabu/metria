@@ -1,6 +1,6 @@
 # Verify a local vLLM CPU runtime upgrade
 
-The Metria 0.2 development workflow compares separately pinned vLLM
+The Metria 0.1.2 workflow compares separately pinned vLLM
 `0.29.0+cpu` and `0.30.0+cpu` environments on the same Linux/WSL machine. Model and
 tokenizer files, generation settings, CPU placement and workload stay fixed.
 Runtime installation contents and dependency versions are recorded independently.

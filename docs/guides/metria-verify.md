@@ -1,6 +1,6 @@
 # Verify a local llama.cpp CPU thread change
 
-This guide covers the llama.cpp CPU profile. The 0.2 development line also
+This guide covers the llama.cpp CPU profile. Metria 0.1.2 also
 supports a [qualified vLLM prefix-cache profile](vllm-prefix-verification.md)
 through the same `metria verify` command, lifecycle and report schema.
 
@@ -100,7 +100,7 @@ artifact paths. Review configuration and paths before sharing the records.
 The plain-completion workflow rejects system prompts and expert runtime flags
 instead of silently ignoring them.
 
-The development CLI also requires the preparation tool's four exact thread-change
+The CLI also requires the preparation tool's four exact thread-change
 paths and disallows comparison waivers in this qualified scope. Broad variations
 such as `runtime` or `observed.identity` could conceal unrelated changes and are
 rejected before execution. See the [verification contract](../architecture/verification-contract.md).
@@ -110,12 +110,12 @@ rejected before execution. See the [verification contract](../architecture/verif
 | Verdict | Meaning |
 |---|---|
 | `VERIFIED` | Both runs completed, the scoped evidence checks passed, and behavioral comparison completed. |
-| `PASS` / `FAIL` | Development version: a valid comparison met / did not meet an explicit user-defined acceptance policy. |
+| `PASS` / `FAIL` | A valid comparison met / did not meet an explicit user-defined acceptance policy. |
 | `NOT_COMPARABLE` | An undeclared or controlled difference prevents a valid comparison. |
 | `INSUFFICIENT_EVIDENCE` | Required model/provider identity, runtime readback, or token captures are absent or inconsistent with the request. |
 | `EXECUTION_FAILED` | Execution, timeout, interruption, or behavioral analysis prevented completion. |
 
-In the development version, exit status is `0` for `VERIFIED` or `PASS`, `1` for
+In Metria 0.1.2, exit status is `0` for `VERIFIED` or `PASS`, `1` for
 policy `FAIL`, `2` for invalid input/configuration, `3` for `NOT_COMPARABLE`, `4`
 for `INSUFFICIENT_EVIDENCE`, `5` for execution/preflight or persistence failure,
 and `130` for interruption. See [CI integration](verification-ci.md) for
@@ -125,16 +125,17 @@ summaries, and artifact retention.
 `VERIFIED` is not a task-quality or deployment-acceptance verdict. Token prefix
 agreement and exact sequence matches describe behavioral change on the supplied
 prompts. Without a policy, the report explicitly records that no acceptance
-policy was evaluated. The development version adds
-[optional typed acceptance policies](verification-policies.md); published 0.1.0
-does not include that feature.
+policy was evaluated. Configure
+[typed acceptance policies](verification-policies.md) for the criteria your
+workload needs.
 
 Process wall-time samples include startup, model loading, prompt evaluation, and
-generation. The development verifier reports method-compatible cold-process
+generation. The verifier reports method-compatible cold-process
 request-latency deltas after comparison passes. These are not decode-only
 throughput, TTFT, isolated kernel timing, or a statistically qualified speedup.
 See [performance methodology and availability](verification-performance.md).
-Current acceptance-policy targets cover behavioral analysis.
+Policy targets distinguish behavioral analysis, declared task checks, and
+compatible systems measurements; availability depends on the selected profile.
 
 The observed thread count and context come from the running llama.cpp context.
 Missing readback never becomes a match. For example, if llama.cpp rounds a
@@ -154,7 +155,7 @@ The JSON manifest uses `metria.verification.v1` and records the scoped contract,
 recipe digest, run/evidence digests, hardware evidence, observed facts, comparison
 issues, analysis identity, diagnostics, and process wall-time method.
 
-In the development version, `verification.json` is the canonical result and
+In Metria 0.1.2, `verification.json` is the canonical result and
 `report.md` is a deterministic projection of it. The report leads with the
 verdict and separates Change, Evidence, Comparison, Impact, and Verdict.
 `lifecycle.status`, `comparison_status`, and `policy_status` distinguish execution

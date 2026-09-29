@@ -12,7 +12,7 @@ milestones. The standalone 0.3.5 publication plan is retired.
 
 ---
 
-## Unreleased
+## Included in Metria 0.1.2
 
 - The implementation and packaged assets now live in `metria.fidelity` and ship
   in the Metria wheel. `metria fidelity` exposes the retained expert commands.
@@ -31,8 +31,7 @@ milestones. The standalone 0.3.5 publication plan is retired.
   archive/member hashes through Metria's shared artifact API. Cached defaults
   are verified before use; unsafe, oversized, or unexpected archive entries
   are rejected before promotion. JSON reports retain input artifact provenance.
-  KV Fidelity now requires `metria>=0.1.1.dev0,<0.2`; use the uv workspace for
-  current development until the corresponding root release is published.
+  The source-only compatibility bridge now requires the stable Metria 0.1.2 line.
 
 - Removed the unnecessary Accelerate dependency from the optional benchmark
   stack to address GHSA-4j2p-28q2-5m79, which has no patched release.
@@ -43,8 +42,8 @@ milestones. The standalone 0.3.5 publication plan is retired.
   distribution and command `kv-fidelity`, import package `kv_fidelity`,
   environment prefix `KV_FIDELITY_`, component path
   `components/kv-fidelity`, and report schema `kv_fidelity.report`. Source
-  versions use the `0.3.5.dev0` development marker until the release blockers
-  and protected Trusted Publisher setup are complete.
+  versions retain the `0.3.5.dev0` marker for compatibility. The standalone
+  publication plan and its separate publisher prerequisites are retired.
 - vLLM and SGLang KLD evaluation now rejects empty, non-finite, and
   positionally misaligned prompt-log-probability responses instead of allowing
   missing evidence to produce a perfect score. Symmetrically unavailable

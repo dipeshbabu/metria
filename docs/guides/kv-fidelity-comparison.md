@@ -2,12 +2,12 @@
 
 `metria fidelity compare` uses Metria's `RunRecord`, `ComparisonPlan`, and
 `compare_runs` APIs. It checks retained evidence before treating report scores as
-directly comparable. This is available in the development workspace; the first
-KV Fidelity now ships through Metria; the standalone publication plan is retired.
+directly comparable. KV Fidelity ships in Metria 0.1.2; the standalone publication
+plan is retired.
 
 ```bash
-uv sync --locked --all-packages
-uv run --locked metria fidelity compare run-a.json run-b.json --json-out comparison.json
+python -m pip install metria==0.1.2
+metria fidelity compare run-a.json run-b.json --json-out comparison.json
 ```
 
 The command requires at least two valid reports and checks every pair. It exits
