@@ -764,9 +764,6 @@ class VLLMAdapter:
 
         module = _load_vllm()
         runtime_artifact = require_runtime_pin(environment, loaded_module=module)
-        llm_cls = getattr(module, "LLM", None)
-        if not callable(llm_cls):
-            raise RuntimeError("installed vLLM module does not expose LLM")
         kwargs: dict[str, Any] = {
             "model": model["model"],
             "dtype": settings["dtype"],
@@ -787,12 +784,32 @@ class VLLMAdapter:
             kwargs["tokenizer_revision"] = model["tokenizer_revision"]
         if self.worker_extension_cls is not None:
             kwargs["worker_extension_cls"] = self.worker_extension_cls
-        llm = llm_cls(**kwargs)
+        llm = self._create_llm(module, kwargs, resolved)
         try:
-            return VLLMSession(resolved, environment, module, llm, runtime_artifact)
+            return self._create_session(
+                resolved, environment, module, llm, runtime_artifact
+            )
         except Exception:
             _cleanup_failed_llm(llm)
             raise
+
+    def _create_llm(
+        self, module: Any, kwargs: Mapping[str, Any], resolved: Mapping[str, Any]
+    ) -> Any:
+        llm_cls = getattr(module, "LLM", None)
+        if not callable(llm_cls):
+            raise RuntimeError("installed vLLM module does not expose LLM")
+        return llm_cls(**dict(kwargs))
+
+    def _create_session(
+        self,
+        resolved: Mapping[str, Any],
+        environment: Mapping[str, Any],
+        module: Any,
+        llm: Any,
+        artifact: Mapping[str, Any] | None,
+    ) -> RuntimeSession:
+        return VLLMSession(resolved, environment, module, llm, artifact)
 
     def observe(self, session: RuntimeSession) -> Mapping[str, Any]:
         """Return configured state and independent applied-config introspection."""
