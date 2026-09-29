@@ -1,0 +1,20 @@
+{
+  "schema": "metria.qualification_files.v1",
+  "files": {
+    "policy.json": "79d8af951d00368caf6dfe6ef53fb4ec47894d35e1e53bdcb7996e885291fa35",
+    "prepare.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prepare.stdout.log": "811dad1d8c9250aa978c950067bbb8792f8f68af26f07e592ae410b9ec47b718",
+    "qualification.json": "557ac1b7699ca421d0a3b75ff22f1e59ac1d294a0e60fcb46ebe52fb2c132898",
+    "study.json": "e351c662fb28a6652100cbfba0c470bcc3795c4cd38276fee52d0059db4ca91b",
+    "validate.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validate.stdout.log": "8492105ced1a708813fdb20da6d274e7c4a27191858f3a4db600fd23421e7595",
+    "verification/candidate.run.json": "063bcb5329f2c22dc79e7aae45cd05e7f37f44ead058a2215a1439fcdaa8b935",
+    "verification/manifest.json": "49125f93da78bab18f9478bb283badd725d29d34e8a7fd270e3036caebabfef4",
+    "verification/reference.run.json": "b0bb167670c739e2080b25bd8e6f43ae5d9a4d877058411a0ad8b81f140e453f",
+    "verification/report.md": "42ecdee22c7f73d6b2f6ba8d388bfe58711122660785818a20e8b63db4724b30",
+    "verification/verification.json": "49125f93da78bab18f9478bb283badd725d29d34e8a7fd270e3036caebabfef4",
+    "verify.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.stdout.log": "f8b11a478664b4255b26862c06474157f1086a3f498b2adfc54f314da18bab2f",
+    "workload.jsonl": "1e36930cde3b1c22ff7cb67c5cabb1392d76807693c5a11d717f9d9d4303b5f7"
+  }
+}

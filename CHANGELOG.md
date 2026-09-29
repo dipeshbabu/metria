@@ -5,6 +5,10 @@ TurboQuant reference packages have independent versions and release notes.
 
 ## Unreleased
 
+- Added separate-interpreter CPU runtime-upgrade verification with pinned
+  environment contents, native worker placement, bounded process cleanup and
+  checked run-record bindings through the shared study lifecycle.
+
 - Added controlled GGUF Q8_0 preparation and verification with pinned native
   conversion, observed tensor storage, unchanged tokenizer/model controls,
   retained failure evidence, task checks and explicit policy decisions.

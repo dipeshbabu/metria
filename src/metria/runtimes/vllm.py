@@ -464,6 +464,7 @@ class VLLMSession:
         self._reset_count = 0
         self._reset_events: list[dict[str, Any]] = []
         self._cleanup: Mapping[str, Any] = {}
+        self._worker_placement: Mapping[str, Any] | None = None
 
     @property
     def closed(self) -> bool:
@@ -599,12 +600,30 @@ class VLLMSession:
         self._cleanup = freeze_mapping(cleanup)
         self._closed = True
 
+    def capture_worker_placement(self) -> None:
+        if self._closed or self._llm is None:
+            raise RuntimeError("vLLM session is closed")
+        self._worker_placement = None
+        rows = self._llm.collective_rpc("metria_worker_placement", timeout=30)
+        if (
+            not isinstance(rows, (list, tuple))
+            or len(rows) != 1
+            or not isinstance(rows[0], Mapping)
+        ):
+            raise RuntimeError("single-worker placement evidence is missing")
+        self._worker_placement = freeze_mapping(rows[0])
+
     def observation(self) -> Mapping[str, Any]:
         """Return configured state separately from authoritative identity evidence."""
 
         return freeze_mapping(
             {
                 **({"artifacts": self._artifacts} if self._artifacts else {}),
+                **(
+                    {"worker_placement": self._worker_placement}
+                    if self._worker_placement is not None
+                    else {}
+                ),
                 "runtime": {
                     "name": "vllm",
                     "version": self._resolved["runtime"]["version"],
@@ -631,6 +650,7 @@ class VLLMAdapter:
     """Resolve and launch optional in-process vLLM offline inference sessions."""
 
     name = "vllm"
+    worker_extension_cls: str | None = None
 
     def probe(
         self,
@@ -757,6 +777,8 @@ class VLLMAdapter:
             kwargs["tokenizer"] = model["tokenizer"]
         if model.get("tokenizer_revision") is not None:
             kwargs["tokenizer_revision"] = model["tokenizer_revision"]
+        if self.worker_extension_cls is not None:
+            kwargs["worker_extension_cls"] = self.worker_extension_cls
         llm = llm_cls(**kwargs)
         try:
             return VLLMSession(resolved, environment, module, llm, runtime_artifact)

@@ -224,6 +224,19 @@ def _analyze_pair(
     return tuple(outcomes)
 
 
+def _check_run_binding(
+    record: Any, study_name: str, run_id: str, spec: RunSpec
+) -> None:
+    if not isinstance(record, RunRecord):
+        raise TypeError("run executor must return a RunRecord")
+    if (record.study_name, record.run_id, record.requested) != (
+        study_name,
+        run_id,
+        spec,
+    ):
+        raise ValueError("run executor returned evidence for a different requested run")
+
+
 def execute_study(
     study: StudySpec,
     *,
@@ -234,6 +247,7 @@ def execute_study(
     analyses: Mapping[str, PairwiseAnalysis] | None = None,
     record_sink: Callable[[RunRecord], None] | None = None,
     capability_checks: CapabilityCheckRegistry | None = None,
+    _run_executor: Callable[..., RunRecord] | None = None,
 ) -> StudyExecutionResult:
     """Execute every run, validate pair compatibility, and derive analyses.
 
@@ -275,9 +289,10 @@ def execute_study(
         )
 
     records: list[RunRecord] = []
+    run_executor = execute_run if _run_executor is None else _run_executor
     for index, (spec, route) in enumerate(zip(study.runs, routes, strict=True)):
         runtime_name, measurement_name = route
-        record = execute_run(
+        record = run_executor(
             study_name=study.name,
             run_id=f"run-{index:04d}",
             spec=spec,
@@ -287,6 +302,7 @@ def execute_study(
             environment=environment,
             capability_checks=capability_checks,
         )
+        _check_run_binding(record, study.name, f"run-{index:04d}", spec)
         records.append(record)
         if record_sink is not None:
             record_sink(record)

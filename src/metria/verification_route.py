@@ -21,3 +21,4 @@ class VerificationRoute:
     change: Mapping[str, Any]
     performance: Callable[[RunRecord, RunRecord, bool], dict[str, Any]]
     isolated: bool = False
+    run_executor: Callable[..., RunRecord] | None = None

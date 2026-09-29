@@ -70,7 +70,6 @@ their unsupported routes. They are planning templates, not runnable support clai
 
 | Change | Reference / candidate | Required evidence before enabling |
 |---|---|---|
-| Runtime upgrade | pinned vLLM build A / pinned build B | Separate qualified environments, immutable model/tokenizer, matching generation/workload/hardware, and a verifier route that executes both builds. |
 | KV-cache precision | auto cache / FP8 cache | Qualified hardware/engine support plus authoritative applied-cache readback and compatible systems measurement. |
 
 Do not enable a template merely because a fixture passes or a runtime imports.
@@ -85,7 +84,7 @@ and summary after preparing an appropriate runner and recipe.
 The 0.2 development verifier also supports a pinned local vLLM prefix-cache change.
 Use [vllm-prefix-workload.jsonl](vllm-prefix-workload.jsonl) and the
 [preparation/verification guide](../../docs/guides/vllm-prefix-verification.md).
-Runtime upgrades and FP8 KV precision remain staged.
+FP8 KV precision remains staged pending successful hardware qualification.
 
 ## llama.cpp build regression
 
@@ -104,3 +103,11 @@ tensor storage and qualifies both model/provider combinations before verificatio
 The [guide](../../docs/guides/gguf-quantization-verification.md) includes installed
 commands and the [native qualification](../../artifacts/qualification/gguf-q8-quantization/README.md)
 retains the conversion receipt, run records and explicit policy result.
+
+## vLLM CPU runtime upgrade
+
+Use `metria recipe prepare-vllm-upgrade` to compare separately pinned vLLM
+0.29.0+cpu and 0.30.0+cpu environments with fixed model/tokenizer, workload,
+generation and CPU-placement controls. The [upgrade guide](../../docs/guides/runtime-upgrade-verification.md)
+explains setup and scope; [native evidence](../../artifacts/qualification/vllm-cpu-upgrade/README.md)
+retains both observed environments and the completed policy decision.

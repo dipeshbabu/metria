@@ -173,7 +173,11 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
 
 
 def _scope_label(manifest: Mapping[str, Any]) -> str:
-    from .verification_schema import GGUF_QUANTIZATION_SCOPE, LLAMACPP_BUILD_SCOPE
+    from .verification_schema import (
+        GGUF_QUANTIZATION_SCOPE,
+        LLAMACPP_BUILD_SCOPE,
+        VLLM_UPGRADE_SCOPE,
+    )
 
     if manifest.get("fixture_only") is True:
         return "Scope: synthetic fixture; no real runtime or model qualification"
@@ -185,13 +189,21 @@ def _scope_label(manifest: Mapping[str, Any]) -> str:
         return "Scope: local llama.cpp CPU build comparison"
     if manifest.get("scope") == GGUF_QUANTIZATION_SCOPE:
         return "Scope: local llama.cpp GGUF weight-quantization comparison"
+    if manifest.get("scope") == VLLM_UPGRADE_SCOPE:
+        return "Scope: local vLLM CPU runtime-stack upgrade"
     return "Scope: unrecognized verification contract"
 
 
 def _change_label(manifest: Mapping[str, Any]) -> str:
-    from .verification_schema import GGUF_QUANTIZATION_SCOPE, LLAMACPP_BUILD_SCOPE
+    from .verification_schema import (
+        GGUF_QUANTIZATION_SCOPE,
+        LLAMACPP_BUILD_SCOPE,
+        VLLM_UPGRADE_SCOPE,
+    )
 
     change = manifest["change"]
+    if manifest.get("scope") == VLLM_UPGRADE_SCOPE:
+        return f"  vLLM runtime environment: {change['reference']} -> {change['candidate']}; controlled CPU IDs: {list(change['cpu_binding'])}"
     if manifest.get("scope") == GGUF_QUANTIZATION_SCOPE:
         return f"  Observed tensor storage: {dict(change['reference'])} -> {dict(change['candidate'])} (Q8_0 conversion; mixed storage retained)"
     if manifest.get("scope") == LLAMACPP_BUILD_SCOPE:
@@ -206,6 +218,10 @@ def _change_label(manifest: Mapping[str, Any]) -> str:
 
 
 def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
+    from .verification_schema import VLLM_UPGRADE_SCOPE
+
+    if scope == VLLM_UPGRADE_SCOPE:
+        return f"    Observed runtime: {facts['runtime_version']}; context: {facts['context']}"
     if scope == VLLM_VERIFICATION_SCOPE:
         return f"    Observed prefix caching: {facts['prefix_caching']}; context: {facts['context']}"
     return f"    Observed threads: {facts['threads']}; context: {facts['context']}"

@@ -1,0 +1,18 @@
+{
+  "schema": "metria.runtime_upgrade_qualification.v1",
+  "source_revision": "23f25f2b3f930c49ff7f8d5aeefa822be5c48d8a",
+  "metria_version": "0.2.0.dev0",
+  "metria_wheel_sha256": "3d20f24e5f7f18ac43db045b562b621227b7adbb9caf3309973c20037c849cd3",
+  "verdict": "PASS",
+  "exit_code": 0,
+  "qualified_pair": [
+    "0.29.0+cpu",
+    "0.30.0+cpu"
+  ],
+  "limitations": [
+    "Tiny-model maintainer contract qualification, not external pilot feedback or a production performance benchmark.",
+    "This compares independently pinned runtime stacks, including their recorded dependency/OpenMP differences; it does not isolate vLLM source alone.",
+    "The same Python/Metria contents, immutable model/tokenizer, generation policy, observed hardware and controlled CPU set are required.",
+    "Loaded-engine request latency is not streaming TTFT or serving throughput."
+  ]
+}

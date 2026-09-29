@@ -58,6 +58,7 @@ def main() -> int:
             (["recipe", "prepare-vllm", "--help"], "--example"),
             (["recipe", "prepare-llamacpp-build", "--help"], "--reference-bin-dir"),
             (["recipe", "prepare-gguf-quantization", "--help"], "--candidate-model"),
+            (["recipe", "prepare-vllm-upgrade", "--help"], "--reference-python"),
             (["demo", "--help"], "not-comparable"),
             (["compare", "--help"], "compare"),
         ]:
