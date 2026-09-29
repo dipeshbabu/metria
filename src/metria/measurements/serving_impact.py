@@ -150,6 +150,9 @@ def compare_serving(
         **result,
         "label": "Local serving request latency",
         "metrics": rows,
+        "unsupported_metrics": [
+            name for name, row in rows.items() if not row["available"]
+        ],
         "conditions": {
             "reference_concurrency": reference.requested.trial_policy.get(
                 "concurrency"

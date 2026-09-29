@@ -129,6 +129,8 @@ def test_complete_serving_route_binds_streams_and_separates_reports(
     assert "ttft_seconds:" in report and "allocated_kv_bytes: unavailable" in report
     data = result.to_data()
     assert data["performance"]["metrics"]["output_tokens_per_second"]["available"]
+    assert "ttft_seconds" not in data["performance"]["unsupported_metrics"]
+    assert "allocated_kv_bytes" in data["performance"]["unsupported_metrics"]
     left = load_run_record(result.output_dir / "reference.run.json")
     right = load_run_record(result.output_dir / "candidate.run.json")
     assert not evidence_gaps(
