@@ -237,7 +237,19 @@ def test_missing_executable_does_not_retain_arguments_or_paths(tmp_path):
     assert str(tmp_path) not in evidence
 
 
-@pytest.mark.parametrize("timeout", [0, -1, float("nan"), float("inf"), True])
+@pytest.mark.parametrize(
+    "timeout",
+    [
+        0,
+        -1,
+        float("nan"),
+        float("inf"),
+        True,
+        pytest.param(10**400, id="integer-overflow"),
+        pytest.param("1", id="numeric-string"),
+        pytest.param(None, id="null"),
+    ],
+)
 def test_invalid_timeout(timeout):
     with pytest.raises(ValueError, match="timeout_s"):
         run_process(_python("pass"), timeout_s=timeout)

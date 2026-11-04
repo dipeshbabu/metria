@@ -92,6 +92,19 @@ def _kill_tree(process: subprocess.Popen[bytes]) -> None:
             pass
 
 
+def _timeout_seconds(value: float) -> float:
+    message = "timeout_s must be positive and finite"
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(message)
+    try:
+        timeout = float(value)
+    except OverflowError:
+        raise ValueError(message) from None
+    if not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError(message)
+    return timeout
+
+
 def run_process(
     command: Sequence[str],
     *,
@@ -119,8 +132,7 @@ def run_process(
     args = list(command)
     if any(not isinstance(arg, str) or "\0" in arg for arg in args) or not args[0]:
         raise ValueError("command must contain strings without NUL bytes")
-    if isinstance(timeout_s, bool) or not math.isfinite(timeout_s) or timeout_s <= 0:
-        raise ValueError("timeout_s must be positive and finite")
+    timeout_s = _timeout_seconds(timeout_s)
     if (
         isinstance(max_output_bytes, bool)
         or not isinstance(max_output_bytes, int)
