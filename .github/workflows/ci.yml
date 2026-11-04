@@ -270,6 +270,24 @@ jobs:
             uv audit --locked --script "${script_lock%.lock}"
           done < "$RUNNER_TEMP/metria-script-locks"
 
+      - name: Check citation schema validation and invalid-input rejection
+        shell: bash
+        run: |
+          uv run --locked --script tools/maintenance/validate_citation.py
+          printf 'cff-version: 1.2.0\n' > "$RUNNER_TEMP/invalid-citation.cff"
+          if uv run --locked --script tools/maintenance/validate_citation.py \
+            --citation "$RUNNER_TEMP/invalid-citation.cff" > "$RUNNER_TEMP/citation-rejection.log" 2>&1
+          then
+            echo "Citation validator accepted metadata missing required fields"
+            exit 1
+          else
+            result=$?
+            if [[ "$result" -ne 1 ]]; then
+              cat "$RUNNER_TEMP/citation-rejection.log"
+              exit "$result"
+            fi
+          fi
+
   ci-required:
     name: CI required
     if: ${{ always() }}

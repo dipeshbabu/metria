@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -23,14 +24,19 @@ from cffconvert import Citation
 def main() -> int:
     """Validate the root CITATION.cff against cffconvert's CFF schema."""
     repository_root = Path(__file__).resolve().parents[2]
-    citation_path = repository_root / "CITATION.cff"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--citation", type=Path, default=repository_root / "CITATION.cff"
+    )
+    citation_path = parser.parse_args().citation
     try:
         Citation(
             citation_path.read_text(encoding="utf-8"),
             src=str(citation_path),
-        )
+        ).validate()
     except Exception as error:
-        print(f"Invalid citation metadata: {error}", file=sys.stderr)
+        message = getattr(error, "message", None) or str(error)
+        print(f"Invalid citation metadata: {message}", file=sys.stderr)
         return 1
 
     print("Citation metadata are valid.")
