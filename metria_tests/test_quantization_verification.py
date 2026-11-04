@@ -408,6 +408,7 @@ def test_installed_preparation_converts_qualifies_and_preserves_outputs(
         {"threads": True},
         {"timeout": float("inf")},
         {"timeout": 0},
+        {"timeout": 10**400},
         {"quantizer_sha256": "a" * 64},
     ],
 )
@@ -425,6 +426,61 @@ def test_invalid_conversion_options_fail_before_native_execution(
             **options,
         )
     assert not calls
+
+
+@pytest.mark.parametrize("existing_receipt", [False, True])
+def test_conversion_expands_receipt_home_before_checking_or_writing(
+    quant_case, tmp_path, monkeypatch, existing_receipt
+):
+    calls = _conversion_runner(monkeypatch, quant_case)
+    home = tmp_path / "home"
+    receipt = home / "receipts" / "conversion.json"
+    receipt.parent.mkdir(parents=True)
+    monkeypatch.setenv("USERPROFILE" if os.name == "nt" else "HOME", str(home))
+    monkeypatch.chdir(tmp_path)
+    if existing_receipt:
+        receipt.write_text("existing receipt")
+    args = (
+        quant_case["source"],
+        quant_case["conversion"]["source"]["sha256"],
+        tmp_path / "new.gguf",
+        quant_case["quantizer"],
+        Path("~/receipts/conversion.json"),
+    )
+    if existing_receipt:
+        with pytest.raises(FileExistsError):
+            convert_gguf(*args)
+        assert receipt.read_text() == "existing receipt"
+        assert not calls
+        assert not (tmp_path / "new.gguf").exists()
+    else:
+        convert_gguf(*args)
+        assert json.loads(receipt.read_text())["status"] == "converted"
+        assert len(calls) == 1
+    assert not (tmp_path / "~").exists()
+
+
+def test_dangling_receipt_is_rejected_before_conversion(
+    quant_case, tmp_path, monkeypatch
+):
+    calls = _conversion_runner(monkeypatch, quant_case)
+    receipt = tmp_path / "receipt.json"
+    missing = tmp_path / "missing.json"
+    try:
+        receipt.symlink_to(missing)
+    except OSError:
+        pytest.skip("symlink creation is unavailable to this Windows account")
+    with pytest.raises(FileExistsError):
+        convert_gguf(
+            quant_case["source"],
+            quant_case["conversion"]["source"]["sha256"],
+            tmp_path / "new.gguf",
+            quant_case["quantizer"],
+            receipt,
+        )
+    assert not calls
+    assert not (tmp_path / "new.gguf").exists()
+    assert receipt.is_symlink() and not missing.exists()
 
 
 def test_source_pin_and_output_aliases_are_rejected_before_conversion(

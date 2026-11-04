@@ -3,6 +3,18 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
+## Unreleased
+
+- Preserve competing artifact-cache entries during downloads; verify and reuse
+  matching content, reject invalid content, and retain links without replacing them.
+- Compute top-k KL divergence in log space so extreme finite probabilities remain
+  scoreable; limit token chunk allocations to the requested number of chunks.
+- Expand conversion receipt home paths consistently and reject dangling receipt
+  links before native conversion. Reject invalid or overflowing download and
+  conversion deadlines with input errors.
+- Reject JSON task outputs whose numeric exponents decode to infinity, including
+  nested values, so malformed output cannot pass a strict JSON-object check.
+
 ## 0.1.3
 
 - Publish completed evidence without overwriting an existing file, dangling

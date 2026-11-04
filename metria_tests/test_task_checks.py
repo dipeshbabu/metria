@@ -38,6 +38,8 @@ from metria.measurements.task_checks import (
         ),
         ({"id": "shape", "kind": "json_object"}, '{"a": 1,"a": 2}', False),
         ({"id": "shape", "kind": "json_object"}, '{"a": NaN}', False),
+        ({"id": "shape", "kind": "json_object"}, '{"a": 1e9999}', False),
+        ({"id": "shape", "kind": "json_object"}, '{"a": [-1e9999]}', False),
         ({"id": "shape", "kind": "json_object"}, "[]", False),
     ],
 )

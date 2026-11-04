@@ -80,6 +80,70 @@ def test_fetch_is_verified_atomic_and_rechecks_the_cache(tmp_path, monkeypatch):
     assert not list(tmp_path.glob(".download-*"))
 
 
+@pytest.mark.parametrize("competing_data", [b"trusted bytes", b"other writer"])
+def test_download_never_replaces_a_competing_cache_entry(
+    tmp_path, monkeypatch, competing_data
+):
+    data = b"trusted bytes"
+    source = _manifest(data)
+    target = tmp_path / source.sha256
+    identity = []
+
+    def open_url(*args):
+        target.write_bytes(competing_data)
+        identity.append(target.stat().st_ino)
+        return io.BytesIO(data)
+
+    monkeypatch.setattr(artifacts, "_open_url", open_url)
+    if competing_data == data:
+        result = artifacts.fetch_artifact(source, tmp_path, max_bytes=100)
+        assert Path(result.path) == target
+    else:
+        with pytest.raises(artifacts.ArtifactIntegrityError, match="SHA-256"):
+            artifacts.fetch_artifact(source, tmp_path, max_bytes=100)
+    assert target.read_bytes() == competing_data
+    assert target.stat().st_ino == identity[0]
+    assert not list(tmp_path.glob(".download-*"))
+
+
+@pytest.mark.parametrize(
+    "timeout", [True, 0, -1, float("nan"), float("inf"), 10**400, "30", None]
+)
+def test_invalid_download_timeout_fails_before_network_or_cache_creation(
+    tmp_path, monkeypatch, timeout
+):
+    def unexpected_network(*args):
+        pytest.fail("invalid timeout reached the network")
+
+    monkeypatch.setattr(artifacts, "_open_url", unexpected_network)
+    cache = tmp_path / "cache"
+    with pytest.raises(ValueError, match="timeout must be positive and finite"):
+        artifacts.fetch_artifact(_manifest(), cache, max_bytes=100, timeout_s=timeout)
+    assert not cache.exists()
+
+
+def test_download_preserves_a_symlink_created_during_the_transfer(
+    tmp_path, monkeypatch
+):
+    data = b"trusted bytes"
+    source = _manifest(data)
+    target = tmp_path / source.sha256
+    missing = tmp_path / "missing"
+
+    def open_url(*args):
+        try:
+            target.symlink_to(missing)
+        except OSError:
+            pytest.skip("symlink creation is unavailable to this Windows account")
+        return io.BytesIO(data)
+
+    monkeypatch.setattr(artifacts, "_open_url", open_url)
+    with pytest.raises(artifacts.ArtifactIntegrityError, match="regular, unlinked"):
+        artifacts.fetch_artifact(source, tmp_path, max_bytes=100)
+    assert target.is_symlink() and not missing.exists()
+    assert not list(tmp_path.glob(".download-*"))
+
+
 @pytest.mark.parametrize(
     "failure", ["checksum", "size", "limit", "interrupted", "read_error"]
 )

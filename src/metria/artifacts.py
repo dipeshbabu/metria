@@ -16,6 +16,7 @@ from pathlib import Path, PurePosixPath
 from typing import IO, Any
 from urllib.parse import urlsplit
 
+from ._files import _publish_new_file
 from .identity import ArtifactManifest
 from .recipes import _json_value
 
@@ -158,7 +159,13 @@ def fetch_artifact(
 
     _pinned(manifest)
     limit = _limit(max_bytes)
-    if isinstance(timeout_s, bool) or not math.isfinite(timeout_s) or timeout_s <= 0:
+    if isinstance(timeout_s, bool) or not isinstance(timeout_s, (int, float)):
+        raise ValueError("artifact timeout must be positive and finite")
+    try:
+        timeout_s = float(timeout_s)
+    except OverflowError:
+        raise ValueError("artifact timeout must be positive and finite") from None
+    if not math.isfinite(timeout_s) or timeout_s <= 0:
         raise ValueError("artifact timeout must be positive and finite")
     uri = urlsplit(manifest.uri or "")
     if (
@@ -186,7 +193,10 @@ def fetch_artifact(
             output.flush()
             os.fsync(output.fileno())
         result = _checked(manifest, target, digest, size)
-        os.replace(temporary, target)
+        try:
+            _publish_new_file(temporary, target)
+        except FileExistsError:
+            return verify_artifact(manifest, target, max_bytes=limit)
         return result
     finally:
         temporary.unlink(missing_ok=True)
