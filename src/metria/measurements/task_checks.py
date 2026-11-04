@@ -117,6 +117,7 @@ def _passes(text: str, check: Mapping[str, Any]) -> bool:
         value = json.loads(
             text, object_pairs_hook=_unique_json_object, parse_constant=_reject_constant
         )
+        _json_value(value, path="task_check.output")
     except (ValueError, TypeError, RecursionError):
         return False
     return isinstance(value, dict) and all(

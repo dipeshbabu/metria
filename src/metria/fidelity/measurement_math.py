@@ -22,11 +22,33 @@ def full_token_chunks(
     if max_chunks <= 0:
         return []
 
-    stop = len(token_ids) - chunk_len + 1
+    stop = min(len(token_ids) - chunk_len + 1, max_chunks * chunk_len)
     return [
         list(token_ids[start : start + chunk_len])
         for start in range(0, stop, chunk_len)
-    ][:max_chunks]
+    ]
+
+
+def _log_probability(value: float, label: str) -> float:
+    message = f"{label} must be finite and non-positive"
+    if isinstance(value, bool):
+        raise ValueError(message)
+    try:
+        finite = math.isfinite(value)
+        result = float(value)
+    except (TypeError, OverflowError):
+        raise ValueError(message) from None
+    if not finite or result > 0.0:
+        raise ValueError(message)
+    return result
+
+
+def _normalized_logprobs(values: list[float], log_floor: float) -> list[float]:
+    mass = math.fsum(math.exp(value) for value in values)
+    omitted = max(math.log1p(-mass), log_floor) if mass < 1.0 else log_floor
+    values.append(omitted)
+    normalizer = math.log(math.fsum(math.exp(value) for value in values))
+    return [value - normalizer for value in values]
 
 
 def approximate_topk_kl(
@@ -48,8 +70,7 @@ def approximate_topk_kl(
     """
     if not reference_logprobs or not candidate_logprobs:
         raise ValueError("both top-k distributions must be non-empty")
-    if not math.isfinite(log_floor) or log_floor > 0.0:
-        raise ValueError("log_floor must be a finite, non-positive value")
+    log_floor = _log_probability(log_floor, "log_floor")
 
     for label, logprobs in (
         ("reference", reference_logprobs),
@@ -58,33 +79,20 @@ def approximate_topk_kl(
         for token_id, logprob in logprobs.items():
             if isinstance(token_id, bool) or not isinstance(token_id, int):
                 raise ValueError(f"{label} token ID must be an integer")
-            try:
-                finite = math.isfinite(logprob)
-            except TypeError as exc:
-                raise ValueError(
-                    f"{label} log probability for token {token_id} must be numeric"
-                ) from exc
-            if not finite:
-                raise ValueError(
-                    f"{label} log probability for token {token_id} must be finite"
-                )
-            if logprob > 0.0:
-                raise ValueError(
-                    f"{label} log probability for token {token_id} must be <= 0"
-                )
+            _log_probability(logprob, f"{label} log probability for token {token_id}")
 
-    floor = math.exp(log_floor)
     token_ids = sorted(set(reference_logprobs) | set(candidate_logprobs))
-    p = [math.exp(reference_logprobs.get(tid, log_floor)) for tid in token_ids]
-    q = [math.exp(candidate_logprobs.get(tid, log_floor)) for tid in token_ids]
-    p.append(max(1.0 - sum(p), floor))
-    q.append(max(1.0 - sum(q), floor))
-
-    p_total = sum(p)
-    q_total = sum(q)
-    p = [value / p_total for value in p]
-    q = [value / q_total for value in q]
-    value = sum(pi * math.log(pi / qi) for pi, qi in zip(p, q, strict=True) if pi > 0.0)
+    p = _normalized_logprobs(
+        [float(reference_logprobs.get(tid, log_floor)) for tid in token_ids], log_floor
+    )
+    q = _normalized_logprobs(
+        [float(candidate_logprobs.get(tid, log_floor)) for tid in token_ids], log_floor
+    )
+    # Subtract logs before weighting: exp(q) and p/q can under/overflow even
+    # when the log probabilities and resulting divergence are both finite.
+    value = math.fsum(
+        math.exp(logp) * (logp - logq) for logp, logq in zip(p, q, strict=True)
+    )
     if not math.isfinite(value):
         raise ValueError("top-k KL estimate is non-finite")
     return max(value, 0.0)

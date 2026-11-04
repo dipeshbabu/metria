@@ -5,13 +5,13 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from ._files import _publish_new_file
 from ._freeze import freeze_mapping
 from .capability_checks import CapabilityCheckRegistry
 from .comparison import _declared_dimension_issue, compare_runs
@@ -273,14 +273,6 @@ class _CheckedAnalysis:
                 "verification evidence is insufficient for behavioral analysis"
             )
         return self._analysis.analyze(left, right)
-
-
-def _publish_new_file(temporary: Path, path: Path) -> None:
-    if os.name == "nt":
-        # Windows rename fails atomically when any destination entry exists.
-        os.rename(temporary, path)
-    else:
-        os.link(temporary, path)
 
 
 def _write_atomic(path: Path, text: str) -> None:

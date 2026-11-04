@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import os
 import tempfile
 from collections.abc import Mapping, Sequence
@@ -51,15 +50,15 @@ def convert_gguf(
     if (
         isinstance(timeout, bool)
         or not isinstance(timeout, (int, float))
-        or not math.isfinite(timeout)
         or not 1 <= timeout <= 3600
     ):
         raise ValueError("quantization timeout must be between 1 and 3600 seconds")
     source = source.expanduser().resolve()
     candidate = candidate.expanduser().absolute()
-    if candidate.resolve() == receipt.expanduser().resolve():
+    receipt = receipt.expanduser().absolute()
+    if candidate.resolve() == receipt.resolve():
         raise ValueError("candidate model and conversion receipt need separate paths")
-    if candidate.exists() or candidate.is_symlink() or receipt.exists():
+    if any(path.exists() or path.is_symlink() for path in (candidate, receipt)):
         raise FileExistsError("choose new candidate and conversion receipt paths")
     expected = _pin(source_sha256)
     if _sha256_file(source) != expected:
