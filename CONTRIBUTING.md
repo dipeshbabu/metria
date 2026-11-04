@@ -69,7 +69,7 @@ import sorter. The root configuration targets Python 3.10 and uses an 88
 character line length. `E501` is intentionally left to the formatter instead
 of being reported as a separate lint error. Mypy checks all three package source
 trees and repository tools using Python 3.10 language assumptions. It is
-pinned to 2.3.1 so local and CI results use the same checker release.
+pinned to 2.4.1 so local and CI results use the same checker release.
 
 Check Python quality without changing files:
 
