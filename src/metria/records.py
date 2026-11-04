@@ -37,7 +37,10 @@ def _string(value: Any, *, name: str) -> str:
 def _number(value: Any, *, name: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a finite number")
-    result = float(value)
+    try:
+        result = float(value)
+    except OverflowError:
+        raise ValueError(f"{name} must be finite") from None
     if result != result or result in (float("inf"), float("-inf")):
         raise ValueError(f"{name} must be finite")
     return result

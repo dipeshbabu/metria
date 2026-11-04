@@ -1,0 +1,31 @@
+name: Label new issues and pull requests
+
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+
+permissions: {}
+
+jobs:
+  label:
+    name: Apply triage and area labels
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      # Only trusted default-branch code runs, including for pull requests from forks.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Apply additive labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/maintenance/auto_labels.py

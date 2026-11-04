@@ -163,6 +163,28 @@ def test_metric_mapping_key_must_match_definition_name() -> None:
         run_record_from_data(data)
 
 
+@pytest.mark.parametrize("field", ["value", "sample", "uncertainty", "coverage"])
+def test_record_parser_rejects_integer_overflow_as_invalid_evidence(field):
+    data = run_record_to_data(_record())
+    metric = data["record"]["metrics"]["latency_ms"]
+    if field == "sample":
+        metric["samples"][0]["value"] = 10**400
+    elif field == "uncertainty":
+        metric["uncertainty"]["stdev"] = 10**400
+    else:
+        metric[field] = 10**400
+    with pytest.raises(ValueError, match="finite"):
+        run_record_from_data(data)
+
+
+def test_record_writer_rejects_integer_overflow_as_invalid_evidence():
+    record = _record()
+    metric = replace(record.metrics["latency_ms"], value=10**400)
+    record = replace(record, metrics={"latency_ms": metric})
+    with pytest.raises(ValueError, match="finite"):
+        run_record_to_json(record)
+
+
 @pytest.mark.parametrize(
     ("original", "duplicate"),
     [

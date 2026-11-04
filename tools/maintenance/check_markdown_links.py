@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 from urllib.parse import unquote
@@ -32,9 +33,42 @@ def _target_path(source: Path, raw_target: str) -> Path | None:
     return (source.parent / target).resolve()
 
 
+def _sources(root: Path) -> list[Path]:
+    if not (root / ".git").exists():
+        return sorted(root.rglob("*.md"))
+    result: subprocess.CompletedProcess[bytes] | None
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "ls-files",
+                "-z",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "--",
+                "*.md",
+            ],
+            cwd=root,
+            capture_output=True,
+            check=False,
+        )
+    except OSError:
+        result = None
+    if result is not None and result.returncode == 0:
+        return sorted(
+            {
+                root / name
+                for name in result.stdout.decode("utf-8").split("\0")
+                if name and (root / name).is_file()
+            }
+        )
+    return sorted(root.rglob("*.md"))
+
+
 def check(root: Path) -> list[tuple[Path, str]]:
     broken: list[tuple[Path, str]] = []
-    for source in sorted(root.rglob("*.md")):
+    for source in _sources(root):
         if any(part in SKIP_PARTS for part in source.parts):
             continue
         text = source.read_text(encoding="utf-8")

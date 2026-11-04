@@ -38,7 +38,7 @@ dependencies, security or release policy, governance, or published claims.
 
 ## Development setup
 
-Use Python 3.10–3.14 and `uv` 0.11.8 or newer, then create the shared
+Use Python 3.11–3.14 and `uv` 0.11.8 or newer, then create the shared
 workspace environment from the repository root:
 
 ```bash
@@ -61,6 +61,18 @@ Do not use `--all-extras` for routine development because the backend stacks
 have different platform and hardware requirements. The vLLM adapter can still
 be tested in an existing audited environment, but its managed extra is paused
 until upstream vLLM supports PyTorch 2.13 or newer.
+
+Native backend extras and the development workspace require Python 3.11 or newer
+so they can use patched filelock releases. The dependency-free core still supports
+Python 3.10. Its CI jobs use the separately locked `tools/ci/python310.py`
+environment, which excludes the native/backend and pre-commit dependency stacks:
+
+```bash
+uv run --locked --script tools/ci/python310.py pytest
+```
+
+Both dependency graphs are audited in required CI. Changes to package metadata
+must update both `uv.lock` and `tools/ci/python310.py.lock`.
 
 ## Python style
 
@@ -120,6 +132,18 @@ uv run python -m build components/turboquant-reference
 
 Changes to packaging must verify that KV Fidelity prompts, examples, `LICENSE`,
 and `NOTICE` are present in the built artifacts.
+
+## Automatic labels
+
+New issues receive `needs triage`, a type label from the issue form or title, and
+an area label when the selected form area matches a repository category. Pull
+requests receive labels from their title and changed paths. Unclassified pull
+requests receive `needs triage`; maintainers assign priority and final disposition.
+The bot only adds missing labels and preserves labels assigned by people.
+
+Fork pull requests run the labeling workflow using trusted default-branch code.
+Contributor titles, bodies, and filenames are treated as data; the workflow does
+not check out or execute the contributed branch.
 
 ## Releases
 

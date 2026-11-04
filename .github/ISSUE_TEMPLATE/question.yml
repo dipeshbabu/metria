@@ -1,6 +1,7 @@
 name: Usage question
 description: Ask for help using a documented component or workflow.
 title: "[Question]: "
+labels: [question]
 body:
   - type: dropdown
     id: component
