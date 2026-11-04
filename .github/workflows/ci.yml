@@ -261,10 +261,14 @@ jobs:
           version: "0.11.21"
           enable-cache: true
           prune-cache: true
-      - name: Audit workspace and Python 3.10 compatibility dependencies
+      - name: Audit workspace and every locked Python script
+        shell: bash
         run: |
           uv audit --locked
-          uv audit --locked --script tools/ci/python310.py
+          git ls-files -z -- '*.py.lock' > "$RUNNER_TEMP/metria-script-locks"
+          while IFS= read -r -d '' script_lock; do
+            uv audit --locked --script "${script_lock%.lock}"
+          done < "$RUNNER_TEMP/metria-script-locks"
 
   ci-required:
     name: CI required

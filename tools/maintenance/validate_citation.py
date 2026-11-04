@@ -3,6 +3,12 @@
 # dependencies = [
 #     "cffconvert==2.0.0",
 # ]
+# [tool.uv]
+# constraint-dependencies = [
+#     "certifi>=2026.10.18",
+#     "urllib3>=2.8.0",
+#     "setuptools>=84.1.0",
+# ]
 # ///
 """Validate the repository's Citation File Format metadata."""
 

@@ -71,7 +71,8 @@ environment, which excludes the native/backend and pre-commit dependency stacks:
 uv run --locked --script tools/ci/python310.py pytest
 ```
 
-Both dependency graphs are audited in required CI. Changes to package metadata
+The workspace and every tracked Python script lock are audited in required CI.
+Changes to package metadata
 must update both `uv.lock` and `tools/ci/python310.py.lock`.
 
 ## Python style
