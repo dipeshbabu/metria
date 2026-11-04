@@ -3,6 +3,20 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
+## 0.1.3
+
+- Publish completed evidence without overwriting an existing file, dangling
+  symlink, or competing writer's output; retain records on publication failure.
+- Reject overflowing metric integers and invalid process deadlines with bounded
+  input errors instead of uncaught exceptions.
+- Patch filelock and setuptools vulnerabilities; audit both dependency graphs in
+  required CI while retaining separately locked Python 3.10 core compatibility.
+- Run the complete test suite together and expand supported-version release
+  testing, clean installs, coverage, and security checks.
+- Add automatic issue/PR type and area labels using trusted workflow code.
+- Refresh the README and current installation guides; keep ignored local caches
+  out of repository Markdown-link validation.
+
 ## 0.1.2
 
 - Added `metria pilot record` to bind workload decisions, setup friction and

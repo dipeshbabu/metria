@@ -68,6 +68,11 @@ jobs:
             expected_platform: Linux
             expected_environment: linux
             expected_status: supported
+          - os: ubuntu-24.04
+            python-version: "3.14"
+            expected_platform: Linux
+            expected_environment: linux
+            expected_status: supported
           - os: windows-2025
             python-version: "3.13"
             expected_platform: Windows
