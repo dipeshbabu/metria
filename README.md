@@ -1,76 +1,98 @@
-# Metria
+<h1 align="center">Metria</h1>
 
-[![PyPI](https://img.shields.io/pypi/v/metria)](https://pypi.org/project/metria/)
-[![CI](https://github.com/dipeshbabu/metria/actions/workflows/ci.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/ci.yml)
-[![Metria core](https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml/badge.svg)](https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml)
+<p align="center">
+  Test inference changes before you ship them.
+</p>
 
-**Metria verifies changes to LLM inference systems.**
+<p align="center">
+  <a href="https://pypi.org/project/metria/"><img alt="PyPI" src="https://img.shields.io/pypi/v/metria?style=flat-square&amp;color=3ECF8E"></a>
+  <a href="https://github.com/dipeshbabu/metria/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/dipeshbabu/metria/ci.yml?branch=main&amp;style=flat-square&amp;label=CI&amp;color=3ECF8E"></a>
+  <a href="https://github.com/dipeshbabu/metria/actions/workflows/metria-core.yml"><img alt="Metria core" src="https://img.shields.io/github/actions/workflow/status/dipeshbabu/metria/metria-core.yml?branch=main&amp;style=flat-square&amp;label=core&amp;color=3ECF8E"></a>
+  <a href="https://github.com/dipeshbabu/metria/blob/main/LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-3ECF8E?style=flat-square"></a>
+</p>
 
-Give it a reference configuration and a candidate configuration. Metria checks
-what actually ran, rejects an unjustified comparison, measures behavioral change,
-and evaluates the result against your explicit acceptance criteria.
+---
 
-**Test inference changes before you ship them.**
+Metria verifies changes to LLM inference systems. Give it a reference and a
+candidate configuration to check what actually ran, measure behavioral change,
+and evaluate the result against your acceptance criteria. Keep both runs and a
+report you can review locally or in CI.
 
-Metria 0.1.2 (Alpha) verifies scoped llama.cpp CPU configuration, build and GGUF Q8_0
-changes, plus pinned vLLM prefix-cache, CPU runtime-upgrade and local serving
-concurrency changes. Each profile checks its native evidence and fixed controls,
-then retains both runs and a reviewable report. FP8 qualification awaits a
-supported GPU; arbitrary runtime recipes are not implicitly qualified.
+## Installation
 
-## Start with one change
+Use Python 3.10–3.14 in a virtual environment:
 
-Install the unified package with Python 3.10–3.14:
-
-```bash
+```sh
 python -m pip install metria==0.1.2
+metria --version
 ```
 
-Prepare the pinned runtime, model, and reference/candidate recipe using the
-[local verification guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-verify.md), then run:
+Metria 0.1.2 is an alpha release. The base package has no runtime dependencies;
+install native inference engines and models separately for real verification.
+See the [release notes](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/releases/0.1.2.md).
 
-```bash
+## Try the Report
+
+Run a complete synthetic example without a model or GPU:
+
+```sh
+metria demo --case pass --output demo-pass
+```
+
+Open `demo-pass/report.md` to see the decision, evidence checks, and behavioral
+diagnostics. Try `--case fail` or `--case not-comparable` with a new output
+directory to see a policy failure or an invalid comparison. These examples are
+labeled synthetic throughout; they do not establish runtime support, model
+quality, or performance.
+
+## Verify an Inference Change
+
+Start with the [installed workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/installed-workflow.md)
+to prepare a qualified runtime, a pinned local model, and a workload. For a vLLM
+prefix-cache comparison, run from your prepared runtime environment:
+
+```sh
+metria recipe prepare-vllm \
+  --model /path/to/local/model \
+  --descriptor trusted-model-files.json \
+  --workload prompts.jsonl \
+  --policy policy.json \
+  --output study.json
+
+metria recipe validate study.json
 metria verify study.json --output verification --json
 ```
 
-The root Python package has no runtime dependencies. Native engines and models
-are installed separately. Each output directory must be new.
+The descriptor pins your model and tokenizer files; the policy defines your
+acceptance criteria. Preparation checks those inputs and the installed runtime
+before writing the recipe. It does not download models or install engines.
+Choose a new recipe filename and a new evidence directory for each comparison.
 
-[Metria 0.1.2](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/releases/0.1.2.md) includes canonical results, diagnostics,
-explicit policies, compatible systems measurements and CI integration. Fidelity
-methods use `metria.fidelity` and `metria fidelity`; see the
-[migration guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/unified-fidelity.md).
+Metria checks **requested → resolved → observed** configuration: the setting you
+asked for, the artifacts and configuration selected to launch, and native evidence
+of what actually applied. Missing readback or an undeclared tokenizer or
+generation change prevents a successful comparison.
 
-Try the report flow without a model:
+These profiles have retained native qualification within their documented scope:
 
-```bash
-metria demo --case pass --output demo-pass
-metria recipe prepare-vllm --help
-metria recipe prepare-vllm-serving --help
-```
+| Change | Guide |
+| --- | --- |
+| llama.cpp CPU thread count | [Local configuration](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-verify.md) |
+| llama.cpp CPU build | [Build regression](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/llamacpp-build-verification.md) |
+| GGUF Q8_0 weight quantization | [Quantization](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/gguf-quantization-verification.md) |
+| vLLM prefix caching | [Prefix-cache verification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/vllm-prefix-verification.md) |
+| vLLM CPU runtime version | [Runtime upgrade](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/runtime-upgrade-verification.md) |
+| vLLM local serving concurrency | [Serving measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/serving-measurements.md) |
 
-The demo is explicitly synthetic. Use the [installed workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/installed-workflow.md)
-for your own pinned runtime/model and workload, then add
-[task checks and an acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-decisions.md).
+Each profile has specific runtime, model, device, and evidence requirements.
+FP8 KV-cache precision remains staged pending supported GPU qualification.
+See [runtime qualification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/runtime-qualification.md)
+before using a different configuration.
 
-Start with the [copyable workflows](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/examples/verification/README.md): a qualified
-local configuration change, synthetic PASS/FAIL/invalid-comparison fixtures,
-plus pinned runtime-upgrade, quantization and build comparisons. FP8 precision
-remains staged. Synthetic examples require no model or GPU and are labeled as
-test evidence throughout. The [pilot workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verifier-pilot.md)
-records task acceptance and keep/reject decisions separately from participant
-feedback.
+## Read the Decision
 
-## Read the decision
-
-Every result separates four questions:
-
-| Section | What it answers |
-|---|---|
-| Change | What intentionally differs between reference and candidate? |
-| Evidence | What ran, what stayed controlled, and what evidence is missing? |
-| Impact | Where did token trajectories diverge, and what compatible systems impact was observed? |
-| Verdict | Did execution finish, was comparison valid, and did your policy pass? |
+A completed bundle contains the canonical result, a readable report, and both run
+records:
 
 ```text
 verification/
@@ -80,95 +102,109 @@ verification/
   candidate.run.json
 ```
 
-The original `manifest.json` filename remains a compatibility alias. The canonical
-JSON and Markdown report include separate lifecycle, comparison, and policy
-states. Timeouts, failed runs, insufficient evidence, and unexpected differences
-remain visible instead of becoming a successful comparison.
+The report describes the intended change, checks execution evidence and comparison
+controls, then reports behavioral and compatible systems impact. It keeps
+execution status, comparison validity, and policy acceptance separate.
+`manifest.json` remains a compatibility alias for `verification.json`.
 
-Metria distinguishes **requested → resolved → observed**: a requested setting
-states intent; the resolved artifact/configuration identifies what will launch;
-native observation checks what actually applied. A requested CPU thread change
-must appear in runtime readback before its behavioral result is accepted. An
-undeclared tokenizer or generation change prevents comparison.
+| Outcome | Meaning | Exit |
+| --- | --- | --- |
+| `VERIFIED` | Execution and valid behavioral comparison completed; no acceptance policy was evaluated. | `0` |
+| `PASS` / `FAIL` | A valid comparison met / did not meet your explicit acceptance policy. | `0` / `1` |
+| Invalid input | The recipe or configuration could not be used. | `2` |
+| `NOT_COMPARABLE` | An undeclared or controlled difference prevents comparison. | `3` |
+| `INSUFFICIENT_EVIDENCE` | Required identity, runtime readback, or captures are missing or inconsistent. | `4` |
+| `EXECUTION_FAILED` | Execution, preflight, analysis, or persistence failed. | `5` |
+| Interrupted | Verification was interrupted. | `130` |
 
-The first behavioral method is KV Fidelity-compatible token-trajectory analysis.
-It reports prefix agreement, exact matches, first-divergence positions, category
-rates, and prompt identifiers that help locate drift without dumping prompt text.
-See [behavioral diagnostics](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-trajectory-measurement.md).
+`VERIFIED` establishes that comparison completed. For a keep/reject decision, add
+[task checks and an acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-decisions.md).
+PASS applies to your stated criteria on the supplied workload; Metria supplies no
+universal behavior or safety threshold.
 
-Systems measurements have distinct boundaries: llama.cpp cold-process latency,
-loaded-engine vLLM request latency, and
-[local serving measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/serving-measurements.md) for streaming,
-concurrency and native CUDA allocator/KV storage. Reports retain method, workload,
-coverage and limitations; missing native measurements remain unavailable.
-See [performance evidence](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-performance.md).
+[Behavioral diagnostics](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-trajectory-measurement.md)
+include token-prefix agreement, exact matches, and first-divergence positions.
+[Systems measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-performance.md)
+retain their method and limitations: cold-process llama.cpp latency,
+loaded-engine vLLM latency, or local serving measurements. Missing native
+measurements remain unavailable.
 
-`VERIFIED` means valid comparison and completed analysis. Add an
-[explicit acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-policies.md) for PASS/FAIL.
-Metria supplies no universal behavior or safety threshold; PASS means your stated
-criteria were met after the evidence gates passed.
+## Use in CI
 
-## Use it in code review and CI
-
-Run the same command as a job step and preserve its exit status:
+Provision the qualified runtime and model, then run the same verification command
+as a job step:
 
 ```yaml
 - name: Verify inference change
   run: metria verify .metria/change.json --output metria-verification --json
 ```
 
-The [CI guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-ci.md) defines distinct failure exits,
-retained artifacts, and a GitHub Actions summary adapter. The
-[copyable workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/examples/verification/github-actions.yml) keeps the report
-and records even when verification fails. A real CI workload needs the same
-qualified runtime/model provisioning as local use.
+Preserve the exit status and retain the evidence directory even when verification
+fails. The [copyable GitHub Actions workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/examples/verification/github-actions.yml)
+includes report summaries and artifact retention. See the
+[CI guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verification-ci.md)
+for failure handling and machine-readable results.
 
-## Scope and qualification
+## Reference
 
-| Surface | Scope |
-|---|---|
-| `metria verify` | Qualified local llama.cpp CPU thread changes, plain greedy completion, pinned model/provider, one reference and one candidate |
-| Runtime adapters | llama.cpp and vLLM Python APIs; qualification applies only to retained runtime/model/device configurations |
-| Supporting commands | Recipe validation/digests, capability inspection, and saved-record comparison for preparation and debugging |
-| KV Fidelity | Independently versioned behavioral methodology/component consumed by Metria's verification path |
-| TurboQuant Reference | Portable research/reference implementation with its own lifecycle |
+Use `--help` to explore commands and options:
 
-See [runtime qualification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/runtime-qualification.md). A mocked
-contract test, installed engine, or visible GPU is not a real-engine qualification.
-New routes must prove their identity, requested change, and required captures.
-
-Metria focuses on one inference change at a time. Broad experiment matrices,
-generic benchmark orchestration, arbitrary plugin discovery, automatic search,
-Pareto dashboards, additional runtimes solely for breadth, training optimization,
-and hosted services are deferred until they directly strengthen this verifier.
-The product decision is tracked in [#50](https://github.com/dipeshbabu/metria/issues/50).
-
-## Supporting APIs and repository
-
-Use the [recipe CLI](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-recipe-cli.md),
-[inspection guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-inspection.md), and
-[saved-record comparison](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-run-records.md) to prepare or debug
-a verification. The [core architecture](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/architecture/metria-core.md) documents
-the reusable study/run/evidence machinery behind that workflow.
-
-`src/metria/` owns verification and shared evidence contracts.
-`components/kv-fidelity/` owns focused behavioral methods;
-`components/turboquant-reference/` owns the research reference implementation.
-Current guidance lives in `docs/`; dated investigations in `research/`; retained
-evidence in `artifacts/`. Historical results keep their original scope and known
-gaps under the [provenance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/maintainers/third-party-material.md).
-
-For development:
-
-```bash
-uv sync --locked --all-packages
-uv run pre-commit install
-uv run python -m pytest
+```sh
+metria verify --help
+metria recipe --help
+metria inspect --help
+metria fidelity --help
 ```
 
-See [Contributing](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/CONTRIBUTING.md), [Governance](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/GOVERNANCE.md), and
-[Support](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/SUPPORT.md). Cite [CITATION.cff](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/CITATION.cff) and the specific retained
-report when relying on an experimental result.
+- [Copyable verification examples](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/examples/verification/README.md)
+- [Recipe CLI](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-recipe-cli.md)
+- [Capability inspection](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-inspection.md)
+- [Saved-record comparison](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/metria-run-records.md)
+- [Fidelity methods and migration](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/unified-fidelity.md)
+- [Verifier pilot checklist](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/docs/guides/verifier-pilot.md)
 
-Original software uses Apache-2.0; see [LICENSE](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/LICENSE) and [NOTICE](https://github.com/dipeshbabu/metria/blob/metria-v0.1.2/NOTICE).
-Third-party/model-derived material retains its separately documented rights.
+## Developing
+
+Use Python 3.10–3.14 and uv 0.11.8 or newer. From a fresh checkout:
+
+```sh
+uv sync --locked --all-packages
+uv run pre-commit install
+uv run --locked pre-commit run --all-files
+uv run --locked python -m pytest
+```
+
+Useful source entry points:
+
+| Path | Purpose |
+| --- | --- |
+| `src/metria/` | CLI, verification, and shared evidence contracts |
+| `src/metria/fidelity/` | Integrated behavioral methods and assets |
+| `components/kv-fidelity/` | Method documentation, characterization tests, and source compatibility bridge |
+| `components/turboquant-reference/` | Portable research reference implementation |
+| `docs/` | Current guides and architecture |
+| `tools/` | Qualification, diagnostics, and maintenance utilities |
+| `artifacts/` | Retained qualification and experiment evidence |
+
+Runtime dependencies stay optional. Install only the backend stack you need;
+follow [Contributing](https://github.com/dipeshbabu/metria/blob/main/CONTRIBUTING.md)
+for platform setup, coverage gates, and distribution checks.
+
+## Contributing
+
+Focus contributions on one inference change or evidence failure. Open a design
+issue before changing public contracts, methodology, dependencies, or release
+policy. See [Contributing](https://github.com/dipeshbabu/metria/blob/main/CONTRIBUTING.md),
+[Governance](https://github.com/dipeshbabu/metria/blob/main/GOVERNANCE.md), and
+[Support](https://github.com/dipeshbabu/metria/blob/main/SUPPORT.md).
+
+When citing an experimental result, use
+[CITATION.cff](https://github.com/dipeshbabu/metria/blob/main/CITATION.cff) and the
+specific retained report. Historical evidence keeps its original scope and known
+gaps under the [provenance policy](https://github.com/dipeshbabu/metria/blob/main/docs/maintainers/third-party-material.md).
+
+## License
+
+Original software is released under [Apache-2.0](https://github.com/dipeshbabu/metria/blob/main/LICENSE).
+See [NOTICE](https://github.com/dipeshbabu/metria/blob/main/NOTICE) for attribution.
+Third-party and model-derived material retains its separately documented rights.
