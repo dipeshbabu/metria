@@ -1,6 +1,7 @@
 name: Benchmark or research evidence
 description: Share a benchmark, reproduction, controlled negative result, or correction.
 title: "[Evidence]: "
+labels: ["area:artifacts", "area:benchmarking"]
 body:
   - type: dropdown
     id: evidence_type

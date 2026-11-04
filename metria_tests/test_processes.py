@@ -54,11 +54,12 @@ def test_silent_child_has_wall_clock_timeout():
 
 
 def test_timeout_retains_output_without_a_newline():
+    timeout = 3 if os.name == "nt" else 1
     result = run_process(
         _python(
             "import os,time; os.write(1,b'partial stdout'); os.write(2,b'partial stderr'); time.sleep(30)"
         ),
-        timeout_s=1,
+        timeout_s=timeout,
     )
     assert result.timed_out
     assert result.stdout == "partial stdout"
@@ -80,18 +81,21 @@ def test_diagnostic_source_entry_point_needs_no_package_install():
 
 
 def test_noisy_child_cannot_defeat_deadline_or_retention_limit():
+    # Windows starts an isolated containment helper before the requested child.
+    # Allow its real startup cost while keeping a strict wall-clock bound.
+    timeout = 3 if os.name == "nt" else 0.7
     result = run_process(
         _python(
             "import os\nwhile True:\n os.write(1,b'x'*8192)\n os.write(2,b'y'*8192)"
         ),
-        timeout_s=0.7,
+        timeout_s=timeout,
         max_output_bytes=1000,
     )
     assert result.timed_out
     assert result.stdout == "x" * 1000
     assert result.stderr == "y" * 1000
     assert result.stdout_truncated and result.stderr_truncated
-    assert result.elapsed_s < 4
+    assert result.elapsed_s < timeout + 3
 
 
 def test_streamed_output_unblocks_child_and_preserves_utf8(tmp_path):
@@ -206,7 +210,9 @@ def test_entire_process_tree_is_cleaned_up(process_tree, mode):
         with pytest.raises(RuntimeError if mode == "exception" else KeyboardInterrupt):
             run_process(command, timeout_s=5, on_output=on_output)
     else:
-        result = run_process(command, timeout_s=1.5, on_output=on_output)
+        result = run_process(
+            command, timeout_s=5 if os.name == "nt" else 1.5, on_output=on_output
+        )
         assert result.timed_out == (mode == "timeout")
         assert result.returncode == 0 if mode == "success" else result.returncode != 0
     pids = list(map(int, pid_file.read_text().splitlines()))

@@ -499,14 +499,16 @@ def test_existing_output_is_never_overwritten(local_case):
 def test_write_failure_keeps_completed_record_without_success_manifest(
     local_case, monkeypatch
 ):
-    original = Path.replace
+    from metria import verification
+
+    original = verification._publish_new_file
 
     def fail_candidate(path, target):
         if Path(target).name == "candidate.run.json":
             raise OSError("simulated disk failure")
         return original(path, target)
 
-    monkeypatch.setattr(Path, "replace", fail_candidate)
+    monkeypatch.setattr(verification, "_publish_new_file", fail_candidate)
     status, _, errors = _invoke(local_case)
     assert status == 5 and "EXECUTION_FAILED" in errors
     assert (

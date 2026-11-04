@@ -1,6 +1,7 @@
 name: Bug report
 description: Report a reproducible defect in a supported component or tool.
 title: "[Bug]: "
+labels: [bug]
 body:
   - type: markdown
     attributes:

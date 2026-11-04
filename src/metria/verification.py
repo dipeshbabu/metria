@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from enum import Enum
@@ -274,6 +275,14 @@ class _CheckedAnalysis:
         return self._analysis.analyze(left, right)
 
 
+def _publish_new_file(temporary: Path, path: Path) -> None:
+    if os.name == "nt":
+        # Windows rename fails atomically when any destination entry exists.
+        os.rename(temporary, path)
+    else:
+        os.link(temporary, path)
+
+
 def _write_atomic(path: Path, text: str) -> None:
     temporary = path.with_name("." + path.name + ".tmp")
     created = False
@@ -281,9 +290,15 @@ def _write_atomic(path: Path, text: str) -> None:
         with temporary.open("x", encoding="utf-8", newline="\n") as stream:
             created = True
             stream.write(text)
-        if path.exists():
-            raise FileExistsError(f"verification artifact already exists: {path.name}")
-        temporary.replace(path)
+        try:
+            # Publish the completed inode only if the destination directory entry
+            # is absent. A check followed by replace can clobber another writer
+            # and also mistakes a dangling symlink for an unused filename.
+            _publish_new_file(temporary, path)
+        except FileExistsError:
+            raise FileExistsError(
+                f"verification artifact already exists: {path.name}"
+            ) from None
     finally:
         if created:
             try:

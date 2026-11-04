@@ -44,14 +44,17 @@ dependencies = ["metria>=0.1.2,<0.2"]
 
 [project.optional-dependencies]
 mlx = [
+    "filelock>=4.2.1",
     "mlx>=0.29.4; sys_platform == 'darwin'",
     "mlx-lm>=0.31; sys_platform == 'darwin'",
 ]
 sglang = [
+    "filelock>=4.2.1",
     "requests>=2.33",
     "transformers>=5.3",
 ]
 full = [
+    "filelock>=4.2.1",
     "mlx>=0.29.4; sys_platform == 'darwin'",
     "mlx-lm>=0.31; sys_platform == 'darwin'",
     "requests>=2.33",
@@ -62,6 +65,7 @@ research = [
     "scipy>=1.10",
 ]
 benchmarks = [
+    "filelock>=4.2.1",
     "numpy>=1.23",
     "scipy>=1.10",
     "torch>=2.13",
@@ -93,7 +97,7 @@ where = ["src"]
 include = ["kv_fidelity*"]
 
 [build-system]
-requires = ["setuptools>=83.0.0", "wheel"]
+requires = ["setuptools>=84.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]

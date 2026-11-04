@@ -165,7 +165,8 @@ metria fidelity --help
 
 ## Developing
 
-Use Python 3.10–3.14 and uv 0.11.8 or newer. From a fresh checkout:
+Use Python 3.11–3.14 and uv 0.11.8 or newer for the development workspace. From a
+fresh checkout:
 
 ```sh
 uv sync --locked --all-packages
@@ -187,7 +188,10 @@ Useful source entry points:
 | `artifacts/` | Retained qualification and experiment evidence |
 
 Runtime dependencies stay optional. Install only the backend stack you need;
-follow [Contributing](https://github.com/dipeshbabu/metria/blob/main/CONTRIBUTING.md)
+native backend extras require Python 3.11 or newer to use patched dependencies.
+The dependency-free core retains Python 3.10 support, tested with a separate
+locked compatibility environment.
+See [Contributing](https://github.com/dipeshbabu/metria/blob/main/CONTRIBUTING.md)
 for platform setup, coverage gates, and distribution checks.
 
 ## Contributing

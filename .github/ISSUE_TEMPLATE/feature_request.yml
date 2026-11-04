@@ -1,6 +1,7 @@
 name: Feature request
 description: Propose a scoped capability or project improvement.
 title: "[Feature]: "
+labels: [enhancement]
 body:
   - type: dropdown
     id: component
