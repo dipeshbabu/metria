@@ -9,6 +9,7 @@
 #   "coverage>=7.16.2",
 #   "mypy==2.4.1",
 #   "ruff>=0.17.3",
+#   "rich>=14.0",
 #   "types-requests>=2.33.0.20261030",
 # ]
 # [tool.uv.sources]
