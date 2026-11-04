@@ -1,13 +1,15 @@
 # From installation to an inference-change decision
 
-Install Metria 0.1.2 with Python 3.10–3.14:
+Install Metria 0.1.3 with Python 3.10–3.14:
 
 ```bash
-python -m pip install metria==0.1.2
+python -m pip install metria==0.1.3
 ```
 
 The same package includes verification, fidelity methods and pilot records.
 Native inference engines and model files are installed separately.
+Use Python 3.11 or newer for native backend extras; the dependency-free core
+continues to support Python 3.10.
 
 ## See the result format without a model
 

@@ -9,6 +9,8 @@ This directory contains current, maintained guidance for Metria. Dated
 experiments and historical conclusions live under [`research/`](../research/README.md);
 generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
+Current release: [Metria 0.1.3](releases/0.1.3.md).
+
 ## Supporting architecture
 
 - [Verifier product decision and scope](architecture/verifier-product.md)
