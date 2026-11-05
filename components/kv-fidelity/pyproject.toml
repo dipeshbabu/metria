@@ -7,7 +7,7 @@ license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10,<3.15"
 authors = [
-    { name = "Dipesh Tharu Mahato (dipeshbabu)" },
+    { name = "Dipesh Tharu Mahato" },
 ]
 keywords = [
     "llm",

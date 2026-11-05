@@ -9,7 +9,7 @@ import zipfile
 from email.parser import Parser
 from pathlib import Path
 
-AUTHOR = "Dipesh Tharu Mahato (dipeshbabu)"
+AUTHOR = "Dipesh Tharu Mahato"
 METRIA_PROJECT_URLS = {
     "Homepage, https://github.com/dipeshbabu/metria",
     "Repository, https://github.com/dipeshbabu/metria",
