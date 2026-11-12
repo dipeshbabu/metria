@@ -29,6 +29,15 @@ from ..protocols import (
 from .vllm_artifacts import require_runtime_pin, validate_file_pins, verify_model_files
 from .vllm_hardware import native_hardware
 from .vllm_identity import inspect_vllm_identity, require_matching_vllm_identity
+from .vllm_treatments import (
+    QUALIFICATION as STAGED_QUALIFICATION,
+)
+from .vllm_treatments import (
+    engine_arguments,
+    is_staged_treatment,
+    read_back_staged_treatments,
+    resolve_staged_treatments,
+)
 
 _SUPPORTED_GENERATION_KEYS = frozenset(
     {"max_tokens", "seed", "temperature", "chat_template", "system"}
@@ -218,6 +227,8 @@ def _kv_treatment(treatments: Sequence[TreatmentSpec]) -> dict[str, Any]:
     dtype = "auto"
     seen = False
     for treatment in treatments:
+        if is_staged_treatment(treatment):
+            continue  # validated by resolve_staged_treatments
         if treatment.name not in {"kv_cache", "vllm.kv_cache"}:
             raise ValueError(
                 "vLLM adapter does not yet apply treatment "
@@ -440,6 +451,10 @@ class VLLMSession:
             applied=self._applied,
         )
         require_matching_vllm_identity(self._identity)
+        staged = self._resolved.get("staged_treatments")
+        self._staged_readback = (
+            freeze_mapping(read_back_staged_treatments(llm, staged)) if staged else None
+        )
         self._artifacts: dict[str, Any] = {}
         if runtime_artifact is not None:
             self._artifacts["runtime"] = runtime_artifact
@@ -635,6 +650,11 @@ class VLLMSession:
                     "kv_cache": self._resolved["kv_cache"],
                 },
                 "applied": self._applied,
+                **(
+                    {"staged_treatments": self._staged_readback}
+                    if self._staged_readback is not None
+                    else {}
+                ),
                 "invocations": tuple(self._invocations),
                 "hardware": self._hardware,
                 "reset_count": self._reset_count,
@@ -672,6 +692,12 @@ class VLLMAdapter:
             _model_source(spec)
             runtime = _runtime_config(spec)
             kv = _kv_treatment(spec.treatments)
+            staged = resolve_staged_treatments(spec.treatments)
+            if staged:
+                evidence["staged_treatments"] = {
+                    "qualification": STAGED_QUALIFICATION,
+                    "settings": staged,
+                }
             requested_version = _requested_runtime_version(spec)
             if requested_version is not None and installed_version != requested_version:
                 reasons.append(
@@ -726,8 +752,10 @@ class VLLMAdapter:
         runtime_artifact = require_runtime_pin(environment)
         runtime = _runtime_config(spec)
         kv = _kv_treatment(spec.treatments)
+        staged = resolve_staged_treatments(spec.treatments)
         return freeze_mapping(
             {
+                **({"staged_treatments": staged} if staged else {}),
                 "runtime": {
                     "name": "vllm",
                     "version": _vllm_version(),
@@ -784,6 +812,13 @@ class VLLMAdapter:
             kwargs["tokenizer_revision"] = model["tokenizer_revision"]
         if self.worker_extension_cls is not None:
             kwargs["worker_extension_cls"] = self.worker_extension_cls
+        staged = engine_arguments(resolved.get("staged_treatments", {}))
+        if collisions := sorted(set(staged) & set(kwargs)):
+            raise ValueError(
+                "staged treatments cannot override managed vLLM arguments: "
+                + ", ".join(collisions)
+            )
+        kwargs.update(staged)
         llm = self._create_llm(module, kwargs, resolved)
         try:
             return self._create_session(
