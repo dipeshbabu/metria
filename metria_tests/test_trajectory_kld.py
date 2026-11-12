@@ -303,3 +303,25 @@ def test_analysis_reads_run_local_capture_evidence() -> None:
 
     result = TrajectoryDivergenceAnalysis().analyze(record("r"), record("c"))
     assert result.metrics["trajectory_kld_mean"].value == pytest.approx(0.0, abs=1e-12)
+
+
+@pytest.mark.parametrize("huge", [10**400, -(10**400)])
+def test_overflowing_integer_logprobs_are_rejected_not_raised(
+    tmp_path: Path, huge: int
+) -> None:
+    # JSON decodes an integer literal of any size to int; math.isfinite on it
+    # raises OverflowError, which must surface as an invalid-capture error.
+    path = tmp_path / "capture.jsonl"
+    path.write_text(
+        '{"step":0,"token_id":1,"top_logprobs":[[1,' + str(huge) + "]]}\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="finite"):
+        read_token_capture(path, top_k=3)
+
+    capture = _capture(((1,), (2,)), ((SHARP,), (SHARP,)))
+    rows = [dict(row) for row in capture.evidence["prompts"]]
+    rows[0]["top_logprobs"] = (((1, huge),),)
+    damaged = MeasurementResult(evidence={**capture.evidence, "prompts": tuple(rows)})
+    with pytest.raises(ValueError, match="finite"):
+        compare_trajectory_distributions(damaged, capture)

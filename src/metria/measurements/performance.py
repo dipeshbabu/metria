@@ -8,6 +8,7 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from .._numbers import is_finite
 from ..models import (
     MetricDefinition,
     MetricDirection,
@@ -95,7 +96,7 @@ def measure_invocation_performance(record: RunRecord) -> MeasurementResult:
         if (
             isinstance(value, bool)
             or not isinstance(value, (int, float))
-            or not math.isfinite(value)
+            or not is_finite(value)
             or value < 0
             or invocation.get("returncode") != 0
         ):
@@ -228,7 +229,7 @@ def compare_latency_results(
     if any(
         isinstance(value, bool)
         or not isinstance(value, (int, float))
-        or not math.isfinite(value)
+        or not is_finite(value)
         or value < 0
         for value in values
     ):

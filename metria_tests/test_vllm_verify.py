@@ -408,6 +408,8 @@ def test_unqualified_runtime_configuration_fails_before_launch(
         {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": True},
         {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": 0},
         {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": float("inf")},
+        {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": 10**400},
+        {"vllm_distribution_sha256": "a" * 64, "verification_timeout_s": -(10**400)},
     ],
 )
 def test_invalid_worker_environment_rejected_before_launch(

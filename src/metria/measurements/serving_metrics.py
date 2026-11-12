@@ -6,6 +6,7 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from .._numbers import is_finite
 from ..models import MetricDefinition, MetricDirection, MetricSample, MetricSummary
 from ..protocols import MeasurementResult
 
@@ -80,7 +81,7 @@ def _number(value: Any, *, positive: bool = False) -> float:
     if (
         isinstance(value, bool)
         or not isinstance(value, (int, float))
-        or not math.isfinite(value)
+        or not is_finite(value)
         or value < 0
         or (positive and value == 0)
     ):

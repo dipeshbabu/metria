@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import math
 from collections.abc import Mapping
 from dataclasses import replace
 from typing import Any
 
+from ._numbers import is_finite
 from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
 from .measurements.prefix_performance import compare_prefix_performance
 from .measurements.prefix_workload import PrefixWorkloadProtocol, trajectory_config
@@ -122,7 +122,7 @@ def validate_upgrade_recipe(
     if (
         isinstance(timeout, bool)
         or not isinstance(timeout, (int, float))
-        or not math.isfinite(timeout)
+        or not is_finite(timeout)
         or not 1 <= timeout <= 3600
     ):
         raise ValueError("verification_timeout_s must be between 1 and 3600 seconds")

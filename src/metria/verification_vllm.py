@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import math
 from collections.abc import Mapping, Sequence
 from functools import partial
 from pathlib import Path
 from typing import Any
 
+from ._numbers import is_finite
 from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
 from .measurements.prefix_workload import (
     WORKLOAD_METHOD,
@@ -178,7 +178,7 @@ def validate_vllm_recipe(recipe: StudyRecipe) -> None:
     if (
         isinstance(timeout, bool)
         or not isinstance(timeout, (int, float))
-        or not math.isfinite(timeout)
+        or not is_finite(timeout)
         or not 1 <= timeout <= 3600
     ):
         raise ValueError(

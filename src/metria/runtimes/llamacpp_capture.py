@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from .._numbers import is_finite
 from ..recipes import _unique_json_object
 
 CAPTURE_SCHEMA = "metria.llamacpp_capture.v1"
@@ -70,7 +71,7 @@ def _top_logprobs(value: Any, *, top_k: int, step: int) -> TopLogprobs:
         if (
             isinstance(logprob, bool)
             or not isinstance(logprob, (int, float))
-            or not math.isfinite(logprob)
+            or not is_finite(logprob)
             or logprob > 0.0
         ):
             raise ValueError(f"{label} log probabilities must be finite and <= 0")

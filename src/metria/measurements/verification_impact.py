@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import math
 from collections import defaultdict
 from collections.abc import Mapping
 from itertools import combinations
 from typing import Any
 
+from .._numbers import is_finite
 from ..models import MetricSummary, RunRecord
 from ..protocols import MeasurementResult
 from .impact_schema import DEFINITIONS
@@ -84,7 +84,7 @@ def _quality(record: RunRecord) -> Mapping[str, Any] | None:
     if (
         isinstance(metric.value, bool)
         or not isinstance(metric.value, (int, float))
-        or not math.isfinite(metric.value)
+        or not is_finite(metric.value)
         or metric.value != passed / count
     ):
         return None
