@@ -22,6 +22,12 @@ or hardware.
 
 The patch is derived from MIT-licensed llama.cpp; see `LICENSE.llama.cpp`.
 
+`staged/llamacpp-topk-capture.patch` is an unqualified extension applied after
+`llamacpp-capture.patch`. When `KV_FIDELITY_TOPK` is set it adds full-vocabulary
+top-k log probabilities to each trajectory row; otherwise output is unchanged.
+It stays separate so qualified providers keep the SHA-256 of the capture patch.
+See [staged capabilities](../../docs/guides/staged-capabilities.md).
+
 `build_llamacpp_cpu.sh` builds that pinned provider in a new workspace.
 `prepare_cpu_verification.py` exercises it, verifies the local model pin, saves
 the qualification run, and creates a one-thread versus two-thread recipe.
