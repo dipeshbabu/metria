@@ -5,7 +5,7 @@ examples. Install one public distribution and use the `metria` CLI. Metria 0.1.1
 retains its original command surface; upgrade to 0.1.2 for the unified tools.
 
 ```bash
-python -m pip install metria==0.1.3
+python -m pip install metria==0.1.4
 metria verify --help
 metria fidelity --help
 metria fidelity score --help

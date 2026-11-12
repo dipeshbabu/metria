@@ -101,7 +101,7 @@ from .study_execution import (
     execute_study,
 )
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 from .verification import VerificationResult, VerificationVerdict, verify_recipe
 

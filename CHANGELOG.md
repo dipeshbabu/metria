@@ -3,7 +3,7 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
-## Unreleased
+## 0.1.4
 
 - Report an isolated vLLM worker that leaves an unreadable or foreign partial run
   record as `EXECUTION_FAILED` with a complete bundle, retaining the untrusted file
