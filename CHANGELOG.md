@@ -11,6 +11,9 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 - Stage `vllm.scheduler` and `vllm.cache_layout` treatments with engine readback
   that fails on contradiction. Preflight blocks them unless the run overrides
   the `vllm.staged_treatments` capability check.
+- Report an isolated vLLM worker that leaves an unreadable or foreign partial run
+  record as `EXECUTION_FAILED` with a complete bundle, retaining the untrusted file
+  as `*.run.json.invalid`, instead of exiting as an invalid configuration.
 - Preserve competing artifact-cache entries during downloads; verify and reuse
   matching content, reject invalid content, and retain links without replacing them.
 - Compute top-k KL divergence in log space so extreme finite probabilities remain

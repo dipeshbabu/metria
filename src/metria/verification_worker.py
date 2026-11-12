@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from ._files import _publish_new_file
 from .comparison import compare_runs
 from .hardware import capture_hardware_fingerprint
 from .models import RunRecord, RunStatus
@@ -81,6 +82,17 @@ def _read_receipt(
     return data
 
 
+def _quarantine(path: Path) -> None:
+    """Retain untrusted worker output without letting it stand in for a record."""
+    if not path.is_symlink():
+        try:
+            _publish_new_file(path, path.with_name(path.name + ".invalid"))
+        except FileExistsError:
+            raise ValueError("untrusted worker record cannot be retained") from None
+    # Windows rename already moved the file; POSIX linked a second name.
+    path.unlink(missing_ok=True)
+
+
 def _partial_records(
     output: Path, recipe: StudyRecipe, status: RunStatus
 ) -> list[RunRecord]:
@@ -90,11 +102,17 @@ def _partial_records(
     first_missing = True
     for index, role in enumerate(VERIFICATION_ROLES):
         path = output / f"{role}.run.json"
-        if path.exists():
-            record = load_run_record(path)
-            if record.requested != recipe.study.runs[index]:
-                raise ValueError("partial worker record does not belong to this recipe")
-        else:
+        record = None
+        if path.exists() or path.is_symlink():
+            try:
+                loaded = load_run_record(path)
+            except (OSError, TypeError, ValueError, KeyError):
+                loaded = None
+            if loaded is not None and loaded.requested == recipe.study.runs[index]:
+                record = loaded
+            else:
+                _quarantine(path)
+        if record is None:
             record = RunRecord(
                 study_name=recipe.study.name,
                 run_id=f"run-{index:04d}",
