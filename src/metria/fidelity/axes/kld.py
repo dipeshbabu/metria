@@ -14,8 +14,10 @@ Score mapping (per spec):
 
 so 0 nats → 100, 0.7 nats → 50, 1.7 nats (paper headline) → ~18.
 
-TODO(v0.2): replace with true trajectory-KLD by capturing per-step logits
-during generation in the GTM pass — same forward, two oracles.
+Trajectory-KLD from per-step distributions is staged in
+:mod:`metria.measurements.trajectory_kld` with the unqualified
+``tools/qualification/staged/llamacpp-topk-capture.patch`` provider. This
+axis keeps the corpus proxy until that path has retained native qualification.
 """
 
 from __future__ import annotations

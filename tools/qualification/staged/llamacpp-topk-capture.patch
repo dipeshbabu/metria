@@ -1,0 +1,86 @@
+--- a/tools/completion/completion.cpp
++++ b/tools/completion/completion.cpp
+@@ -6,11 +6,14 @@
+ #include "llama.h"
+ #include "chat.h"
+ 
++#include <algorithm>
+ #include <clocale>
++#include <cmath>
+ #include <cstdio>
+ #include <cstdlib>
+ #include <cstring>
+ #include <ctime>
++#include <iomanip>
+ #include <fstream>
+ #include <iostream>
+ #include <sstream>
+@@ -101,12 +104,25 @@
+     const char * trajectory_path = std::getenv("KV_FIDELITY_TRAJECTORY");
+     std::ofstream trajectory;
+     int trajectory_step = 0;
++    int trajectory_topk = 0;
+     if (trajectory_path && trajectory_path[0]) {
+         trajectory.open(trajectory_path, std::ios::out | std::ios::trunc);
+         if (!trajectory) {
+             LOG_ERR("cannot open token capture file\n");
+             return 1;
+         }
++        trajectory << std::setprecision(9);
++        // Staged: optional full-vocabulary top-k log probabilities per step.
++        const char * topk = std::getenv("KV_FIDELITY_TOPK");
++        if (topk && topk[0]) {
++            char * end = nullptr;
++            const long value = std::strtol(topk, &end, 10);
++            if (end == topk || *end != '\0' || value < 1 || value > 256) {
++                LOG_ERR("KV_FIDELITY_TOPK must be an integer from 1 to 256\n");
++                return 1;
++            }
++            trajectory_topk = (int) value;
++        }
+     }
+ 
+     // save choice to use color for later
+@@ -697,7 +713,41 @@
+             const llama_token id = common_sampler_sample(smpl, ctx, -1);
+ 
+             if (trajectory.is_open()) {
+-                trajectory << "{\"step\":" << trajectory_step++ << ",\"token_id\":" << id << "}\n";
++                trajectory << "{\"step\":" << trajectory_step++ << ",\"token_id\":" << id;
++                if (trajectory_topk > 0) {
++                    // Raw model distribution for the step just sampled, before
++                    // sampler transforms; normalized over the full vocabulary.
++                    const float * logits = llama_get_logits_ith(ctx, -1);
++                    const int n_vocab = llama_vocab_n_tokens(vocab);
++                    if (logits == nullptr || n_vocab <= 0) {
++                        LOG_ERR("cannot read logits for top-k capture\n");
++                        return 1;
++                    }
++                    double max_logit = logits[0];
++                    for (int i = 1; i < n_vocab; ++i) {
++                        max_logit = std::max(max_logit, (double) logits[i]);
++                    }
++                    double sum = 0.0;
++                    for (int i = 0; i < n_vocab; ++i) {
++                        sum += std::exp((double) logits[i] - max_logit);
++                    }
++                    const double log_norm = max_logit + std::log(sum);
++                    const int k = std::min(trajectory_topk, n_vocab);
++                    std::vector<int> order(n_vocab);
++                    for (int i = 0; i < n_vocab; ++i) {
++                        order[i] = i;
++                    }
++                    std::partial_sort(order.begin(), order.begin() + k, order.end(), [&](int a, int b) {
++                        return logits[a] > logits[b] || (logits[a] == logits[b] && a < b);
++                    });
++                    trajectory << ",\"top_logprobs\":[";
++                    for (int i = 0; i < k; ++i) {
++                        trajectory << (i ? "," : "") << "[" << order[i] << ","
++                                   << ((double) logits[order[i]] - log_norm) << "]";
++                    }
++                    trajectory << "]";
++                }
++                trajectory << "}\n";
+                 trajectory.flush();
+                 if (!trajectory) {
+                     LOG_ERR("cannot write token capture file\n");

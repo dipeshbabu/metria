@@ -5,6 +5,12 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## 0.1.4
 
+- Stage trajectory KL divergence: an opt-in llama.cpp top-k capture patch,
+  a `token_top_logprobs` capture, and `metria.trajectory_kld` scored only over
+  shared-context decode steps. Results are labeled staged; no policy target uses them.
+- Stage `vllm.scheduler` and `vllm.cache_layout` treatments with engine readback
+  that fails on contradiction. Preflight blocks them unless the run overrides
+  the `vllm.staged_treatments` capability check.
 - Report an isolated vLLM worker that leaves an unreadable or foreign partial run
   record as `EXECUTION_FAILED` with a complete bundle, retaining the untrusted file
   as `*.run.json.invalid`, instead of exiting as an invalid configuration.
