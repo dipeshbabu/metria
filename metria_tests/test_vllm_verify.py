@@ -309,6 +309,33 @@ def test_supervisor_keeps_completed_reference_after_worker_timeout(
     assert result.manifest["records"]["candidate"]["status"] == "timed_out"
 
 
+@pytest.mark.parametrize("damage", ["corrupt", "foreign"])
+def test_supervisor_quarantines_untrusted_partial_worker_records(
+    prefix_case, tmp_path, monkeypatch, damage
+):
+    def invoke(recipe, output):
+        execute(prefix_case, output, reserved_output=True, defer_result=True)
+        path = output / "reference.run.json"
+        if damage == "corrupt":
+            path.write_text("{not json", encoding="utf-8")
+        else:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["record"]["requested"]["scenario"] = {"foreign": True}
+            path.unlink()
+            path.write_text(json.dumps(data), encoding="utf-8")
+        (output / "candidate.run.json").unlink()
+        return ProcessResult("fixture", 1, "", "", False, 0.1)
+
+    monkeypatch.setattr(verification_worker, "_invoke_worker", invoke)
+    result = verification.verify_recipe(prefix_case["recipe"], tmp_path / damage)
+    assert result.exit_code == 5
+    assert result.manifest["verdict"] == "EXECUTION_FAILED"
+    assert (result.output_dir / "verification.json").is_file()
+    assert (result.output_dir / "reference.run.json.invalid").is_file()
+    assert result.manifest["records"]["reference"]["status"] == "failed"
+    assert result.manifest["records"]["candidate"]["status"] == "cancelled"
+
+
 def test_output_collision_never_launches_a_worker(prefix_case, tmp_path, monkeypatch):
     marker = tmp_path / "keep.txt"
     marker.write_text("keep")
