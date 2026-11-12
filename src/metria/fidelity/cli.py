@@ -127,6 +127,7 @@ Recognised keys: ctk, ctv, attn_rot_k, attn_rot_v, attn_rot_disable.
 
 
 _KV_FIDELITY_CACHE = Path.home() / ".cache" / "kv-fidelity"
+_PROG = ["kv-fidelity"]  # invoked command, named in user-facing hints
 
 
 def _ensure_wikitext_2(
@@ -188,7 +189,7 @@ def _resolve_default_paths(args, *, need_corpus: bool, need_haystack: bool):
             raise SystemExit(
                 f"Missing cached default for {' and '.join(missing_flags)} "
                 f"while --no-auto-fetch is set. Pass the missing path "
-                f"explicitly, run `kv-fidelity fetch` ahead of time, or omit "
+                f"explicitly, run `{_PROG[0]} fetch` ahead of time, or omit "
                 f"--no-auto-fetch to download wikitext-2-raw (~10MB)."
             )
         _ensure_wikitext_2(cache_dir=_KV_FIDELITY_CACHE)
@@ -682,7 +683,7 @@ def _run_score(args) -> int:
         if args.rniah_haystack is None:
             print(
                 "ERROR: --axis-rniah requires --rniah-haystack "
-                "(or run `kv-fidelity fetch` first to populate the cache)."
+                f"(or run `{_PROG[0]} fetch` first to populate the cache)."
             )
             return 2
         # v0.3.2: synthesize lengths from --rniah-up-to (doubling step-up
@@ -865,10 +866,7 @@ quantization quality on a model. Replaces "lower PPL = better" — a metric
 that can invert sign on instruct-tuned models — with a 4-axis composite
 anchored to the fp16-KV reference.
 
-Subcommands:
-  score   run KV Fidelity on a candidate KV config vs the reference
-
-Run `kv-fidelity score --help` for full options + usage examples.
+Run `{prog} score --help` for full options + usage examples.
 """
 
 
@@ -1041,7 +1039,7 @@ def _run_selftest(args) -> int:
         except ImportError as e:
             print("  ✗ SGLang client dependencies missing")
             failures.append(
-                f"SGLang dependencies missing ({e}); install kv-fidelity[sglang]"
+                f"SGLang dependencies missing ({e}); install {_PROG[0].split()[0]}[sglang]"
             )
 
     # --- Model probe (optional) ---
@@ -1101,7 +1099,7 @@ def _run_selftest(args) -> int:
     else:
         print("OK — selftest passed.")
     print()
-    print("You're ready to run `kv-fidelity score --model ... --candidate ... ...`.")
+    print(f"You're ready to run `{_PROG[0]} score --model ... --candidate ... ...`.")
     return 0
 
 
@@ -1176,7 +1174,7 @@ def _run_fetch(args) -> int:
     print()
     if args.cache_dir.resolve() == _KV_FIDELITY_CACHE.resolve():
         print(
-            "`kv-fidelity score` and `kv-fidelity repeatability` will auto-find "
+            f"`{_PROG[0]} score` and `{_PROG[0]} repeatability` will auto-find "
             "these when --corpus / --rniah-haystack are omitted."
         )
     else:
@@ -1401,6 +1399,7 @@ def _run_repeatability(args) -> int:
 
 
 def main(argv=None, *, prog: str = "kv-fidelity", version: str | None = None) -> int:
+    _PROG[0] = prog
     _configure_utf8_stdio()
     import argparse as _ap
 
@@ -1408,7 +1407,7 @@ def main(argv=None, *, prog: str = "kv-fidelity", version: str | None = None) ->
 
     parser = argparse.ArgumentParser(
         prog=prog,
-        description=_TOP_DESCRIPTION,
+        description=_TOP_DESCRIPTION.format(prog=prog),
         formatter_class=_ap.RawDescriptionHelpFormatter,
     )
     parser.add_argument(

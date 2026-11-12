@@ -5,6 +5,12 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Report recipes, run records, policies and other JSON inputs nested too
+  deeply to parse or validate as invalid input (exit `2`) instead of crashing
+  with `RecursionError` in `recipe`, `inspect`, `compare`, `verify` and `pilot`.
+- Name the invoked command in `metria fidelity` help and hints, so installed
+  users are no longer told to run the source-only `kv-fidelity` command or
+  install `kv-fidelity[sglang]`.
 - Reject integer values too large for a float as invalid instead of raising
   `OverflowError`: vLLM and runtime-upgrade `verification_timeout_s`, staged
   top-k log probabilities, run timing, serving and task-check metrics. An

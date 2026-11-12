@@ -423,9 +423,11 @@ def load_study_recipe(path: str | Path) -> StudyRecipe:
             recipe_path.read_text(encoding="utf-8"),
             object_pairs_hook=_unique_json_object,
         )
+        return study_recipe_from_data(raw)
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid JSON recipe {recipe_path}: {exc.msg}") from exc
-    return study_recipe_from_data(raw)
+    except RecursionError:
+        raise ValueError(f"recipe {recipe_path} is nested too deeply") from None
 
 
 def dump_study_recipe(path: str | Path, recipe: StudyRecipe) -> None:
