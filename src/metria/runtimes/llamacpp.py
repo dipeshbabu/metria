@@ -27,8 +27,16 @@ from ..protocols import (
     RuntimeSession,
     SupportReport,
 )
-from .llamacpp_capture import read_runtime_capture, read_token_trajectory
+from .llamacpp_capture import (
+    TopLogprobs,
+    read_runtime_capture,
+    read_token_capture,
+)
 from .llamacpp_identity import inspect_llamacpp_identity
+
+# Staged decode-time distribution capture; see tools/qualification/staged/.
+TOP_LOGPROBS_CAPTURE = "token_top_logprobs"
+TOP_LOGPROBS_K = 20
 
 _DEFAULT_BIN_DIR = Path(
     os.path.expanduser(
@@ -456,12 +464,13 @@ class LlamaCppSession:
         if self._closed:
             raise RuntimeError("llama.cpp session is closed")
         capture_kinds = tuple(item.kind for item in capture)
-        unknown = sorted(set(capture_kinds) - {"token_ids"})
+        unknown = sorted(set(capture_kinds) - {"token_ids", TOP_LOGPROBS_CAPTURE})
         if unknown:
             raise ValueError("unsupported llama.cpp captures: " + ", ".join(unknown))
         if len(capture_kinds) != len(set(capture_kinds)):
             raise ValueError("duplicate capture requests are not allowed")
-        token_capture = "token_ids" in capture_kinds
+        distribution_capture = TOP_LOGPROBS_CAPTURE in capture_kinds
+        token_capture = "token_ids" in capture_kinds or distribution_capture
         if token_capture and self._resolved["runtime"].get("completion") is None:
             raise RuntimeError(
                 "token_ids capture requires a llama-completion binary with the "
@@ -470,24 +479,31 @@ class LlamaCppSession:
 
         outputs: list[str] = []
         token_batches: list[tuple[int, ...]] = []
+        distribution_batches: list[tuple[TopLogprobs, ...]] = []
         batch_invocations: list[Mapping[str, Any]] = []
         for request in requests:
             if not isinstance(request, InferenceRequest):
                 raise TypeError("requests must contain InferenceRequest objects")
-            output, token_ids, evidence = self._infer_one(
+            output, token_ids, distributions, evidence = self._infer_one(
                 request,
                 token_capture=token_capture,
+                top_k=TOP_LOGPROBS_K if distribution_capture else None,
             )
             outputs.append(output)
             if token_capture:
                 token_batches.append(tuple(token_ids))
+            if distribution_capture:
+                assert distributions is not None
+                distribution_batches.append(tuple(distributions))
             frozen_evidence = freeze_mapping(evidence)
             self._invocations.append(frozen_evidence)
             batch_invocations.append(frozen_evidence)
 
         captures: dict[str, Any] = {}
-        if token_capture:
+        if "token_ids" in capture_kinds:
             captures["token_ids"] = tuple(token_batches)
+        if distribution_capture:
+            captures[TOP_LOGPROBS_CAPTURE] = tuple(distribution_batches)
         return InferenceBatch(
             outputs=tuple(outputs),
             captures=captures,
@@ -538,7 +554,8 @@ class LlamaCppSession:
         request: InferenceRequest,
         *,
         token_capture: bool,
-    ) -> tuple[str, list[int], dict[str, Any]]:
+        top_k: int | None = None,
+    ) -> tuple[str, list[int], list[TopLogprobs] | None, dict[str, Any]]:
         runtime = self._resolved["runtime"]
         model = self._resolved["model"]
         kv = self._resolved["kv_cache"]
@@ -585,15 +602,9 @@ class LlamaCppSession:
         process_env = os.environ.copy()
         managed_env = _kv_env(kv)
         process_env.update(managed_env)
-        trajectory_path: str | None = None
-        if token_capture:
-            fd, trajectory_path = tempfile.mkstemp(
-                prefix="metria-llama-trajectory-",
-                suffix=".jsonl",
-            )
-            os.close(fd)
-            os.unlink(trajectory_path)
-            process_env["KV_FIDELITY_TRAJECTORY"] = trajectory_path
+        trajectory_path = (
+            _prepare_capture_env(process_env, top_k) if token_capture else None
+        )
 
         started = time.monotonic()
         try:
@@ -621,15 +632,8 @@ class LlamaCppSession:
                     f"stderr tail: {stderr_tail}"
                 )
 
-            token_ids = (
-                _read_trajectory(Path(trajectory_path))
-                if trajectory_path is not None
-                else []
-            )
-            runtime_capture = (
-                read_runtime_capture(Path(trajectory_path + ".runtime.json"))
-                if trajectory_path is not None
-                else None
+            token_ids, distributions, runtime_capture = _read_capture_files(
+                trajectory_path, top_k
             )
             evidence = {
                 "binary": str(executable),
@@ -646,7 +650,14 @@ class LlamaCppSession:
                 "token_capture_observed": bool(token_ids) if token_capture else None,
                 "runtime_capture": runtime_capture,
             }
-            return _extract_completion(completed.stdout), token_ids, evidence
+            if top_k is not None:
+                evidence["top_logprobs"] = {"top_k": top_k, "qualification": "staged"}
+            return (
+                _extract_completion(completed.stdout),
+                token_ids,
+                distributions,
+                evidence,
+            )
         finally:
             if trajectory_path is not None:
                 for path in (trajectory_path, trajectory_path + ".runtime.json"):
@@ -656,10 +667,36 @@ class LlamaCppSession:
                         pass
 
 
-def _read_trajectory(path: Path) -> list[int]:
-    """Read token IDs emitted by the existing patched llama-completion ABI."""
+def _prepare_capture_env(process_env: dict[str, str], top_k: int | None) -> str:
+    """Reserve a capture path and set the provider's capture variables."""
 
-    return read_token_trajectory(path)
+    fd, trajectory_path = tempfile.mkstemp(
+        prefix="metria-llama-trajectory-",
+        suffix=".jsonl",
+    )
+    os.close(fd)
+    os.unlink(trajectory_path)
+    process_env["KV_FIDELITY_TRAJECTORY"] = trajectory_path
+    if top_k is not None:
+        process_env["KV_FIDELITY_TOPK"] = str(top_k)
+    else:
+        # Never let an inherited variable change the qualified token stream.
+        process_env.pop("KV_FIDELITY_TOPK", None)
+    return trajectory_path
+
+
+def _read_capture_files(
+    trajectory_path: str | None, top_k: int | None
+) -> tuple[list[int], list[TopLogprobs] | None, Mapping[str, Any] | None]:
+    """Read token, staged distribution, and runtime-fact captures."""
+
+    if trajectory_path is None:
+        return [], None, None
+    token_ids, distributions = read_token_capture(Path(trajectory_path), top_k=top_k)
+    if distributions is not None and len(distributions) != len(token_ids):
+        raise RuntimeError("llama.cpp top-k capture does not cover every step")
+    runtime_capture = read_runtime_capture(Path(trajectory_path + ".runtime.json"))
+    return token_ids, distributions, runtime_capture
 
 
 class LlamaCppAdapter:
@@ -701,6 +738,15 @@ class LlamaCppAdapter:
                 "llama_completion": str(completion) if completion else None,
                 "token_ids_capture": (
                     "binary_present_unverified" if completion else "unavailable"
+                ),
+                f"{TOP_LOGPROBS_CAPTURE}_capture": (
+                    {
+                        "status": "experimental",
+                        "top_k": TOP_LOGPROBS_K,
+                        "reason": "staged top-k patch pending native qualification",
+                    }
+                    if completion
+                    else "unavailable"
                 ),
                 "n_gpu_layers": runtime["n_gpu_layers"],
             }
