@@ -29,6 +29,7 @@ Current release: [Metria 0.1.3](releases/0.1.3.md).
 - [Representative maintainer pilot](guides/representative-maintainer-pilot.md)
 - [Local serving, streaming and native memory measurements](guides/serving-measurements.md)
 - [FP8 KV-cache qualification status](guides/fp8-qualification-status.md)
+- [Staged capabilities: trajectory KL divergence and vLLM treatments](guides/staged-capabilities.md)
 - [Verify a local llama.cpp CPU thread change](guides/metria-verify.md)
 - [Verify a llama.cpp CPU build change](guides/llamacpp-build-verification.md)
 - [Verify a GGUF Q8_0 weight-quantization change](guides/gguf-quantization-verification.md)
