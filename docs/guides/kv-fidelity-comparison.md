@@ -6,7 +6,7 @@ directly comparable. KV Fidelity ships in Metria 0.1.2; the standalone publicati
 plan is retired.
 
 ```bash
-python -m pip install metria==0.1.3
+python -m pip install metria==0.1.4
 metria fidelity compare run-a.json run-b.json --json-out comparison.json
 ```
 

@@ -1,6 +1,6 @@
 # Verify a local llama.cpp CPU thread change
 
-This guide covers the llama.cpp CPU profile. Metria 0.1.3 also
+This guide covers the llama.cpp CPU profile. Metria 0.1.4 also
 supports a [qualified vLLM prefix-cache profile](vllm-prefix-verification.md)
 through the same `metria verify` command, lifecycle and report schema.
 
@@ -24,20 +24,20 @@ Install the published root package in a Python virtual environment:
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-python -m pip install metria==0.1.3
+python -m pip install metria==0.1.4
 ```
 
 The Python package does not bundle the native runtime or model. The source
 archive contains the setup helpers. Download and extract it from PyPI:
 
 ```bash
-python -m pip download --no-deps --no-binary=:all: metria==0.1.3
-tar -xzf metria-0.1.3.tar.gz
-cd metria-0.1.3
+python -m pip download --no-deps --no-binary=:all: metria==0.1.4
+tar -xzf metria-0.1.4.tar.gz
+cd metria-0.1.4
 ```
 
 The archive and checksums are also available in the
-[GitHub release](https://github.com/dipeshbabu/metria/releases/tag/metria-v0.1.3).
+[GitHub release](https://github.com/dipeshbabu/metria/releases/tag/metria-v0.1.4).
 From the extracted directory, prepare the pinned local example:
 
 ```bash
@@ -115,7 +115,7 @@ rejected before execution. See the [verification contract](../architecture/verif
 | `INSUFFICIENT_EVIDENCE` | Required model/provider identity, runtime readback, or token captures are absent or inconsistent with the request. |
 | `EXECUTION_FAILED` | Execution, timeout, interruption, or behavioral analysis prevented completion. |
 
-In Metria 0.1.3, exit status is `0` for `VERIFIED` or `PASS`, `1` for
+In Metria 0.1.4, exit status is `0` for `VERIFIED` or `PASS`, `1` for
 policy `FAIL`, `2` for invalid input/configuration, `3` for `NOT_COMPARABLE`, `4`
 for `INSUFFICIENT_EVIDENCE`, `5` for execution/preflight or persistence failure,
 and `130` for interruption. See [CI integration](verification-ci.md) for
@@ -155,7 +155,7 @@ The JSON manifest uses `metria.verification.v1` and records the scoped contract,
 recipe digest, run/evidence digests, hardware evidence, observed facts, comparison
 issues, analysis identity, diagnostics, and process wall-time method.
 
-In Metria 0.1.3, `verification.json` is the canonical result and
+In Metria 0.1.4, `verification.json` is the canonical result and
 `report.md` is a deterministic projection of it. The report leads with the
 verdict and separates Change, Evidence, Comparison, Impact, and Verdict.
 `lifecycle.status`, `comparison_status`, and `policy_status` distinguish execution

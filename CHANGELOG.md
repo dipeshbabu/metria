@@ -3,7 +3,7 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
-## Unreleased
+## 0.1.4
 
 - Stage trajectory KL divergence: an opt-in llama.cpp top-k capture patch,
   a `token_top_logprobs` capture, and `metria.trajectory_kld` scored only over
