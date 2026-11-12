@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from enum import Enum
@@ -13,6 +12,7 @@ from typing import Any
 
 from ._files import _publish_new_file
 from ._freeze import freeze_mapping
+from ._numbers import is_finite
 from .capability_checks import CapabilityCheckRegistry
 from .comparison import _declared_dimension_issue, compare_runs
 from .hardware import capture_hardware_fingerprint
@@ -358,7 +358,7 @@ def _wall_time(record: RunRecord) -> dict[str, Any]:
         if (
             isinstance(value, bool)
             or not isinstance(value, (int, float))
-            or not math.isfinite(value)
+            or not is_finite(value)
             or value < 0
         ):
             return {"available": False}

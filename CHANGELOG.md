@@ -3,6 +3,13 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
+## Unreleased
+
+- Reject integer values too large for a float as invalid instead of raising
+  `OverflowError`: vLLM and runtime-upgrade `verification_timeout_s`, staged
+  top-k log probabilities, run timing, serving and task-check metrics. An
+  oversized recipe timeout now exits as an invalid configuration (`2`).
+
 ## 0.1.4
 
 - Stage trajectory KL divergence: an opt-in llama.cpp top-k capture patch,

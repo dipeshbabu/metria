@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from ._numbers import is_finite
 from .recipes import StudyRecipe, _json_value, study_recipe_digest
 from .verification import VERIFICATION_SCOPE, _write_atomic, verify_recipe
 from .verification_schema import (
@@ -191,7 +191,7 @@ def _latency_summary(
         if all(
             isinstance(value, (int, float))
             and not isinstance(value, bool)
-            and math.isfinite(value)
+            and is_finite(value)
             and value >= 0
             for samples in values.values()
             for value in samples
