@@ -91,3 +91,11 @@ def test_rendered_site_requires_search_data(tmp_path):
     root = _site(tmp_path)
     (root / "search" / "search_index.json").unlink()
     assert checker.check_site(root) == ["search index is missing or invalid"]
+
+
+def test_stylesheet_icon_references_are_checked(tmp_path):
+    root = _site(tmp_path)
+    (root / "style.css").write_text(".icon { mask-image: url('icon.svg'); }")
+    assert checker.check_site(root) == ["style.css: missing target: icon.svg"]
+    (root / "icon.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"/>')
+    assert checker.check_site(root) == []

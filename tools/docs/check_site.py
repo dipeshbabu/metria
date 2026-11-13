@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -35,8 +36,13 @@ def check_site(directory: Path, base_path: str = "/metria/") -> list[str]:
     errors = []
     if root / "index.html" not in pages:
         errors.append("site has no index.html")
-    for source, page in pages.items():
-        for link in page.links:
+    sources = {source: page.links for source, page in pages.items()}
+    for source in root.rglob("*.css"):
+        sources[source] = re.findall(
+            r"url\(\s*['\"]?([^'\")]+)['\"]?\s*\)", source.read_text(encoding="utf-8")
+        )
+    for source, links in sources.items():
+        for link in links:
             url = urlsplit(link)
             if url.scheme or url.netloc:
                 continue
