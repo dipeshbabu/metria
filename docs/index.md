@@ -9,7 +9,7 @@ This directory contains current, maintained guidance for Metria. Dated
 experiments and historical conclusions live under [`research/`](../research/README.md);
 generated evidence lives under [`artifacts/`](../artifacts/README.md).
 
-Current release: [Metria 0.1.5](releases/0.1.5.md).
+Current release: [Metria 0.1.6](releases/0.1.6.md).
 
 ## Supporting architecture
 
