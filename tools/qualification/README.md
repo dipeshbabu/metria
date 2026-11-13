@@ -26,7 +26,18 @@ The patch is derived from MIT-licensed llama.cpp; see `LICENSE.llama.cpp`.
 `llamacpp-capture.patch`. When `KV_FIDELITY_TOPK` is set it adds full-vocabulary
 top-k log probabilities to each trajectory row; otherwise output is unchanged.
 It stays separate so qualified providers keep the SHA-256 of the capture patch.
-See [staged capabilities](../../docs/guides/staged-capabilities.md).
+After building it on top of a qualified source tree with the same CMake flags,
+`staged/check_topk_provider.py` checks the layered provider against the
+qualified one. See [staged capabilities](../../docs/guides/staged-capabilities.md).
+
+## Linux toolchain
+
+The build scripts need Linux (or WSL2) with `git`, CMake 3.28 or newer, GNU
+Make and a C/C++ compiler; Ubuntu 24.04's `build-essential` and `cmake` packages
+are sufficient. Build from a Linux checkout of this repository: `git apply`
+rejects the patches if a Windows checkout converted them to CRLF line endings.
+A rebuilt provider is not bit-for-bit identical to a retained one, so qualify it
+by its own SHA-256 before using it in a qualified profile.
 
 `build_llamacpp_cpu.sh` builds that pinned provider in a new workspace.
 `prepare_cpu_verification.py` exercises it, verifies the local model pin, saves

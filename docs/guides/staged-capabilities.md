@@ -45,10 +45,27 @@ patch only writes distributions when `KV_FIDELITY_TOPK` is set, so the token
 stream is otherwise unchanged. It is a separate file because qualified
 providers are pinned to the SHA-256 of the unchanged capture patch.
 
-**Remaining qualification:** compile the layered provider at the pinned
-llama.cpp revision; retain a self-comparison (expected KL of exactly zero) and a
-known KV-precision change; and confirm the captured top-k matches the logits
-from an independent `llama-perplexity --kl-divergence` run on the same context.
+**Functional check.** The layered provider has been compiled at the pinned
+revision (GCC 13.3, Ubuntu 24.04 under WSL2, no compiler warnings) and passes
+`tools/qualification/staged/check_topk_provider.py` with the pinned
+`stories260K.gguf` fixture:
+
+- the token stream is identical to the qualified provider's with and without
+  `KV_FIDELITY_TOPK`;
+- every step carries a top-20 distribution accepted by Metria's strict reader;
+- at temperature 0 the sampled token is the captured top-1 at every step;
+- repeating an identical run through the llama.cpp adapter gives KL of exactly 0;
+- enabling flash attention left every sampled token unchanged but moved the
+  distributions by a mean of about 5e-7 nats, which token agreement cannot see.
+
+This is a functional check, not qualification: nothing is retained, and the
+fixture's 8-wide attention heads cannot load quantized (`q8_0`, block 32) KV
+caches.
+
+**Remaining qualification:** retain native runs on a model whose head size
+supports quantized KV caches, including a self-comparison and a known
+KV-precision change, and confirm the captured top-k matches the logits from an
+independent `llama-perplexity --kl-divergence` run on the same context.
 
 ## vLLM staged treatments
 
