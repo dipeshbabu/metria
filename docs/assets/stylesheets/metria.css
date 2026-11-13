@@ -45,12 +45,6 @@
 .md-search__input, .md-search__icon { color: var(--md-default-fg-color); }
 .md-search__input::placeholder { color: var(--metria-muted); }
 .md-search__form:hover { background: var(--metria-soft); border-color: var(--metria-accent); }
-.md-banner { background: var(--metria-soft); color: var(--metria-muted); border-bottom: 1px solid var(--metria-border); }
-.md-banner__inner { font-size: .6rem; padding: .4rem 0; }
-.md-banner a { color: inherit; display: block; }
-.metria-release-dot { display: inline-block; width: .3rem; height: .3rem; border-radius: 50%; background: var(--metria-accent); margin-right: .4rem; }
-.metria-announcement-separator { opacity: .5; margin: 0 .5rem; }
-.metria-announcement-link { float: right; font-weight: 600; }
 .md-main__inner { margin-top: 1.8rem; }
 .md-content__inner { padding: 0 1rem 1.5rem; }
 .md-typeset { font-size: .8rem; line-height: 1.75; }
@@ -114,7 +108,6 @@
 @media (max-width: 44em) {
   .md-typeset .metria-cards { grid-template-columns: 1fr; }
   .md-content__inner { padding: 0 .3rem 1rem; }
-  .metria-announcement-link { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
