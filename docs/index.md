@@ -1,77 +1,113 @@
-# Documentation
+---
+title: Overview
+hide:
+  - navigation
+  - toc
+---
 
-Metria verifies one inference change between a reference and a candidate. Start
-with [getting started](guides/getting-started.md), the
-[copyable workflows](../examples/verification/README.md), and
-[CI integration](guides/verification-ci.md). The internal APIs support that path.
+<div class="metria-kicker">Metria documentation</div>
 
-This directory contains current, maintained guidance for Metria. Dated
-experiments and historical conclusions live under [`research/`](../research/README.md);
-generated evidence lives under [`artifacts/`](../artifacts/README.md).
+<div class="metria-hero" markdown="1">
+<div markdown="1">
 
-Current release: [Metria 0.1.6](releases/0.1.6.md).
+# Test inference changes.<br><em>Keep the evidence.</em>
 
-## Supporting architecture
+<p class="metria-lede">Compare a reference with a candidate, check what actually ran, and decide whether the change meets your acceptance criteria. Keep a report you can inspect and reproduce.</p>
 
-- [Verifier product decision and scope](architecture/verifier-product.md)
-- [Metria core architecture](architecture/metria-core.md)
+<p class="metria-actions" markdown="1">
+[Get started &rarr;](guides/getting-started.md){ .md-button .md-button--primary }
+[See your first report](guides/first-report.md){ .md-button }
+</p>
 
-## Guides
+</div>
+<div class="metria-terminal" markdown="1">
+<div class="metria-terminal-title"><span></span><span></span><span></span><strong>A first look · no model required</strong></div>
 
-- [Task checks, repeatability and decision policies](guides/verification-decisions.md)
-- [Installed-package workflow and synthetic demo](guides/installed-workflow.md)
-- [Real-user pilot checklist](guides/verifier-pilot.md)
-- [Unified fidelity methods and source migration](guides/unified-fidelity.md)
+```text
+python -m pip install metria
 
-- [Verified model and data artifacts](guides/artifact-resolution.md)
+metria demo --case pass --output demo-pass
 
-- [Verify a local vLLM prefix-cache change](guides/vllm-prefix-verification.md)
-- [Representative maintainer pilot](guides/representative-maintainer-pilot.md)
-- [Local serving, streaming and native memory measurements](guides/serving-measurements.md)
-- [FP8 KV-cache qualification status](guides/fp8-qualification-status.md)
-- [Verify an FP8 KV-cache change](guides/fp8-kv-cache-verification.md)
-- [Staged capabilities: trajectory KL divergence and vLLM treatments](guides/staged-capabilities.md)
-- [Verify a local llama.cpp CPU thread change](guides/metria-verify.md)
-- [Verify a llama.cpp CPU build change](guides/llamacpp-build-verification.md)
-- [Verify a GGUF Q8_0 weight-quantization change](guides/gguf-quantization-verification.md)
-- [Verify a pinned local vLLM CPU runtime upgrade](guides/runtime-upgrade-verification.md)
-- [Copyable verification workflows and synthetic fixtures](../examples/verification/README.md)
-- [Gate verification in CI](guides/verification-ci.md)
-- [Metria llama.cpp runtime adapter](guides/metria-llamacpp-runtime.md)
-- [Metria vLLM runtime adapter](guides/metria-vllm-runtime.md)
-- [Metria trajectory measurement bridge](guides/metria-trajectory-measurement.md)
-- [Metria pairwise analyses](guides/metria-pairwise-analysis.md)
-- [TurboQuant configuration recommendations](guides/turboquant-recommendations.md)
-- [MLX port](guides/mlx-port.md)
-- [Windows and AMD RDNA 4 setup](guides/windows-rdna4-setup.md)
+# Read the synthetic decision and evidence
+# demo-pass/report.md
+# demo-pass/verification.json
+```
 
-## Reference
+<div class="metria-terminal-note">Synthetic example. Real verification uses a qualified runtime and pinned model.</div>
+</div>
+</div>
 
-- [Benchmarks](reference/benchmarks.md)
-- [Hardware comparison matrix](reference/hardware-comparison-matrix.md)
-- [Test-suite definition](reference/test-suite-definition.md)
-- [Weight-compression results](reference/weight-compression-results.md)
+<div class="metria-facts"><span>Python 3.10–3.14</span><span>No base runtime dependencies</span><span>CLI + Python API</span><span>Apache-2.0</span></div>
 
-## Historical engine setup
+## Start with a decision
 
-- [Archived TurboQuant+ fork setup](../research/archive/turboquant-engine-setup.md)
+Metria checks one declared inference change at a time. It keeps evidence gates,
+behavioral measurements, and your acceptance policy separate, so a missing capture
+or an unexpected difference cannot silently become a policy pass.
 
-This archived guide describes an experimental fork whose public source is
-unavailable. For the published Metria CLI, use the local verification guide above.
+<div class="metria-cards" markdown="1">
+<div class="metria-card" markdown="1">
+<span class="metria-card-number">01 / LEARN THE WORKFLOW</span>
 
-## Components
+### Read your first report
 
-- [KV Fidelity](../components/kv-fidelity/README.md)
-- [TurboQuant reference](../components/turboquant-reference/README.md)
+Install the package and try synthetic PASS, FAIL, and NOT_COMPARABLE cases. Learn the output before setting up an inference engine.
 
-## Maintainers
+[Run the walkthrough &rarr;](guides/first-report.md)
 
-- [Project governance](../GOVERNANCE.md)
-- [Maintainers and component ownership](../MAINTAINERS.md)
-- [Repository settings baseline](maintainers/repository-settings.md)
-- [Publishing the root Metria package](guides/releasing-metria.md)
-- [Independent component release procedures](guides/releasing.md)
+</div>
+<div class="metria-card" markdown="1">
+<span class="metria-card-number">02 / CHECK A REAL CHANGE</span>
 
-When documents disagree, prefer current guidance backed by the newer
-controlled experiment. Preserve older results as dated evidence rather than
-rewriting them to match the latest recommendation.
+### Verify a candidate
+
+Choose a scoped workflow for local CPU settings, a runtime build, weight quantization, prefix caching, or serving measurements.
+
+[Choose a workflow &rarr;](guides/verification-overview.md)
+
+</div>
+<div class="metria-card" markdown="1">
+<span class="metria-card-number">03 / MAKE IT REPEATABLE</span>
+
+### Gate changes in CI
+
+Declare acceptance criteria, use distinct failure exits, and retain the report and both run records when a check fails.
+
+[Set up CI &rarr;](guides/verification-ci.md)
+
+</div>
+</div>
+
+## From change to evidence
+
+<div class="metria-flow">
+<div><strong>1. Declare</strong><span>Pin the model, runtime, workload, and intended change in a recipe.</span></div>
+<div><strong>2. Verify</strong><span>Check observed identities and reject undeclared differences.</span></div>
+<div><strong>3. Measure</strong><span>Inspect token drift, task checks, repeatability, and compatible timing.</span></div>
+<div><strong>4. Decide</strong><span>Evaluate your policy and retain both runs with the report.</span></div>
+</div>
+
+[Understand the verification contract](architecture/verification-contract.md)
+&nbsp; · &nbsp;
+[Read the decision model](guides/verification-decisions.md)
+
+<div class="metria-boundary" markdown="1">
+**A valid comparison is the beginning of a decision.** `VERIFIED` means the
+comparison had sufficient evidence and its analysis completed. A policy `PASS`
+applies to your declared criteria on this workload. Neither is a universal model
+quality or production performance guarantee. See [qualified and staged capabilities](guides/staged-capabilities.md).
+</div>
+
+## Go deeper
+
+| Work on | Read next |
+| --- | --- |
+| Recipes and saved evidence | [Recipe CLI](guides/metria-recipe-cli.md), [study recipes](guides/metria-study-recipes.md), [run records](guides/metria-run-records.md) |
+| Local inference engines | [llama.cpp adapter](guides/metria-llamacpp-runtime.md), [vLLM adapter](guides/metria-vllm-runtime.md), [runtime qualification](guides/runtime-qualification.md) |
+| Fidelity measurements | [Unified fidelity tools](guides/unified-fidelity.md), [report comparison](guides/kv-fidelity-comparison.md), [token trajectories](guides/metria-trajectory-measurement.md) |
+| Reproducible evidence | [Artifact resolution](guides/artifact-resolution.md), [testing evidence](guides/testing-evidence.md), [maintainer pilot](guides/representative-maintainer-pilot.md) |
+| Development | [Core architecture](architecture/metria-core.md), [build these docs](maintainers/documentation.md), [contributing](../CONTRIBUTING.md) |
+
+Current guidance lives here. [Historical research](../research/README.md) and
+[retained artifacts](../artifacts/README.md) remain in the repository with their
+original scope and provenance.
