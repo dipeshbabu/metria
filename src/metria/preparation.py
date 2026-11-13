@@ -26,8 +26,11 @@ def prepare_vllm_prefix_recipe(
     timeout_s: float = 900,
     gpu_memory_utilization: float = 0.35,
     kv_cache_dtype: str | None = None,
+    staged_distributions: bool = False,
 ) -> StudyRecipe:
     """Pin current runtime content and verify a separately trusted model manifest."""
+    if staged_distributions and kv_cache_dtype is None:
+        raise ValueError("staged trajectory KLD requires a KV-cache precision recipe")
     directory = Path(model_dir).expanduser().resolve()
     files = descriptor.get("files")
     verify_model_files(directory, files)
@@ -37,6 +40,7 @@ def prepare_vllm_prefix_recipe(
         "prompts": tuple(prompts),
         "warmup_trials": warmup_trials,
         "measured_trials": measured_trials,
+        **({"staged_distributions": True} if staged_distributions else {}),
     }
     model: dict[str, Any] = {"path": str(directory), "files": files}
     for source, target in (("model_id", "id"), ("revision", "revision")):
@@ -117,7 +121,11 @@ def _kv_precision_recipe(
     """Build an automatic-vs-FP8 KV-cache recipe; validated once a policy is set."""
 
     from .models import TreatmentSpec, TreatmentType
-    from .verification_kv_precision import FP8_KV_DTYPES, KV_PRECISION_VARIATIONS
+    from .verification_kv_precision import (
+        FP8_KV_DTYPES,
+        KV_PRECISION_VARIATIONS,
+        _analyses,
+    )
 
     if kv_cache_dtype not in FP8_KV_DTYPES:
         raise ValueError(
@@ -149,10 +157,7 @@ def _kv_precision_recipe(
                 control=frozenset(
                     {"model", "scenario", "measurements", "trial_policy"}
                 ),
-                analyses=(
-                    TrajectoryAgreementAnalysis.name,
-                    VerificationImpactAnalysis.name,
-                ),
+                analyses=_analyses(config),
             ),
         ),
         measurement_configs={TokenTrajectoryProtocol.name: config},

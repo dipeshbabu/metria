@@ -43,14 +43,21 @@ QUALIFIED_VLLM_VERSIONS = frozenset({"0.30.0+cpu", "0.30.0+cu129"})
 
 
 def trial_identity(config: Mapping[str, Any]) -> dict[str, Any]:
+    from .integrations.staged_captures import STAGED_CAPTURE_CHECK
+    from .measurements.prefix_distributions import staged_distributions
+
     warmup, measured = trial_settings(config)
-    return {
+    identity: dict[str, Any] = {
         "method": WORKLOAD_METHOD,
         "warmup_trials": warmup,
         "measured_trials": measured,
         "schedule": "sequential",
         "isolation": "reset_prefix_cache_before_each_trial",
     }
+    if staged_distributions(config):
+        # The experimental capture runs only under its explicit override.
+        identity["capability_overrides"] = (STAGED_CAPTURE_CHECK,)
+    return identity
 
 
 def _mapping(value: Any) -> Mapping[str, Any]:
@@ -188,6 +195,12 @@ def validate_vllm_recipe(
         )
     config = recipe.measurement_configs[TokenTrajectoryProtocol.name]
     trajectory_config(config)
+    from .measurements.prefix_distributions import staged_distributions
+
+    if check_prefix_change and staged_distributions(config):
+        raise ValueError(
+            "staged distributions are accepted only by KV-precision verification"
+        )
     left, right = recipe.study.runs
     for run in (left, right):
         _validate_run(run, config)

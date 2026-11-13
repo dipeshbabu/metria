@@ -14,7 +14,15 @@ from dataclasses import replace
 from functools import partial
 from typing import Any
 
-from .measurements import TokenTrajectoryProtocol, TrajectoryAgreementAnalysis
+from .measurements import (
+    TokenTrajectoryProtocol,
+    TrajectoryAgreementAnalysis,
+    TrajectoryDivergenceAnalysis,
+)
+from .measurements.prefix_distributions import (
+    DISTRIBUTIONS_KEY,
+    staged_distributions,
+)
 from .measurements.prefix_workload import PrefixWorkloadProtocol
 from .measurements.task_checks import prompt_checks, task_workload_identity
 from .measurements.verification_impact import VerificationImpactAnalysis
@@ -74,6 +82,18 @@ def _kv_dtype(run: Any) -> str:
     return dtype
 
 
+def _analyses(config: Any) -> tuple[str, ...]:
+    """Qualified analyses, plus STAGED trajectory KLD when distributions are on."""
+
+    names: tuple[str, ...] = (
+        TrajectoryAgreementAnalysis.name,
+        VerificationImpactAnalysis.name,
+    )
+    if isinstance(config, Mapping) and staged_distributions(config):
+        names += (TrajectoryDivergenceAnalysis.name,)
+    return names
+
+
 def validate_kv_precision_recipe(recipe: StudyRecipe) -> tuple[str, str]:
     """Validate the profile and return the reference and candidate dtypes."""
 
@@ -85,16 +105,16 @@ def validate_kv_precision_recipe(recipe: StudyRecipe) -> tuple[str, str]:
             "KV-precision verification permits only its five KV-cache "
             "variation paths and no waivers"
         )
-    if comparison.analyses != (
-        TrajectoryAgreementAnalysis.name,
-        VerificationImpactAnalysis.name,
-    ):
-        raise ValueError(
-            "KV-precision verification requires trajectory and impact analyses"
-        )
     if set(recipe.measurement_configs) != {TokenTrajectoryProtocol.name}:
         raise ValueError(
             "KV-precision verification requires exactly one workload configuration"
+        )
+    if comparison.analyses != _analyses(
+        recipe.measurement_configs[TokenTrajectoryProtocol.name]
+    ):
+        raise ValueError(
+            "KV-precision verification requires trajectory and impact analyses, "
+            "plus metria.trajectory_kld exactly when staged_distributions is true"
         )
     if recipe.policy is None:
         raise ValueError(
@@ -118,11 +138,13 @@ def validate_kv_precision_recipe(recipe: StudyRecipe) -> tuple[str, str]:
     validate_vllm_recipe(
         replace(
             recipe,
+            policy=None,
             study=replace(
                 recipe.study,
                 runs=(replace(left, treatments=()), replace(right, treatments=())),
                 comparison=replace(
                     comparison,
+                    analyses=comparison.analyses[:2],
                     vary=frozenset(
                         {
                             "runtime.enable_prefix_caching",
@@ -163,12 +185,33 @@ def _kv_gaps(record: RunRecord) -> list[str]:
     return gaps
 
 
+def _distribution_gaps(record: RunRecord) -> list[str]:
+    """STAGED: require raw top-k evidence for every native call when opted in."""
+
+    capture = _mapping(
+        _mapping(record.evidence.get("measurements")).get(TokenTrajectoryProtocol.name)
+    )
+    retained = _mapping(capture.get(DISTRIBUTIONS_KEY))
+    if retained.get("qualification") != "staged" or retained.get(
+        "n_prompts"
+    ) != capture.get("n_prompts"):
+        return ["staged distribution evidence is missing or incomplete"]
+    invocations = record.observed.get("invocations", ())
+    if not invocations or any(
+        _mapping(_mapping(row).get("top_logprobs")).get("mode") != "raw_logprobs"
+        for row in invocations
+    ):
+        return ["native calls did not retain raw top-k logprob provenance"]
+    return []
+
+
 def evidence_gaps(
     record: RunRecord,
     *,
     runtime_pin: str,
     trials: Mapping[str, Any],
     quality_identity: Mapping[str, Any],
+    distributions: bool = False,
 ) -> tuple[str, ...]:
     return tuple(
         dict.fromkeys(
@@ -178,6 +221,7 @@ def evidence_gaps(
                 ),
                 *_workload_gaps(record, trials),
                 *_kv_gaps(record),
+                *(_distribution_gaps(record) if distributions else ()),
             )
         )
     )
@@ -206,19 +250,24 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
         "check_count": sum(len(row) for row in checks) * trials["measured_trials"],
     }
     analysis = TrajectoryAgreementAnalysis()
+    distributions = staged_distributions(config)
+    analyses: dict[str, Any] = {
+        analysis.name: analysis,
+        VerificationImpactAnalysis.name: VerificationImpactAnalysis(),
+    }
+    if distributions:
+        analyses[TrajectoryDivergenceAnalysis.name] = TrajectoryDivergenceAnalysis()
     return VerificationRoute(
         scope=VLLM_KV_PRECISION_SCOPE,
         adapters={"vllm": VLLMAdapter()},
         measurements={measurement.name: measurement},
-        analyses={
-            analysis.name: analysis,
-            VerificationImpactAnalysis.name: VerificationImpactAnalysis(),
-        },
+        analyses=analyses,
         evidence_gaps=partial(
             evidence_gaps,
             runtime_pin=recipe.environment["vllm_distribution_sha256"],
             trials=trials,
             quality_identity=quality_identity,
+            distributions=distributions,
         ),
         observed_facts=kv_observed_facts,
         change={

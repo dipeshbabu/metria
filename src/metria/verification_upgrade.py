@@ -150,6 +150,10 @@ def _validate_pair(recipe: StudyRecipe, targets: Mapping[str, Any]) -> None:
         raise ValueError("runtime upgrades require one trajectory workload")
     config = recipe.measurement_configs[TokenTrajectoryProtocol.name]
     trajectory_config(config)
+    if config.get("staged_distributions") is True:
+        raise ValueError(
+            "staged distributions are accepted only by KV-precision verification"
+        )
     for role, run in zip(("reference", "candidate"), recipe.study.runs, strict=True):
         validate_upgrade_run(run, config)
         if (

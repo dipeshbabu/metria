@@ -412,6 +412,11 @@ class TrajectoryDivergenceAnalysis:
             )
         raw = measurements.get(TokenDistributionProtocol.name)
         if not isinstance(raw, Mapping):
+            # Prefix workloads retain staged distributions beside trajectories.
+            trajectory = measurements.get(_TRAJECTORY_METHOD)
+            if isinstance(trajectory, Mapping):
+                raw = trajectory.get("distributions")
+        if not isinstance(raw, Mapping):
             raise ValueError(
                 f"run {record.run_id!r} does not contain distribution capture evidence"
             )
