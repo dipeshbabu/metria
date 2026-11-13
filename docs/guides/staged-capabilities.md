@@ -91,9 +91,19 @@ bfloat16 model weights at a mean of 0.056 nats (max 0.41) with token agreement
 95.3. `tools/qualification/staged/observe_vllm_gpu.py run --distribution`
 reproduces them; the same flag works with `--backend cuda`.
 
-**Remaining before promotion:** the method stays staged until a verify profile
-consumes it with an explicit policy target and it is retained on a second
-model or build.
+**Policy target.** The FP8 KV-cache verify profile consumes it when prepared
+with `metria recipe prepare-vllm --kv-cache-dtype fp8 --staged-kld`. The prefix
+workload then keeps measured-trial distributions under the trajectory
+evidence's `distributions` key, so the qualified trajectory evidence is
+unchanged, and the policy may bound `behavior.trajectory_kld_mean` or
+`behavior.trajectory_kld_max` (`0.1.0`, nats). Every other vLLM profile rejects
+the option. Natively, the CPU wheel retains top-20 raw distributions for every
+measured step through this path. The FP8 candidate itself needs a GPU (or a CPU
+with AVX-512 or AMX); on a CPU without them vLLM refuses the cache and the
+verifier ends `EXECUTION_FAILED` with the policy not evaluated.
+
+**Remaining before promotion:** a retained native L4 FP8 verification with a
+KLD policy, and retention on a second model or build.
 
 ## vLLM staged treatments
 

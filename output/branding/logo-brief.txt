@@ -1,0 +1,19 @@
+Metria — comparison aperture
+
+Original symbol for reference/candidate inference verification. Two related,
+interlocking forms frame a shared center. No letters or wordmark. Transparent
+background. Cobalt #406CE3 and periwinkle #A8BDFF.
+
+Creative exploration used the built-in image-generation tool. The production
+SVG was drawn directly as geometric paths for clean edges and scalability.
+
+Generation prompt:
+Create one original symbol-only logo for Metria, an open-source tool for verifying
+LLM inference changes by comparing reference and candidate runs. A compact
+geometric comparison aperture: two clean, balanced, interlocking folded forms
+facing a shared central diamond of negative space. Strong silhouette, optical
+balance, consistent visual weight, recognizable at favicon size. Cobalt blue
+#406CE3 and periwinkle #A8BDFF. Crisp vector-like edges and softly rounded exterior
+corners. Transparent canvas and negative space. No letters, wordmark, text,
+rounded-square app tile, badge, infinity sign, arrows, gradient, shadow, bevel,
+3D render, mockup scene, or watermark.

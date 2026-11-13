@@ -36,6 +36,21 @@ metria verify fp8-study.json --output fp8-verification --json
 
 Preparation refuses a recipe without a policy or without task checks.
 
+**STAGED: trajectory KL divergence.** Add `--staged-kld` to also capture vLLM's
+raw top-20 logprobs on every call and score how far the FP8 cache moved the
+next-token distributions, before any sampled token changes. The policy can then
+bound `behavior.trajectory_kld_mean` or `behavior.trajectory_kld_max` in nats:
+
+```json
+{"target": "behavior.trajectory_kld_mean", "version": "0.1.0", "max": 0.05}
+```
+
+The recipe records the `metria.staged_captures` override in both runs' trial
+policy, declares the `metria.trajectory_kld` analysis, and treats missing
+distributions or a non-raw `logprobs_mode` as an evidence gap. No native L4 run
+of this option is retained yet, so choose thresholds from your own reference
+runs.
+
 ## What the verifier checks
 
 - **Requested → resolved → observed.** Each run requests one `vllm.kv_cache`

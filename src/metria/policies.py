@@ -45,6 +45,7 @@ class _Target:
     evidence_schema: str = "metria.trajectory_comparison.v1"
     domain_min: float | None = 0.0
     domain_max: float | None = 1.0
+    qualification: str | None = None
 
     def to_data(self) -> dict[str, Any]:
         source: dict[str, Any] = {
@@ -56,7 +57,7 @@ class _Target:
             source["normalization_divisor"] = self.divisor
         if self.fact is not None:
             source["fact"] = self.fact
-        return {
+        data = {
             "name": self.name,
             "version": self.version,
             "kind": self.kind,
@@ -64,6 +65,9 @@ class _Target:
             "direction": self.metric.direction.value if self.metric else "descriptive",
             "source": source,
         }
+        if self.qualification is not None:
+            data["qualification"] = self.qualification
+        return data
 
 
 _TARGETS = MappingProxyType(
@@ -194,7 +198,38 @@ def _serving_targets() -> dict[str, _Target]:
     }
 
 
-_TARGETS = MappingProxyType({**_TARGETS, **_serving_targets()})
+def _divergence_targets() -> dict[str, _Target]:
+    """STAGED: trajectory KL divergence targets, labeled in every report row."""
+    from .measurements import trajectory_kld as kld
+
+    return {
+        f"behavior.{name}": _Target(
+            name=f"behavior.{name}",
+            kind="number",
+            unit="nats",
+            metric=MetricDefinition(
+                name,
+                "nats",
+                MetricDirection.LOWER_IS_BETTER,
+                kld._COMPARISON_METHOD,
+                kld._COMPARISON_VERSION,
+            ),
+            aggregation=aggregation,
+            version=kld._COMPARISON_VERSION,
+            analysis=kld._COMPARISON_METHOD,
+            analysis_version=kld._COMPARISON_VERSION,
+            evidence_schema=kld._COMPARISON_SCHEMA,
+            domain_max=None,
+            qualification=kld.QUALIFICATION,
+        )
+        for name, aggregation in (
+            ("trajectory_kld_mean", "mean_over_shared_context_steps"),
+            ("trajectory_kld_max", "max_over_shared_context_steps"),
+        )
+    }
+
+
+_TARGETS = MappingProxyType({**_TARGETS, **_serving_targets(), **_divergence_targets()})
 
 
 def _target(name: str, version: str) -> _Target:
@@ -569,8 +604,13 @@ def render_policy_evaluation(data: Mapping[str, Any]) -> list[str]:
             if row["observed_value"] is None
             else json.dumps(row["observed_value"])
         )
+        staged = (
+            " [staged]"
+            if row.get("target_identity", {}).get("qualification") == "staged"
+            else ""
+        )
         lines.append(
-            f"  {criterion['target']}@{criterion['version']} {' and '.join(constraints)}: {row['result']} (observed {value} {criterion['unit']})"
+            f"  {criterion['target']}@{criterion['version']}{staged} {' and '.join(constraints)}: {row['result']} (observed {value} {criterion['unit']})"
         )
         if row["reason"]:
             lines.append(f"    {row['reason']}")

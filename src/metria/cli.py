@@ -192,6 +192,12 @@ def _add_preparation_parser(subparsers: Any) -> None:
         "requires --policy and workload task checks",
     )
     prepare.add_argument(
+        "--staged-kld",
+        action="store_true",
+        help="STAGED: with --kv-cache-dtype, also capture raw top-20 logprobs and "
+        "score trajectory KL divergence (behavior.trajectory_kld_* policy targets)",
+    )
+    prepare.add_argument(
         "--output",
         type=Path,
         required=True,

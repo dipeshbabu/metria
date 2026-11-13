@@ -5,6 +5,13 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- STAGED: FP8 KV-cache verification can gate on trajectory KL divergence.
+  `metria recipe prepare-vllm --kv-cache-dtype ... --staged-kld` captures raw
+  top-20 logprobs alongside the trajectory evidence and declares the
+  `metria.trajectory_kld` analysis; policies may bound the new
+  `behavior.trajectory_kld_mean` and `behavior.trajectory_kld_max` targets
+  (nats). Their report rows are labeled staged. Other vLLM profiles reject the
+  option.
 - Capture staged raw top-20 logprobs from vLLM (`token_top_logprobs`,
   experimental) so trajectory KL divergence runs on the vLLM adapter. The
   adapter requires `logprobs_mode=raw_logprobs`, keeps exactly ranks 1–20, and

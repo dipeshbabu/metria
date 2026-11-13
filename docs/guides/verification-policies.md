@@ -60,6 +60,17 @@ package version. Targets are registered identifiers, not arbitrary JSON paths.
 | `behavior.all_trajectories_match` | `boolean` | Exact `equals: true` or `equals: false` |
 | `analysis.status` | `status` | Exact `equals: "completed"`, `"failed"`, or `"skipped"` |
 
+**STAGED** targets refer to the `metria.trajectory_kld` analysis, version
+`0.1.0`. Only the FP8 KV-cache profile accepts them, and only when it was
+prepared with `--staged-kld`. Their report rows carry
+`"qualification": "staged"` and the Markdown report marks them `[staged]`. See
+[staged capabilities](staged-capabilities.md#trajectory-kl-divergence).
+
+| Target | Unit | Criteria |
+|---|---|---|
+| `behavior.trajectory_kld_mean` | `nats` | Numeric `min` and/or `max`, at least 0; lower is better |
+| `behavior.trajectory_kld_max` | `nats` | Numeric `min` and/or `max`, at least 0; lower is better |
+
 The verifier still requires completed analysis before evaluating a policy.
 Requesting `analysis.status == "failed"` cannot make a failed execution pass.
 

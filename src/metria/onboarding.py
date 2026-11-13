@@ -91,6 +91,7 @@ def prepare_command(args: Any, stdout: TextIO) -> int:
             measured_trials=args.measured_trials,
             timeout_s=args.timeout,
             kv_cache_dtype=getattr(args, "kv_cache_dtype", None),
+            staged_distributions=getattr(args, "staged_kld", False),
         )
     except importlib.metadata.PackageNotFoundError as exc:
         raise ValueError(

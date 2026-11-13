@@ -16,6 +16,13 @@ from ..protocols import (
     MeasurementResult,
     RuntimeSession,
 )
+from .prefix_distributions import (
+    DISTRIBUTION_CAPTURE,
+    DISTRIBUTIONS_KEY,
+    STAGED_DISTRIBUTIONS,
+    distribution_evidence,
+    staged_distributions,
+)
 from .task_checks import evaluate_checks, prompt_checks, summarize_checks
 from .trajectory import TokenTrajectoryProtocol, _prompt_rows
 
@@ -47,6 +54,7 @@ def trajectory_config(config: Mapping[str, Any]) -> dict[str, Any]:
         "generation",
         "warmup_trials",
         "measured_trials",
+        STAGED_DISTRIBUTIONS,
     }
     if unknown:
         raise ValueError("unsupported prefix-workload configuration fields")
@@ -63,6 +71,7 @@ def trajectory_config(config: Mapping[str, Any]) -> dict[str, Any]:
     if len(_prompt_rows(result)) > 100:
         raise ValueError("prefix verification accepts at most 100 prompts")
     trial_settings(config)
+    staged_distributions(config)
     return result
 
 
@@ -77,6 +86,10 @@ class _SequentialSession:
     checks: Sequence[Sequence[Mapping[str, Any]]] = ()
     prompt_ids: Sequence[str] = ()
     check_results: list[dict[str, Any]] = field(default_factory=list)
+    # STAGED captures requested on every call but kept out of the batch the
+    # trajectory protocol sees, so its evidence is unchanged.
+    extra_capture: Sequence[CaptureRequest] = ()
+    extra: dict[str, list[Any]] = field(default_factory=dict)
 
     def infer(
         self,
@@ -85,9 +98,10 @@ class _SequentialSession:
     ) -> InferenceBatch:
         outputs: list[str] = []
         captures: dict[str, list[Any]] = {item.kind: [] for item in capture}
+        requested = (*capture, *self.extra_capture)
         for index, request in enumerate(requests):
             started = time.perf_counter_ns()
-            batch = self.session.infer((request,), capture=capture)
+            batch = self.session.infer((request,), capture=requested)
             elapsed = (time.perf_counter_ns() - started) / 1_000_000_000
             if len(batch.outputs) != 1 or not math.isfinite(elapsed) or elapsed < 0:
                 raise RuntimeError(
@@ -107,7 +121,7 @@ class _SequentialSession:
                         ).hexdigest(),
                     )
                 )
-            for item in capture:
+            for item in requested:
                 value = batch.captures.get(item.kind)
                 if (
                     not isinstance(value, Sequence)
@@ -117,7 +131,12 @@ class _SequentialSession:
                     raise RuntimeError(
                         "required sequential capture is missing or malformed"
                     )
-                captures[item.kind].extend(value)
+                target = (
+                    captures[item.kind]
+                    if item in capture
+                    else self.extra.setdefault(item.kind, [])
+                )
+                target.extend(value)
             invocations = batch.metadata.get("invocations", ())
             native = (
                 invocations[0]
@@ -214,7 +233,8 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
     """Retain trajectory evidence across bounded warmup and measured trials."""
 
     def requirements(self, config: Mapping[str, Any]) -> tuple[CaptureRequest, ...]:
-        return super().requirements(trajectory_config(config))
+        base = super().requirements(trajectory_config(config))
+        return (*base, DISTRIBUTION_CAPTURE) if staged_distributions(config) else base
 
     def execute(
         self,
@@ -229,6 +249,8 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
         check_specs = prompt_checks(config["prompts"])
         check_rows: list[dict[str, Any]] = []
         protocol = TokenTrajectoryProtocol()
+        extra = (DISTRIBUTION_CAPTURE,) if staged_distributions(config) else ()
+        distributions: list[Any] = []
         for index in range(warmups + trials):
             measured = index >= warmups
             trial = index - warmups
@@ -240,11 +262,15 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
                 measured,
                 checks=check_specs,
                 prompt_ids=tuple(row["id"] for row in rows),
+                extra_capture=extra,
             )
             result = protocol.execute(sequential, scenario, {**base, "prompts": rows})
             check_rows.extend(sequential.check_results)
             if measured:
                 results.append(result)
+                distributions.extend(
+                    sequential.extra.get(DISTRIBUTION_CAPTURE.kind, ())
+                )
             timings.extend(sequential.timings)
         captured = _merge_results(results, timings, warmups, trials)
         quality, metric = summarize_checks(
@@ -253,6 +279,9 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
         metrics = dict(captured.metrics)
         if metric is not None:
             metrics[metric.definition.name] = metric
-        return MeasurementResult(
-            metrics=metrics, evidence={**captured.evidence, "task_checks": quality}
-        )
+        evidence = {**captured.evidence, "task_checks": quality}
+        if extra:
+            evidence[DISTRIBUTIONS_KEY] = distribution_evidence(
+                captured.evidence["prompts"], distributions
+            )
+        return MeasurementResult(metrics=metrics, evidence=evidence)
