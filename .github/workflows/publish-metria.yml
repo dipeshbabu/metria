@@ -197,7 +197,19 @@ jobs:
       - name: Install and smoke-test the published package
         run: |
           python -m venv .pypi-smoke
-          .pypi-smoke/bin/python -m pip install --index-url https://pypi.org/simple --no-cache-dir "metria==$RELEASE_VERSION"
+          # The simple index can lag the upload by several minutes on some CDN
+          # edges. Retry the exact version for a bounded period; a version that
+          # never appears still fails this job.
+          for attempt in $(seq 1 20); do
+            if .pypi-smoke/bin/python -m pip install --index-url https://pypi.org/simple --no-cache-dir "metria==$RELEASE_VERSION"; then
+              break
+            fi
+            if [ "$attempt" -eq 20 ]; then
+              echo "metria==$RELEASE_VERSION did not appear on the PyPI index" >&2
+              exit 1
+            fi
+            sleep 30
+          done
           .pypi-smoke/bin/python -I tools/maintenance/check_metria_install.py --version "$RELEASE_VERSION"
 
   release:

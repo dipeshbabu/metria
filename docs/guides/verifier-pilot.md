@@ -55,6 +55,20 @@ sharing. A source reference records supplied provenance; it does not authenticat
 the participant. Automated maintainer runs must keep `would_reuse` null and must
 not be presented as another person's feedback.
 
+Participants can submit the **Pilot feedback** issue form
+(`.github/ISSUE_TEMPLATE/pilot_feedback.yml`). It requires an explicit
+permission checkbox and asks only for the fields above. Convert a submitted issue
+without editing the participant's words:
+
+```bash
+gh issue view 123 --json body,url > issue.json
+python tools/maintenance/pilot_notes_from_issue.py issue.json --output notes.json
+```
+
+The converter refuses an issue without permission, records the issue URL as
+`feedback_source`, and maps "not sure" to `would_reuse: null`. Then pass
+`notes.json` to `metria pilot record` with the participant's evidence.
+
 The table below remains available for participants who prefer free-form notes.
 
 | Field | Participant's observation |
