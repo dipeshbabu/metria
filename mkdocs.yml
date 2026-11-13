@@ -131,6 +131,7 @@ nav:
           - Token trajectories: guides/metria-trajectory-measurement.md
           - llama.cpp adapter: guides/metria-llamacpp-runtime.md
           - vLLM adapter: guides/metria-vllm-runtime.md
+          - Endpoint adapter: guides/endpoint-runtime.md
           - Capability integrations: guides/capability-integrations.md
           - Artifact resolution: guides/artifact-resolution.md
           - Subprocess lifecycle: guides/subprocess-lifecycle.md
