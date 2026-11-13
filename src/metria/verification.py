@@ -403,6 +403,12 @@ def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
         from .verification_serving import build_route as build_serving_route
 
         return build_serving_route(recipe)
+    from .verification_endpoint import is_endpoint_recipe
+
+    if is_endpoint_recipe(recipe):
+        from .verification_endpoint import build_route as build_endpoint_route
+
+        return build_endpoint_route(recipe)
     if "runtime_environments" in recipe.environment:
         from .verification_upgrade import build_route as build_upgrade_route
 

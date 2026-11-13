@@ -30,6 +30,15 @@ divergence and the vLLM scheduler and cache-layout treatments, have their own
 boundaries; check the [staged capability notes](staged-capabilities.md) before
 treating a result as a qualified end-to-end workflow.
 
+## Running servers (staged)
+
+| Change | Workflow |
+| --- | --- |
+| A declared change between two running OpenAI-compatible servers | [Remote endpoint verification](endpoint-verification.md) |
+
+Server identity is claimed rather than verified, so this workflow always needs
+a policy and records the limitation in every report.
+
 ## Decide what acceptance means
 
 Behavioral drift, task outcomes, and systems impact answer different questions:
