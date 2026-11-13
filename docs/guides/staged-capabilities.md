@@ -35,8 +35,8 @@ that point, which catches drift that has not yet changed a sampled token.
 
 **Use it** from Python with `metria.measurements.TokenDistributionProtocol` and
 `TrajectoryDivergenceAnalysis`. The protocol requires the `token_ids` and
-`token_top_logprobs` captures; the llama.cpp adapter reports the second as
-`experimental`. The study lifecycle admits an experimental capture only when the
+`token_top_logprobs` captures; the llama.cpp and vLLM adapters report the
+second as `experimental`. The study lifecycle admits an experimental capture only when the
 run opts in explicitly and its token-ID provider is qualified by SHA-256:
 
 ```json
@@ -74,6 +74,22 @@ show a self-comparison KL of exactly 0 over 379 steps; f16 → `q8_0` KV at
 `llama-perplexity --kl-divergence` cross-check over pinned wikitext-2 gives
 0.015 and 1.98 nats: the same ranking and a consistent ratio.
 `tools/qualification/staged/qualify_trajectory_kld.py` reproduces them.
+
+**vLLM provider.** The vLLM adapter requests `logprobs=20` from `SamplingParams`
+only when `token_top_logprobs` is requested, and refuses to capture unless the
+engine's `logprobs_mode` is `raw_logprobs` (the default), so distributions are
+the model's own, before temperature or penalties. Each step keeps exactly the
+ranks 1–20; the sampled token vLLM appends when it falls outside the top 20 is
+dropped. Every generated token must carry a distribution, or the run fails.
+Invocations record `"top_logprobs": {"top_k": 20, "mode": "raw_logprobs",
+"qualification": "staged"}`.
+
+On the pinned vLLM `0.30.0+cpu` wheel with SmolLM2-135M, the
+[retained CPU runs](../../artifacts/qualification/vllm-trajectory-kld-cpu/README.md)
+show a fresh-engine repeat at KL exactly 0 over 64 steps, and float32 →
+bfloat16 model weights at a mean of 0.056 nats (max 0.41) with token agreement
+95.3. `tools/qualification/staged/observe_vllm_gpu.py run --distribution`
+reproduces them; the same flag works with `--backend cuda`.
 
 **Remaining before promotion:** the method stays staged until a verify profile
 consumes it with an explicit policy target and it is retained on a second
@@ -113,6 +129,22 @@ settings read back as `applied`, and a scheduler budget below the model length
 without chunked prefill was rejected by the engine's configuration validation at
 launch. See the
 [retained CPU evidence](../../artifacts/qualification/vllm-staged-treatments-cpu/README.md).
+
+**vLLM provider.** The vLLM adapter requests `logprobs=20` from `SamplingParams`
+only when `token_top_logprobs` is requested, and refuses to capture unless the
+engine's `logprobs_mode` is `raw_logprobs` (the default), so distributions are
+the model's own, before temperature or penalties. Each step keeps exactly the
+ranks 1–20; the sampled token vLLM appends when it falls outside the top 20 is
+dropped. Every generated token must carry a distribution, or the run fails.
+Invocations record `"top_logprobs": {"top_k": 20, "mode": "raw_logprobs",
+"qualification": "staged"}`.
+
+On the pinned vLLM `0.30.0+cpu` wheel with SmolLM2-135M, the
+[retained CPU runs](../../artifacts/qualification/vllm-trajectory-kld-cpu/README.md)
+show a fresh-engine repeat at KL exactly 0 over 64 steps, and float32 →
+bfloat16 model weights at a mean of 0.056 nats (max 0.41) with token agreement
+95.3. `tools/qualification/staged/observe_vllm_gpu.py run --distribution`
+reproduces them; the same flag works with `--backend cuda`.
 
 **Remaining before promotion:** a verify profile that accepts these treatments
 with task checks and an acceptance policy. The native CPU, CUDA and

@@ -5,6 +5,11 @@ adapter and study lifecycle, then writes one run record. ``compare`` derives the
 reference/candidate trajectory comparison from saved records. Output records keep
 local paths redacted. This produces engineering evidence; it does not by itself
 promote a verification profile.
+
+``--distribution`` captures staged raw top-20 logprobs with
+``TokenDistributionProtocol`` instead of token IDs only, so ``compare`` also
+reports trajectory KL divergence. It requires the ``metria.staged_captures``
+capability override, which this tool records in the run's trial policy.
 """
 
 from __future__ import annotations
@@ -21,7 +26,13 @@ from typing import Any
 from metria import ArtifactManifest, RunSpec, TreatmentSpec, TreatmentType, execute_run
 from metria.artifacts import artifact_to_data, verify_artifact
 from metria.hardware import capture_hardware_fingerprint
-from metria.measurements import TokenTrajectoryProtocol, compare_trajectory_results
+from metria.integrations.staged_captures import STAGED_CAPTURE_CHECK
+from metria.measurements import (
+    TokenDistributionProtocol,
+    TokenTrajectoryProtocol,
+    compare_trajectory_distributions,
+    compare_trajectory_results,
+)
 from metria.protocols import MeasurementResult
 from metria.recipes import _json_value
 from metria.records import load_run_record, run_record_from_data, run_record_to_json
@@ -48,6 +59,10 @@ PROMPTS = [
 ]
 VARIANTS: dict[str, dict[str, Any]] = {
     "reference": {"kv": "auto", "staged": ()},
+    # Identical configuration in a fresh engine: KL divergence must be zero.
+    "repeat": {"kv": "auto", "staged": ()},
+    # Numeric change with a known direction: lower model precision.
+    "bf16": {"kv": "auto", "staged": (), "dtype": "bfloat16"},
     "fp8": {"kv": "fp8", "staged": ()},
     "staged": {
         "kv": "auto",
@@ -153,8 +168,14 @@ def _spec(
     model_root: Path,
     descriptor: dict[str, Any],
     backend: str = "cuda",
+    distribution: bool = False,
 ) -> RunSpec:
     _, version, dtype = BACKENDS[backend]
+    dtype = variant.get("dtype", dtype)
+    overrides = ["vllm.staged_treatments"] if variant["staged"] else []
+    if distribution:
+        overrides.append(STAGED_CAPTURE_CHECK)
+    protocol = TokenDistributionProtocol if distribution else TokenTrajectoryProtocol
     treatments = [
         TreatmentSpec(
             name="vllm.kv_cache",
@@ -190,13 +211,9 @@ def _spec(
             "seed": 42,
             "chat_template": False,
         },
-        measurements=(TokenTrajectoryProtocol.name,),
+        measurements=(protocol.name,),
         treatments=tuple(treatments),
-        trial_policy=(
-            {"capability_overrides": ["vllm.staged_treatments"]}
-            if variant["staged"]
-            else {}
-        ),
+        trial_policy={"capability_overrides": overrides} if overrides else {},
     )
 
 
@@ -208,9 +225,13 @@ def _run(args: argparse.Namespace) -> int:
     record = execute_run(
         study_name="vllm-gpu-staged-observation",
         run_id=args.variant,
-        spec=_spec(variant, model_root, descriptor, args.backend),
+        spec=_spec(variant, model_root, descriptor, args.backend, args.distribution),
         adapter=VLLMAdapter(),
-        measurement=TokenTrajectoryProtocol(),
+        measurement=(
+            TokenDistributionProtocol()
+            if args.distribution
+            else TokenTrajectoryProtocol()
+        ),
         measurement_config={"prompts": PROMPTS},
         environment={},
     )
@@ -267,6 +288,8 @@ def _write_outputs(
                 if d.metadata["Name"]
             },
             "requested_kv_cache_dtype": variant["kv"],
+            "requested_model_dtype": variant.get("dtype", BACKENDS[args.backend][2]),
+            "measurement": data["record"]["requested"]["measurements"],
             "applied": observed.get("applied"),
             "staged_treatments": observed.get("staged_treatments"),
         },
@@ -292,10 +315,20 @@ def _write_outputs(
 def _compare(args: argparse.Namespace) -> int:
     def capture(name: str) -> MeasurementResult:
         record = load_run_record(args.output / f"{name}.run.json")
-        return MeasurementResult(
-            evidence=record.evidence["measurements"][TokenTrajectoryProtocol.name]
-        )
+        measurements = record.evidence["measurements"]
+        if TokenDistributionProtocol.name in measurements:
+            evidence = dict(measurements[TokenDistributionProtocol.name])
+            distributions[name] = MeasurementResult(evidence=dict(evidence))
+            # The token-ID view of a distribution capture is a trajectory.
+            evidence.update(
+                schema="metria.trajectory_capture.v1",
+                method="kv_fidelity.decode_time_trajectory",
+                method_version="0.3.4",
+            )
+            return MeasurementResult(evidence=evidence)
+        return MeasurementResult(evidence=measurements[TokenTrajectoryProtocol.name])
 
+    distributions: dict[str, MeasurementResult] = {}
     result = compare_trajectory_results(capture("reference"), capture(args.candidate))
     summary = {
         "schema": "metria.native_observation_comparison.v1",
@@ -321,6 +354,17 @@ def _compare(args: argparse.Namespace) -> int:
             for row in result.evidence["per_prompt"]
         ],
     }
+    if len(distributions) == 2:
+        kld = compare_trajectory_distributions(
+            distributions["reference"], distributions[args.candidate]
+        )
+        summary["trajectory_kld"] = {
+            "mean_nats": kld.metrics["trajectory_kld_mean"].value,
+            "max_nats": kld.metrics["trajectory_kld_max"].value,
+            "coverage": kld.metrics["trajectory_kld_mean"].coverage,
+            "scored_steps": kld.evidence["scored_steps"],
+            "qualification": kld.evidence["qualification"],
+        }
     path = args.output / f"compare-reference-{args.candidate}.json"
     path.write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -339,6 +383,7 @@ def main() -> int:
     run.add_argument("--descriptor", type=Path, required=True)
     run.add_argument("--runtime-wheel", type=Path, required=True)
     run.add_argument("--output", type=Path, required=True)
+    run.add_argument("--distribution", action="store_true")
     compare = sub.add_parser("compare")
     compare.add_argument("--candidate", required=True)
     compare.add_argument("--output", type=Path, required=True)

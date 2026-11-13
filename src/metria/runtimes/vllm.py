@@ -29,6 +29,13 @@ from ..protocols import (
 from .vllm_artifacts import require_runtime_pin, validate_file_pins, verify_model_files
 from .vllm_hardware import native_hardware
 from .vllm_identity import inspect_vllm_identity, require_matching_vllm_identity
+from .vllm_logprobs import (
+    _RAW_LOGPROBS,
+    TOP_LOGPROBS_CAPTURE,
+    TOP_LOGPROBS_K,
+    _logprobs_mode,
+    _top_logprobs,
+)
 from .vllm_treatments import (
     QUALIFICATION as STAGED_QUALIFICATION,
 )
@@ -497,12 +504,18 @@ class VLLMSession:
         if self._closed or self._llm is None:
             raise RuntimeError("vLLM session is closed")
         capture_kinds = tuple(item.kind for item in capture)
-        unknown = sorted(set(capture_kinds) - {"token_ids"})
+        unknown = sorted(set(capture_kinds) - {"token_ids", TOP_LOGPROBS_CAPTURE})
         if unknown:
             raise ValueError("unsupported vLLM captures: " + ", ".join(unknown))
         if len(capture_kinds) != len(set(capture_kinds)):
             raise ValueError("duplicate capture requests are not allowed")
         token_capture = "token_ids" in capture_kinds
+        distribution_capture = TOP_LOGPROBS_CAPTURE in capture_kinds
+        if distribution_capture and _logprobs_mode(self._llm) != _RAW_LOGPROBS:
+            raise RuntimeError(
+                "vLLM top-k capture requires the engine's raw_logprobs mode; "
+                f"observed {_logprobs_mode(self._llm)!r}"
+            )
 
         prompts: list[str] = []
         sampling_params: list[Any] = []
@@ -518,6 +531,7 @@ class VLLMSession:
                     max_tokens=options["max_tokens"],
                     temperature=options["temperature"],
                     seed=options["seed"],
+                    **({"logprobs": TOP_LOGPROBS_K} if distribution_capture else {}),
                 )
             )
             invocation_rows.append(
@@ -553,12 +567,22 @@ class VLLMSession:
 
         outputs: list[str] = []
         token_batches: list[tuple[int, ...]] = []
+        distribution_batches: list[Any] = []
         frozen_rows: list[Mapping[str, Any]] = []
         for index, response in enumerate(responses):
             output_text, tokens, native = _response_capture(response, index)
             outputs.append(output_text)
             token_batches.append(tokens)
             row = {**invocation_rows[index], "output_tokens": len(tokens), **native}
+            if distribution_capture:
+                distribution_batches.append(
+                    _top_logprobs(response.outputs[0], tokens, index)
+                )
+                row["top_logprobs"] = {
+                    "top_k": TOP_LOGPROBS_K,
+                    "mode": _RAW_LOGPROBS,
+                    "qualification": "staged",
+                }
             frozen = freeze_mapping(row)
             self._invocations.append(frozen)
             frozen_rows.append(frozen)
@@ -566,6 +590,8 @@ class VLLMSession:
         captures: dict[str, Any] = {}
         if token_capture:
             captures["token_ids"] = tuple(token_batches)
+        if distribution_capture:
+            captures[TOP_LOGPROBS_CAPTURE] = tuple(distribution_batches)
         return InferenceBatch(
             outputs=tuple(outputs),
             captures=captures,
@@ -686,6 +712,11 @@ class VLLMAdapter:
             "runtime_version": installed_version,
             "vllm_version": installed_version,
             "token_ids_capture": "native_output_token_ids",
+            f"{TOP_LOGPROBS_CAPTURE}_capture": {
+                "status": "experimental",
+                "top_k": TOP_LOGPROBS_K,
+                "reason": "staged raw top-k logprobs pending qualification",
+            },
         }
         reasons: list[str] = []
         try:

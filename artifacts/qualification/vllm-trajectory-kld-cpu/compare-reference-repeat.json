@@ -1,0 +1,49 @@
+{
+  "all_trajectories_match": true,
+  "candidate": "repeat",
+  "full_match_rate": 1.0,
+  "per_prompt": [
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "story",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    },
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "dog",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    },
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "capital",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    },
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "arithmetic",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    }
+  ],
+  "reference": "reference",
+  "schema": "metria.native_observation_comparison.v1",
+  "trajectory_agreement_score": 100.0,
+  "trajectory_kld": {
+    "coverage": 1.0,
+    "max_nats": 0.0,
+    "mean_nats": 0.0,
+    "qualification": "staged",
+    "scored_steps": 64
+  }
+}

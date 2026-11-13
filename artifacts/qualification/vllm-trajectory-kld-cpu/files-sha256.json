@@ -1,0 +1,10 @@
+{
+  "bf16.observation.json": "b354683489e5d32ef7ab94e59c26b3a8a6618c22b3e185a16a3b2bdc69fcc94d",
+  "bf16.run.json": "367738e9256f6578e6d938fe0a47a0b0462f53bf9b9e52f2acc3aa9a42fc9027",
+  "compare-reference-bf16.json": "0bbe59d7c614112a59a812ef2786285559e01934e8fd5e88510cfa3a750b8b2d",
+  "compare-reference-repeat.json": "0d1ccf67aa99e328b30716a125c9b9fcc09e6d0a63c5b3d53ad858f61d11d76c",
+  "reference.observation.json": "c4ba13f358af8792ba614697bd41598bed92606d4b9c109392d5633e5fe99aef",
+  "reference.run.json": "270641a37466ab15f9fc891dbfe1a5903c1df6e823e119bc95f9ef4791c16509",
+  "repeat.observation.json": "b458fb52a48e948b94aa1e370aa3191a3b94576fab313de8e2250a9cf40995dd",
+  "repeat.run.json": "4c2509d64da59fb86c26772f8754fc4f5ce9fb808f492f606a560a2ae785a00e"
+}
