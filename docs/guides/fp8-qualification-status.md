@@ -38,12 +38,14 @@ native output captures and compatible measurements listed below. It is retained
 engineering evidence for one model, device and wheel, not a general FP8 quality
 claim.
 
-## Remaining before promotion
+## Promotion
 
-Promoting the [staged recipe](../../examples/verification/staged/kv-precision.json)
-to a `metria verify` profile still requires an FP8 verification route with
-predeclared task checks and an explicit acceptance policy, run against this kind
-of evidence. A mocked test or device name alone cannot supply that evidence.
+The FP8 route now exists: the
+[FP8 KV-cache profile](fp8-kv-cache-verification.md) requires predeclared task
+checks and an explicit acceptance policy, and a
+[complete L4 verification](../../artifacts/qualification/fp8-kv-cache-verify-l4/README.md)
+is retained. It ended FAIL with a valid comparison because the pilot workload
+fails identically in the reference.
 `tools/qualification/staged/setup_vllm_cuda.sh` and `observe_vllm_gpu.py`
 reproduce the L4 observations on another SM89+ host. Track the remaining work in
 [issue #161](https://github.com/dipeshbabu/metria/issues/161).

@@ -36,7 +36,12 @@ that point, which catches drift that has not yet changed a sampled token.
 **Use it** from Python with `metria.measurements.TokenDistributionProtocol` and
 `TrajectoryDivergenceAnalysis`. The protocol requires the `token_ids` and
 `token_top_logprobs` captures; the llama.cpp adapter reports the second as
-`experimental`.
+`experimental`. The study lifecycle admits an experimental capture only when the
+run opts in explicitly and its token-ID provider is qualified by SHA-256:
+
+```json
+"trial_policy": {"capability_overrides": ["metria.staged_captures"]}
+```
 
 **Native provider.** Build the
 [qualified capture patch](../../tools/qualification/README.md), then apply
@@ -62,10 +67,17 @@ This is a functional check, not qualification: nothing is retained, and the
 fixture's 8-wide attention heads cannot load quantized (`q8_0`, block 32) KV
 caches.
 
-**Remaining qualification:** retain native runs on a model whose head size
-supports quantized KV caches, including a self-comparison and a known
-KV-precision change, and confirm the captured top-k matches the logits from an
-independent `llama-perplexity --kl-divergence` run on the same context.
+**Native evidence.** On Qwen2.5-0.5B-Instruct (64-wide heads), the
+[retained runs](../../artifacts/qualification/trajectory-kld-qwen05b/README.md)
+show a self-comparison KL of exactly 0 over 379 steps; f16 → `q8_0` KV at
+0.038 nats and f16 → `q4_0` KV at 4.89 nats. An independent
+`llama-perplexity --kl-divergence` cross-check over pinned wikitext-2 gives
+0.015 and 1.98 nats: the same ranking and a consistent ratio.
+`tools/qualification/staged/qualify_trajectory_kld.py` reproduces them.
+
+**Remaining before promotion:** the method stays staged until a verify profile
+consumes it with an explicit policy target and it is retained on a second
+model or build.
 
 ## vLLM staged treatments
 
@@ -96,6 +108,12 @@ were all read back from the engine as `applied`, and greedy trajectories matched
 an untreated reference exactly. See the
 [retained L4 evidence](../../artifacts/qualification/l4-native-gpu/README.md).
 
-**Remaining qualification:** retain a native CPU run with the pinned
-`0.30.0+cpu` wheel showing each setting applied, plus a negative run where the
-engine rejects an unsupported value.
+**CPU observation.** With the pinned `0.30.0+cpu` wheel, the same three
+settings read back as `applied`, and a scheduler budget below the model length
+without chunked prefill was rejected by the engine's configuration validation at
+launch. See the
+[retained CPU evidence](../../artifacts/qualification/vllm-staged-treatments-cpu/README.md).
+
+**Remaining before promotion:** a verify profile that accepts these treatments
+with task checks and an acceptance policy. The native CPU, CUDA and
+engine-rejection runs it would rely on are retained.

@@ -39,9 +39,10 @@ def test_staged_catalog_recipes_validate_without_advertising_runtime_support():
     folder = Path(__file__).parents[1] / "examples/verification"
     catalog = json.loads((folder / "catalog.json").read_text())
     staged = [entry for entry in catalog["examples"] if entry["status"] == "staged"]
-    assert {entry["name"] for entry in staged} == {
-        "vllm-kv-precision",
-    }
+    assert {entry["name"] for entry in staged} == set()
+    kv = next(e for e in catalog["examples"] if e["name"] == "vllm-kv-precision")
+    assert kv["status"] == "qualified-local"
+    assert (folder / kv["entry"]).is_file()
     for entry in staged:
         recipe = load_study_recipe(folder / entry["recipe"])
         assert len(recipe.study.runs) == 2

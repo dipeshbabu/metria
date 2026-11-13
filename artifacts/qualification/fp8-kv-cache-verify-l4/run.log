@@ -1,0 +1,12 @@
+nohup: ignoring input
+50da19e84586d68845b5df845b24934472da09a1
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 8 files:  12%|█▎        | 1/8 [00:00<00:01,  5.20it/s]Fetching 8 files:  62%|██████▎   | 5/8 [00:00<00:00, 18.58it/s]Fetching 8 files:  88%|████████▊ | 7/8 [00:20<00:00, 18.58it/s]Fetching 8 files: 100%|██████████| 8/8 [00:22<00:00,  3.54s/it]Fetching 8 files: 100%|██████████| 8/8 [00:22<00:00,  2.80s/it]
+${WORK}/hf/models--HuggingFaceTB--SmolLM2-360M-Instruct/snapshots/a10cc1512eabd3dde888204e902eca88bddb4951
+Prepared fp8-study.json
+Recipe: 34a9907483822c60b7548b8d9a0c525ea184dae95dbb98fcb743e3bce50ee95c
+Next: metria verify fp8-study.json --output verification
+prepare exit=0
+verify exit=1
+{"acceptance_policy_evaluated": true, "analyses": [{"diagnostics": {"all_trajectories_match": true, "comparison_steps": 96, "divergence": {"by_category": [{"category": "classification", "diverged_prompts": 0, "divergence_rate": 0.0, "n_prompts": 4}, {"category": "extraction", "diverged_prompts": 0, "divergence_rate": 0.0, "n_prompts": 4}, {"category": "structured-output", "diverged_prompts": 0, "d
+FP8_DONE

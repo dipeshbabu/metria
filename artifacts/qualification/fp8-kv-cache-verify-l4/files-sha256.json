@@ -1,0 +1,9 @@
+{
+  "run.log": "129cc1ec688ad481e58e592678c76d04bf796c3952c069e746311820b644c1fa",
+  "study.json": "b8e8cd097791feb185ed370b02dbdb48437f3779a6335f73a27d2b9d324ea1a4",
+  "verification/candidate.run.json": "d8c489c6a5bd208db9ac0fcec29cbae6c817da11dd539abd728cca46b1180860",
+  "verification/manifest.json": "f2ef32a2836900225c115d5e76658e23af4fc33ca3854cd9f6dc147e5eb6cd44",
+  "verification/reference.run.json": "8ead539e7634d06e0923c070d53cdcc8869e21f5a41a6a9d252b184d61b314ac",
+  "verification/report.md": "eacc6f41fff4de9f55b113c47cd11d49a60d9cb900d1252de60d7ac10fc2ea62",
+  "verification/verification.json": "f2ef32a2836900225c115d5e76658e23af4fc33ca3854cd9f6dc147e5eb6cd44"
+}
