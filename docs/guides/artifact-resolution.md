@@ -1,9 +1,8 @@
 # Verified model and data artifacts
 
-The development API in `metria.artifacts` uses `ArtifactManifest` for requested
-and resolved file identity. It is part of the upcoming root release; the already
-published `metria==0.1.0` is unchanged. Use `uv sync --all-packages` from a
-checkout while developing against this API.
+`metria.artifacts` uses `ArtifactManifest` for requested and resolved file
+identity. It has shipped since `metria==0.1.1`, and `ArtifactManifest` is also
+exported from `metria`.
 
 ## Shared API
 

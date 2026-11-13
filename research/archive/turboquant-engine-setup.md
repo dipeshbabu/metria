@@ -7,7 +7,7 @@
 This dated setup guide requires the historical experimental llama.cpp fork.
 That fork does not currently have a public source URL, so the build commands
 below are usable only with an existing checkout. See
-[Historical engine forks](../../docs/reference/historical-forks.md#llamacpp-experimental-forks).
+[Historical engine forks](turboquant/historical-forks.md#llamacpp-experimental-forks).
 
 ## Prerequisites
 
@@ -99,7 +99,7 @@ Symmetric. Works great on Llama 70B, Command-R+ 104B, Mistral 24B, Qwen3.5 MoE. 
 | Q4_K_M, Qwen2.5 | `-ctk q8_0 -ctv turbo3` (must be asymmetric) |
 | Q4_K_M, Llama/Mistral/Cohere 24B+ | `-ctk turbo3 -ctv turbo3` (symmetric works) |
 
-For full details see [Configuration Recommendations](../../docs/guides/turboquant-recommendations.md).
+For full details see [Configuration Recommendations](turboquant/recommendations.md).
 
 ## Built-in Optimizations
 
@@ -138,7 +138,7 @@ See [Boundary V paper](../../research/papers/layer-aware-v-compression.md).
 
 Help the project by sharing your numbers. Here's how to generate comparable results.
 
-> **Important: Pick the right config before benchmarking.** Symmetric turbo (e.g., `-ctk turbo3 -ctv turbo3`) is catastrophic on some model families (Qwen2.5, Qwen3 MoE) with Q4 weight quantization. If you benchmark with the wrong config, your PPL numbers will be misleading -- you'll measure the damage from a bad config, not the actual compression quality. Start with asymmetric (`-ctk q8_0 -ctv turbo4`) unless you've validated symmetric on your specific model. See [Configuration Recommendations](../../docs/guides/turboquant-recommendations.md) for which configs are safe on which models.
+> **Important: Pick the right config before benchmarking.** Symmetric turbo (e.g., `-ctk turbo3 -ctv turbo3`) is catastrophic on some model families (Qwen2.5, Qwen3 MoE) with Q4 weight quantization. If you benchmark with the wrong config, your PPL numbers will be misleading -- you'll measure the damage from a bad config, not the actual compression quality. Start with asymmetric (`-ctk q8_0 -ctv turbo4`) unless you've validated symmetric on your specific model. See [Configuration Recommendations](turboquant/recommendations.md) for which configs are safe on which models.
 
 ### Compression reference
 
@@ -235,7 +235,7 @@ TQ4_1S applies WHT rotation + Lloyd-Max polar quantization to model weights (not
 
 **Code:** Weight compression was reported as merged into the historical
 `feature/turboquant-kv-cache` line. Its
-[public fork URL is currently unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks).
+[public fork URL is currently unavailable](turboquant/historical-forks.md#llamacpp-experimental-forks).
 
 See the [weight compression paper](../../research/papers/weight-compression-tq4.md) for full methodology and results.
 
@@ -336,7 +336,7 @@ Source requirement: Q8_0 GGUF. Models already at Q4_K_M have minimal compression
 
 ### Model Compatibility Matrix
 
-For full community benchmark data across 12+ GPUs and 11+ models, see [Community Results](../../docs/reference/weight-compression-results.md).
+For full community benchmark data across 12+ GPUs and 11+ models, see [Community Results](turboquant/weight-compression-results.md).
 
 Based on architecture analysis and tested results. Models marked with * are predictions based on code analysis of `convert_hf_to_gguf.py` and need community validation.
 
@@ -418,7 +418,7 @@ No reboot required. Resets on reboot.
 
 ## Resources
 
-- [Configuration Recommendations](../../docs/guides/turboquant-recommendations.md) (full config guide with all tested models)
+- [Configuration Recommendations](turboquant/recommendations.md) (full config guide with all tested models)
 - [M5 Max Stress Test](../../research/papers/m5-max-stress-test.md) (70B and 104B results)
 - [Sparse V Dequantization](../../research/papers/sparse-v-dequant.md)
 - [Boundary V](../../research/papers/layer-aware-v-compression.md)

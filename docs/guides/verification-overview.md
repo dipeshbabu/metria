@@ -22,13 +22,13 @@ model and runtime. Read each guide's preparation requirements before execution.
 | Prefix caching off versus on | [Prefix-cache verification](vllm-prefix-verification.md) |
 | A CPU runtime upgrade in separate environments | [Runtime-upgrade verification](runtime-upgrade-verification.md) |
 | Local streaming, throughput, and native allocation behavior | [Serving measurements](serving-measurements.md) |
-| FP8 KV-cache precision | [Verification guide](fp8-kv-cache-verification.md) and [qualification status](fp8-qualification-status.md) |
+| Automatic versus FP8 KV cache (CUDA, SM89+) | [FP8 KV-cache verification](fp8-kv-cache-verification.md) |
 
 Use the [runtime qualification guide](runtime-qualification.md) to understand
-the retained evidence for a platform. FP8 and other experimental treatments have
-their own hardware and qualification boundaries. Check the
-[staged capability notes](staged-capabilities.md) before treating a result as a
-qualified end-to-end workflow.
+the retained evidence for a platform. Staged options, such as trajectory KL
+divergence and the vLLM scheduler and cache-layout treatments, have their own
+boundaries; check the [staged capability notes](staged-capabilities.md) before
+treating a result as a qualified end-to-end workflow.
 
 ## Decide what acceptance means
 

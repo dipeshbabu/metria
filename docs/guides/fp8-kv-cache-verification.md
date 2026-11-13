@@ -13,8 +13,8 @@ completed comparison therefore ends in **PASS** or **FAIL**, never just
 ## Requirements
 
 - Linux with an NVIDIA GPU of compute capability 8.9 or newer (Ada, Hopper or
-  later). Older GPUs cannot run the pinned engine's FP8 cache path; see the
-  [FP8 qualification status](fp8-qualification-status.md).
+  later). Older GPUs cannot run the pinned engine's FP8 cache path; see
+  [hardware boundary](#hardware-boundary).
 - The pinned `vllm==0.30.0+cu129` wheel with PyTorch `2.13.0+cu129`, prepared as
   for [prefix-cache verification](vllm-prefix-verification.md).
 - A local model directory with a trusted file-to-SHA-256 descriptor.
@@ -79,6 +79,23 @@ representative pilot workload. FP8 applied, trajectories were identical, and the
 policy failed because the reference and candidate each passed 6 of 12 checks.
 Separate [L4 observations](../../artifacts/qualification/l4-native-gpu/README.md)
 show FP8 changing SmolLM2-135M trajectories substantially (agreement 48.4).
+
+## Hardware boundary
+
+On a GTX 1650 (compute capability 7.5) the pinned wheel's Triton attention
+backend rejects an FP8 KV cache because it requires SM89 or newer. The adapter
+now recognizes that runtime/device combination in preflight and returns an
+actionable unsupported result before building the engine; automatic-cache
+workflows are unaffected. The
+[preflight result](../../artifacts/qualification/fp8-unsupported/preflight.json),
+[native failure log](../../artifacts/qualification/fp8-unsupported/native-stderr.log)
+and [content index](../../artifacts/qualification/fp8-unsupported/sha256.json)
+are retained. The guard does not infer support for other GPUs, wheel builds,
+attention backends or cache formats. vLLM's CPU backend also refuses an FP8
+cache unless the CPU has AVX-512 or AMX.
+
+`tools/qualification/staged/setup_vllm_cuda.sh` and `observe_vllm_gpu.py`
+reproduce the L4 observations on another SM89+ host.
 
 ## Limits
 

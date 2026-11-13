@@ -2,13 +2,13 @@
 
 !!! note "Historical research"
     This page records experimental engine work and its original benchmark scope.
-    Use the [workflow chooser](verification-overview.md) for current Metria verification
-    requirements and [testing evidence](testing-evidence.md) for the maintained test contract.
+    Use the [workflow chooser](../../../docs/guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../../../docs/guides/testing-evidence.md) for the maintained test contract.
 
 TurboQuant KV cache compression is being ported to Apple's [MLX framework](https://github.com/ml-explore/mlx) for native Python/Swift inference on Apple Silicon.
 
 **Fork:** historical MLX `feature/turboquant-plus` implementation
-([public source URL unavailable](../reference/historical-forks.md#mlx-experimental-fork))
+([public source URL unavailable](historical-forks.md#mlx-experimental-fork))
 
 ### Results (M5 Max)
 

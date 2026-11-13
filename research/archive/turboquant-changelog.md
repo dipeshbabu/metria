@@ -1,6 +1,6 @@
 # Changelog / Milestones
 
-Major milestones from the v1 development cycle. The optimization history tables are in [benchmarks.md](../../docs/reference/benchmarks.md) and [speed-experiments.md](../investigations/speed-experiments.md).
+Major milestones from the v1 development cycle. The optimization history tables are in [benchmarks.md](turboquant/benchmarks.md) and [speed-experiments.md](../investigations/speed-experiments.md).
 
 ## v1 Complete, Speed Optimized, Community-Tested
 

@@ -191,7 +191,7 @@ Symmetric turbo may work — Mistral-24B Q4_K_M gives PPL 4.99 with turbo3/turbo
 ### For maximum V compression
 `-ctk q8_0 -ctv turbo2` gives 3.2x V compression with +5.1% PPL. turbo2-V showed promising results but has less validation than turbo4-V and turbo3-V. Treat as experimental.
 
-See [Configuration Recommendations](../../docs/guides/turboquant-recommendations.md) for the full tested matrix.
+See [Configuration Recommendations](../archive/turboquant/recommendations.md) for the full tested matrix.
 
 ## Acknowledgments
 

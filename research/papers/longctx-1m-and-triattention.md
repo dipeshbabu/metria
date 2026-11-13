@@ -99,7 +99,7 @@ The stack is symmetric: the same `ChatSession` path drives both standard decodin
 
 **Code-aware retrieval (Mode A/B).** Every chat completion's prompt is parsed for absolute file paths. The first path's project root is detected via sentinel (`package.json`, `.git`, `pyproject.toml`, etc.). longctx-svc indexes the scope (Hot first → Package on demand), retrieves top-K chunks for the user's query, splices them into a system message, and forwards the request. The model sees a normal chat completion with a `## Retrieved code context` block at the top.
 
-Mode A wraps any OpenAI-compatible engine (proxy in front). Mode B uses an engine flag (`--enable-longctx`) to spawn longctx-svc as a sidecar. Both were tested with the historical `vllm-swift`, `llama-cpp-turboquant`, and `vllm-turboquant` prototypes, and can compose with any upstream engine that speaks OpenAI HTTP. The historical prototype source URLs are [currently unavailable](../../docs/reference/historical-forks.md#swift-and-long-context-prototypes).
+Mode A wraps any OpenAI-compatible engine (proxy in front). Mode B uses an engine flag (`--enable-longctx`) to spawn longctx-svc as a sidecar. Both were tested with the historical `vllm-swift`, `llama-cpp-turboquant`, and `vllm-turboquant` prototypes, and can compose with any upstream engine that speaks OpenAI HTTP. The historical prototype source URLs are [currently unavailable](../archive/turboquant/historical-forks.md#swift-and-long-context-prototypes).
 
 **TriAttention rescue.** When the inference engine has our TriAttention V3 enabled (env: `VLLM_TRIATT_ENABLED=1`, `LONGCTX_ENDPOINT=http://...`), V3 fires per-token eviction during prefill. V3 here refers to our independent implementation; the underlying trigonometric scoring approach is from Mao et al., arXiv:2604.04921. The hybrid prefix-protect + per-segment-quota extensions, the Tier 2 evict-callback and Tier 3 rehydrate plumbing, and the Swift port are ours. The engine's TriAttention rescue bridge POSTs every evicted span (decoded back to text via the bound tokenizer) to `/evict/write`. On the next user turn, `ChatSession` auto-fires `rescue.rehydratePrompt(query: <user_msg>)` against `/evict/retrieve`, prepending recovered chunks as a system message before that turn's prefill.
 
@@ -342,7 +342,7 @@ Open inference engines now have a path to million-token context on a single GPU 
 
 The prototype repositories used for this run no longer have public source
 URLs. The commands below therefore require existing local checkouts; see
-[Historical engine forks](../../docs/reference/historical-forks.md#swift-and-long-context-prototypes).
+[Historical engine forks](../archive/turboquant/historical-forks.md#swift-and-long-context-prototypes).
 
 ```bash
 # longctx-svc
@@ -360,7 +360,7 @@ RUN_V3_CHAT_RAMP=1 swift test --filter "V3ChatSessionRamp"
 
 Findings doc with raw logs and per-cell receipts is available alongside the test sources.
 Test source: historical `Tests/Benchmarks/V3ChatSessionRamp.swift`
-([public endpoint unavailable](../../docs/reference/historical-forks.md#swift-and-long-context-prototypes)).
+([public endpoint unavailable](../archive/turboquant/historical-forks.md#swift-and-long-context-prototypes)).
 
 ---
 

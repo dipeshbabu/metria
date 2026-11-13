@@ -188,8 +188,8 @@ recognized conservative capture-support markers from its ordinary runtime probe.
 Missing or unfamiliar capture evidence is `unknown`, never implicitly supported.
 Only an explicit `supported` capture conclusion permits launch.
 
-These protocols are intentionally provisional until exercised by at least two
-materially different runtimes.
+These protocols are exercised by two materially different first-party adapters,
+llama.cpp (subprocess) and vLLM (in-process), and remain alpha interfaces.
 
 ## Run execution lifecycle
 

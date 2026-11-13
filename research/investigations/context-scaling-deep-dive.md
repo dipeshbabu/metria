@@ -1,6 +1,6 @@
 # Context Scaling Deep Dive
 
-Issue: historical `turboquant_plus#32` ([public endpoint unavailable](../../docs/reference/historical-forks.md#archived-identifiers))
+Issue: historical `turboquant_plus#32` ([public endpoint unavailable](../archive/turboquant/historical-forks.md#archived-identifiers))
 
 ## Problem Statement
 

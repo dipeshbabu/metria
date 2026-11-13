@@ -48,9 +48,12 @@ for preparing the qualified CPU runtime, model, and recipe.
 
 ## Typed targets
 
-The initial catalog refers to the `kv_fidelity.trajectory_match` analysis method
-version `0.3.4`. This version identifies the analysis methodology, not the Metria
-package version. Targets are registered identifiers, not arbitrary JSON paths.
+Targets are registered identifiers, not arbitrary JSON paths. Each names the
+analysis that produces it and that analysis's method version, which is not the
+Metria package version. A target's analysis must be declared in the recipe, and
+each verification profile declares only the analyses it supports.
+
+**Behavior** (`kv_fidelity.trajectory_match`, version `0.3.4`):
 
 | Target | Unit | Criteria |
 |---|---|---|
@@ -60,10 +63,43 @@ package version. Targets are registered identifiers, not arbitrary JSON paths.
 | `behavior.all_trajectories_match` | `boolean` | Exact `equals: true` or `equals: false` |
 | `analysis.status` | `status` | Exact `equals: "completed"`, `"failed"`, or `"skipped"` |
 
-**STAGED** targets refer to the `metria.trajectory_kld` analysis, version
-`0.1.0`. Only the FP8 KV-cache profile accepts them, and only when it was
-prepared with `--staged-kld`. Their report rows carry
-`"qualification": "staged"` and the Markdown report marks them `[staged]`. See
+**Task quality, repeatability and latency** (`metria.verification_impact`,
+version `1`). These need declared task checks or repeated reference trials; see
+[task checks and repeatability](verification-decisions.md) and
+[performance measurements](verification-performance.md).
+
+| Target | Unit | Criteria |
+|---|---|---|
+| `quality.candidate_pass_rate` | `fraction` | Numeric bounds within 0–1 |
+| `quality.reference_pass_rate` | `fraction` | Numeric bounds within 0–1 |
+| `quality.pass_rate_delta` | `fraction_delta` | Candidate minus reference, within −1–1 |
+| `behavior.reference_repeatability` | `fraction` | Numeric bounds within 0–1 |
+| `performance.candidate_latency_seconds` | `seconds` | Nonnegative; lower is better |
+| `performance.latency_ratio` | `ratio` | Candidate/reference, nonnegative; lower is better |
+
+**Serving** (`metria.serving_impact`, version `1`, from
+[serving measurements](serving-measurements.md)). Each metric has a
+`_candidate` absolute target and a `_ratio` candidate/reference target, all
+nonnegative:
+
+| Metric | Candidate unit | Better |
+|---|---|---|
+| `serving.ttft_seconds_*` | `seconds` | lower |
+| `serving.inter_token_latency_seconds_*` | `seconds` | lower |
+| `serving.request_latency_seconds_*` | `seconds` | lower |
+| `serving.output_tokens_per_second_*` | `tokens/second` | higher |
+| `serving.decode_tokens_per_second_*` | `tokens/second` | higher |
+| `serving.requests_per_second_*` | `requests/second` | higher |
+| `serving.allocated_kv_bytes_*` | `bytes` | lower |
+| `serving.peak_device_allocated_bytes_*` | `bytes` | lower |
+| `serving.peak_device_reserved_bytes_*` | `bytes` | lower |
+
+Ratio targets use unit `ratio`.
+
+**STAGED: trajectory KL divergence** (`metria.trajectory_kld`, version `0.1.0`).
+Only the FP8 KV-cache profile accepts these, and only when prepared with
+`--staged-kld`. Their report rows carry `"qualification": "staged"` and the
+Markdown report marks them `[staged]`. See
 [staged capabilities](staged-capabilities.md#trajectory-kl-divergence).
 
 | Target | Unit | Criteria |
@@ -84,10 +120,8 @@ is resolved from the typed catalog; an explicitly wrong unit is rejected.
 Numeric criteria cannot use `equals`, and boolean/status criteria cannot use
 numeric bounds. Empty policies, duplicate targets, contradictory min/max bounds,
 unknown fields, unsupported versions, and non-finite thresholds are rejected
-before execution. A target's analysis must be declared in the recipe.
-
-Performance targets will accompany the verifier-native measurement work. They
-are not guessed from the current process timing display.
+before execution. Latency targets use the verifier's own measured trials, never
+the process timing display.
 
 ## Evaluation order and CI exits
 
