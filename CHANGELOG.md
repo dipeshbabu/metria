@@ -5,6 +5,11 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Capture staged raw top-20 logprobs from vLLM (`token_top_logprobs`,
+  experimental) so trajectory KL divergence runs on the vLLM adapter. The
+  adapter requires `logprobs_mode=raw_logprobs`, keeps exactly ranks 1–20, and
+  fails when any generated token lacks a distribution. Native CPU evidence:
+  repeat KL 0, float32 → bfloat16 at 0.056 nats.
 - Render category, prompt and task-check identifiers in `report.md` with plain
   quotes instead of `&quot;` entities, while still escaping `<`, `>` and `&` so
   hostile identifiers cannot inject HTML. Retained reports are unchanged.

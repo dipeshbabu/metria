@@ -1,0 +1,49 @@
+{
+  "all_trajectories_match": false,
+  "candidate": "bf16",
+  "full_match_rate": 0.75,
+  "per_prompt": [
+    {
+      "candidate_steps": 16,
+      "first_divergence": 13,
+      "id": "story",
+      "matched": false,
+      "prefix_agreement_steps": 13,
+      "reference_steps": 16
+    },
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "dog",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    },
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "capital",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    },
+    {
+      "candidate_steps": 16,
+      "first_divergence": null,
+      "id": "arithmetic",
+      "matched": true,
+      "prefix_agreement_steps": 16,
+      "reference_steps": 16
+    }
+  ],
+  "reference": "reference",
+  "schema": "metria.native_observation_comparison.v1",
+  "trajectory_agreement_score": 95.3125,
+  "trajectory_kld": {
+    "coverage": 1.0,
+    "max_nats": 0.4056977836312676,
+    "mean_nats": 0.05592205681797503,
+    "qualification": "staged",
+    "scored_steps": 62
+  }
+}
