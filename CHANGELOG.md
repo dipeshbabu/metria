@@ -5,6 +5,9 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Render category, prompt and task-check identifiers in `report.md` with plain
+  quotes instead of `&quot;` entities, while still escaping `<`, `>` and `&` so
+  hostile identifiers cannot inject HTML. Retained reports are unchanged.
 - Add a **Pilot feedback** issue form with a required permission checkbox and
   `tools/maintenance/pilot_notes_from_issue.py`, which converts a submitted form
   into validated `participant_feedback` notes for `metria pilot record` without
