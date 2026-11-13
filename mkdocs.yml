@@ -1,0 +1,169 @@
+site_name: Metria
+site_description: Verify an LLM inference change with reproducible evidence and explicit acceptance criteria.
+site_url: https://dipeshbabu.github.io/metria/
+repo_url: https://github.com/dipeshbabu/metria
+repo_name: dipeshbabu/metria
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Dipesh Tharu Mahato
+site_dir: site
+
+theme:
+  name: material
+  custom_dir: tools/docs/theme
+  language: en
+  logo: assets/metria-mark.svg
+  favicon: assets/metria-mark.svg
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+
+plugins:
+  - search
+
+hooks:
+  - tools/docs/hooks.py
+
+extra_css:
+  - https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap
+  - assets/stylesheets/metria.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - def_list
+  - footnotes
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    anchors: warn
+    unrecognized_links: warn
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/dipeshbabu/metria
+      name: Metria on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/metria/
+      name: Metria on PyPI
+
+nav:
+  - Overview: index.md
+  - Get started:
+      - Start here: guides/getting-started.md
+      - Your first report: guides/first-report.md
+      - Install and prepare: guides/installed-workflow.md
+      - Windows and AMD RDNA 4: guides/windows-rdna4-setup.md
+  - Verification:
+      - Choose a workflow: guides/verification-overview.md
+      - Local llama.cpp:
+          - CPU thread changes: guides/metria-verify.md
+          - CPU build changes: guides/llamacpp-build-verification.md
+          - GGUF weight quantization: guides/gguf-quantization-verification.md
+      - Local vLLM:
+          - Prefix caching: guides/vllm-prefix-verification.md
+          - Runtime upgrades: guides/runtime-upgrade-verification.md
+          - Serving and memory: guides/serving-measurements.md
+          - FP8 cache verification: guides/fp8-kv-cache-verification.md
+          - FP8 qualification status: guides/fp8-qualification-status.md
+      - Decisions and automation:
+          - Read checks and repeatability: guides/verification-decisions.md
+          - Define a policy: guides/verification-policies.md
+          - Performance measurements: guides/verification-performance.md
+          - Gate a change in CI: guides/verification-ci.md
+          - Repeated verification trials: guides/verification-trials.md
+      - Runtime qualification: guides/runtime-qualification.md
+      - vLLM qualification: guides/vllm-qualification.md
+  - Reference:
+      - CLI and recipes:
+          - Recipe commands: guides/metria-recipe-cli.md
+          - Study recipes: guides/metria-study-recipes.md
+          - Capability inspection: guides/metria-inspection.md
+      - Python interfaces:
+          - Run records: guides/metria-run-records.md
+          - Pairwise analyses: guides/metria-pairwise-analysis.md
+          - Token trajectories: guides/metria-trajectory-measurement.md
+          - llama.cpp adapter: guides/metria-llamacpp-runtime.md
+          - vLLM adapter: guides/metria-vllm-runtime.md
+          - Capability integrations: guides/capability-integrations.md
+          - Artifact resolution: guides/artifact-resolution.md
+          - Subprocess lifecycle: guides/subprocess-lifecycle.md
+      - Fidelity tools:
+          - Unified fidelity commands: guides/unified-fidelity.md
+          - Compare fidelity reports: guides/kv-fidelity-comparison.md
+  - Architecture:
+      - Product scope: architecture/verifier-product.md
+      - Verification contract: architecture/verification-contract.md
+      - Core architecture: architecture/metria-core.md
+      - Identity and evidence: architecture/identity-and-evidence.md
+      - Library boundaries: architecture/library-boundaries.md
+  - Research:
+      - Staged capabilities: guides/staged-capabilities.md
+      - Benchmarks: reference/benchmarks.md
+      - Hardware matrix: reference/hardware-comparison-matrix.md
+      - Weight compression: reference/weight-compression-results.md
+      - TurboQuant recommendations: guides/turboquant-recommendations.md
+      - MLX port: guides/mlx-port.md
+      - Historical forks: reference/historical-forks.md
+  - Project:
+      - Evidence and feedback:
+          - Testing evidence: guides/testing-evidence.md
+          - Test suite definition: reference/test-suite-definition.md
+          - Maintainer pilot: guides/representative-maintainer-pilot.md
+          - Pilot checklist: guides/verifier-pilot.md
+      - Releases:
+          - 0.1.6: releases/0.1.6.md
+          - 0.1.5: releases/0.1.5.md
+          - 0.1.4: releases/0.1.4.md
+          - 0.1.3: releases/0.1.3.md
+          - 0.1.2: releases/0.1.2.md
+          - 0.1.1: releases/0.1.1.md
+          - 0.1.0: releases/0.1.0.md
+      - Maintenance:
+          - Build these docs: maintainers/documentation.md
+          - Repository settings: maintainers/repository-settings.md
+          - Publish Metria: guides/releasing-metria.md
+          - Component releases: guides/releasing.md
+          - Reference component lifecycle: guides/turboquant-reference-lifecycle.md
+          - Third-party material: maintainers/third-party-material.md

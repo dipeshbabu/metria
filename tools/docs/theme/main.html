@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block announce %}
+  <a href="{{ ('releases/' ~ config.extra.release_version ~ '/') | url }}">
+    <span class="metria-release-dot" aria-hidden="true"></span>
+    Metria {{ config.extra.release_version }}
+    <span class="metria-announcement-separator">/</span>
+    Alpha documentation
+    <span class="metria-announcement-link">Release notes &rarr;</span>
+  </a>
+{% endblock %}

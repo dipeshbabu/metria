@@ -18,6 +18,10 @@ candidate configuration to check what actually ran, measure behavioral change,
 and evaluate the result against your acceptance criteria. Keep both runs and a
 report you can review locally or in CI.
 
+[Read the documentation](https://dipeshbabu.github.io/metria/) ·
+[Your first report](https://dipeshbabu.github.io/metria/guides/first-report/) ·
+[Choose a verification workflow](https://dipeshbabu.github.io/metria/guides/verification-overview/)
+
 ## Installation
 
 Use Python 3.10–3.14 in a virtual environment:
