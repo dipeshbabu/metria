@@ -23,13 +23,13 @@ report you can review locally or in CI.
 Use Python 3.10–3.14 in a virtual environment:
 
 ```sh
-python -m pip install metria==0.1.5
+python -m pip install metria==0.1.6
 metria --version
 ```
 
-Metria 0.1.5 is an alpha release. The base package has no runtime dependencies;
+Metria 0.1.6 is an alpha release. The base package has no runtime dependencies;
 install native inference engines and models separately for real verification.
-See the [release notes](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/releases/0.1.5.md).
+See the [release notes](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/releases/0.1.6.md).
 
 ## Try the Report
 
@@ -47,7 +47,7 @@ quality, or performance.
 
 ## Verify an Inference Change
 
-Start with the [installed workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/installed-workflow.md)
+Start with the [installed workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/installed-workflow.md)
 to prepare a qualified runtime, a pinned local model, and a workload. For a vLLM
 prefix-cache comparison, run from your prepared runtime environment:
 
@@ -77,16 +77,16 @@ These profiles have retained native qualification within their documented scope:
 
 | Change | Guide |
 | --- | --- |
-| llama.cpp CPU thread count | [Local configuration](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/metria-verify.md) |
-| llama.cpp CPU build | [Build regression](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/llamacpp-build-verification.md) |
-| GGUF Q8_0 weight quantization | [Quantization](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/gguf-quantization-verification.md) |
-| vLLM prefix caching | [Prefix-cache verification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/vllm-prefix-verification.md) |
-| vLLM CPU runtime version | [Runtime upgrade](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/runtime-upgrade-verification.md) |
-| vLLM FP8 KV cache (CUDA, SM89+) | [FP8 KV-cache verification](https://github.com/dipeshbabu/metria/blob/main/docs/guides/fp8-kv-cache-verification.md) |
-| vLLM local serving concurrency | [Serving measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/serving-measurements.md) |
+| llama.cpp CPU thread count | [Local configuration](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/metria-verify.md) |
+| llama.cpp CPU build | [Build regression](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/llamacpp-build-verification.md) |
+| GGUF Q8_0 weight quantization | [Quantization](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/gguf-quantization-verification.md) |
+| vLLM prefix caching | [Prefix-cache verification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/vllm-prefix-verification.md) |
+| vLLM CPU runtime version | [Runtime upgrade](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/runtime-upgrade-verification.md) |
+| vLLM FP8 KV cache (CUDA, SM89+) | [FP8 KV-cache verification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/fp8-kv-cache-verification.md) |
+| vLLM local serving concurrency | [Serving measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/serving-measurements.md) |
 
 Each profile has specific runtime, model, device, and evidence requirements.
-See [runtime qualification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/runtime-qualification.md)
+See [runtime qualification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/runtime-qualification.md)
 before using a different configuration.
 
 ## Read the Decision
@@ -118,13 +118,13 @@ execution status, comparison validity, and policy acceptance separate.
 | Interrupted | Verification was interrupted. | `130` |
 
 `VERIFIED` establishes that comparison completed. For a keep/reject decision, add
-[task checks and an acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/verification-decisions.md).
+[task checks and an acceptance policy](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/verification-decisions.md).
 PASS applies to your stated criteria on the supplied workload; Metria supplies no
 universal behavior or safety threshold.
 
-[Behavioral diagnostics](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/metria-trajectory-measurement.md)
+[Behavioral diagnostics](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/metria-trajectory-measurement.md)
 include token-prefix agreement, exact matches, and first-divergence positions.
-[Systems measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/verification-performance.md)
+[Systems measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/verification-performance.md)
 retain their method and limitations: cold-process llama.cpp latency,
 loaded-engine vLLM latency, or local serving measurements. Missing native
 measurements remain unavailable.
@@ -140,9 +140,9 @@ as a job step:
 ```
 
 Preserve the exit status and retain the evidence directory even when verification
-fails. The [copyable GitHub Actions workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/examples/verification/github-actions.yml)
+fails. The [copyable GitHub Actions workflow](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/examples/verification/github-actions.yml)
 includes report summaries and artifact retention. See the
-[CI guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/verification-ci.md)
+[CI guide](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/verification-ci.md)
 for failure handling and machine-readable results.
 
 ## Reference
@@ -156,12 +156,12 @@ metria inspect --help
 metria fidelity --help
 ```
 
-- [Copyable verification examples](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/examples/verification/README.md)
-- [Recipe CLI](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/metria-recipe-cli.md)
-- [Capability inspection](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/metria-inspection.md)
-- [Saved-record comparison](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/metria-run-records.md)
-- [Fidelity methods and migration](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/unified-fidelity.md)
-- [Verifier pilot checklist](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/verifier-pilot.md)
+- [Copyable verification examples](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/examples/verification/README.md)
+- [Recipe CLI](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/metria-recipe-cli.md)
+- [Capability inspection](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/metria-inspection.md)
+- [Saved-record comparison](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/metria-run-records.md)
+- [Fidelity methods and migration](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/unified-fidelity.md)
+- [Verifier pilot checklist](https://github.com/dipeshbabu/metria/blob/metria-v0.1.6/docs/guides/verifier-pilot.md)
 
 ## Developing
 
