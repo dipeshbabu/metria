@@ -141,7 +141,9 @@ def _validate_run(
             )
 
 
-def validate_vllm_recipe(recipe: StudyRecipe) -> None:
+def validate_vllm_recipe(
+    recipe: StudyRecipe, *, check_prefix_change: bool = True
+) -> None:
     if len(recipe.study.runs) != 2:
         raise ValueError("verify requires exactly two runs: reference, then candidate")
     comparison = recipe.study.comparison
@@ -197,7 +199,7 @@ def validate_vllm_recipe(recipe: StudyRecipe) -> None:
         k: v for k, v in right.runtime.items() if k != "enable_prefix_caching"
     }:
         raise ValueError("only the prefix-cache runtime setting may differ")
-    if (
+    if check_prefix_change and (
         left.runtime["enable_prefix_caching"] is not False
         or right.runtime["enable_prefix_caching"] is not True
     ):

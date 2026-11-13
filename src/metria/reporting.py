@@ -229,6 +229,8 @@ def _scope_label(manifest: Mapping[str, Any]) -> str:
         return "Scope: local llama.cpp GGUF weight-quantization comparison"
     if manifest.get("scope") == VLLM_UPGRADE_SCOPE:
         return "Scope: local vLLM CPU runtime-stack upgrade"
+    if manifest.get("scope") == "local_vllm_kv_cache_precision.v1":
+        return "Scope: local vLLM KV-cache precision comparison"
     return "Scope: unrecognized verification contract"
 
 
@@ -252,6 +254,8 @@ def _change_label(manifest: Mapping[str, Any]) -> str:
         )
     if manifest.get("scope") == VLLM_VERIFICATION_SCOPE:
         return f"  Prefix caching: {change['reference']} -> {change['candidate']}"
+    if manifest.get("scope") == "local_vllm_kv_cache_precision.v1":
+        return f"  KV-cache dtype: {change['reference']} -> {change['candidate']}"
     return (
         f"  CPU threads: {change['reference_threads']} -> {change['candidate_threads']}"
     )
@@ -264,6 +268,8 @@ def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
         return f"    Observed runtime: {facts['runtime_version']}; context: {facts['context']}"
     if scope == VLLM_VERIFICATION_SCOPE:
         return f"    Observed prefix caching: {facts['prefix_caching']}; context: {facts['context']}"
+    if scope == "local_vllm_kv_cache_precision.v1":
+        return f"    Observed KV-cache dtype: {facts['kv_cache_dtype']}; context: {facts['context']}"
     return f"    Observed threads: {facts['threads']}; context: {facts['context']}"
 
 

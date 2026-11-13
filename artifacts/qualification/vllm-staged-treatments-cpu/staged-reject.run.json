@@ -1,0 +1,255 @@
+{
+  "record": {
+    "artifacts": [],
+    "events": [
+      {
+        "kind": "supported",
+        "stage": "preflight"
+      },
+      {
+        "error_type": "ValidationError",
+        "kind": "error",
+        "message_sha256": "b10272ba334e1fa873b5f482a551e1a8d5407d688816cac3ddf86a49c2858e67",
+        "stage": "launch"
+      }
+    ],
+    "evidence": {},
+    "metrics": {},
+    "observed": {},
+    "provenance": {
+      "capabilities": {
+        "allowed": true,
+        "blocking": [],
+        "capabilities": {
+          "model.geometry": {
+            "evidence": {
+              "source": "requested_model_metadata"
+            },
+            "reasons": [
+              "model.geometry was not provided"
+            ],
+            "status": "unknown"
+          },
+          "vllm.staged_treatments": {
+            "evidence": {
+              "experimental_override": true,
+              "qualification": "staged",
+              "runtime": "vllm",
+              "supported_treatments": [
+                "vllm.cache_layout",
+                "vllm.scheduler"
+              ],
+              "treatments": [
+                "vllm.scheduler"
+              ]
+            },
+            "reasons": [
+              "staged vLLM treatments (vllm.scheduler) have no retained native qualification; list 'vllm.staged_treatments' in trial_policy.capability_overrides to run them"
+            ],
+            "status": "experimental"
+          }
+        },
+        "checks": {
+          "metria.staged_captures": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          },
+          "turboquant.kv_cache.geometry": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          },
+          "vllm.staged_treatments": {
+            "applicable": true,
+            "override": {
+              "applied": true,
+              "requested": true,
+              "supported": true
+            },
+            "required": true,
+            "version": "1"
+          }
+        }
+      },
+      "environment": {},
+      "executor": {
+        "name": "metria.execute_run",
+        "version": "1"
+      },
+      "measurement": {
+        "name": "kv_fidelity.decode_time_trajectory",
+        "version": "0.3.4"
+      },
+      "preflight": {
+        "captures": {
+          "evidence": {
+            "captures": {
+              "token_ids": {
+                "probe_evidence_key": "token_ids_capture",
+                "probe_marker": "native_output_token_ids",
+                "status": "supported"
+              }
+            },
+            "mechanism": "runtime_probe_evidence"
+          },
+          "reasons": [],
+          "required": [
+            {
+              "kind": "token_ids",
+              "options": {}
+            }
+          ],
+          "status": "supported"
+        },
+        "evidence": {
+          "kv_cache_dtype": "auto",
+          "max_model_len": 128,
+          "requested_runtime_version": "0.30.0+cpu",
+          "runtime": "vllm",
+          "runtime_version": "0.30.0+cpu",
+          "staged_treatments": {
+            "qualification": "staged",
+            "settings": {
+              "vllm.scheduler": {
+                "enable_chunked_prefill": false,
+                "max_num_batched_tokens": 64
+              }
+            }
+          },
+          "token_ids_capture": "native_output_token_ids",
+          "vllm_version": "0.30.0+cpu"
+        },
+        "reasons": [],
+        "status": "supported"
+      }
+    },
+    "requested": {
+      "environment_selector": {},
+      "measurements": [
+        "kv_fidelity.decode_time_trajectory"
+      ],
+      "model": {
+        "id": "HuggingFaceTB/SmolLM2-135M",
+        "path": "${MODEL_SNAPSHOT}",
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+      },
+      "runtime": {
+        "dtype": "float32",
+        "enable_prefix_caching": false,
+        "enforce_eager": true,
+        "gpu_memory_utilization": 0.65,
+        "max_model_len": 128,
+        "max_num_seqs": 1,
+        "name": "vllm",
+        "version": "0.30.0+cpu"
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 96,
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0.0
+      },
+      "treatments": [
+        {
+          "config": {
+            "dtype": "auto"
+          },
+          "kind": "runtime_feature",
+          "name": "vllm.kv_cache"
+        },
+        {
+          "config": {
+            "enable_chunked_prefill": false,
+            "max_num_batched_tokens": 64
+          },
+          "kind": "runtime_feature",
+          "name": "vllm.scheduler"
+        }
+      ],
+      "trial_policy": {
+        "capability_overrides": [
+          "vllm.staged_treatments"
+        ]
+      }
+    },
+    "resolved": {
+      "kv_cache": {
+        "dtype": "auto"
+      },
+      "model": {
+        "model": "${MODEL_SNAPSHOT}",
+        "requested_id": "HuggingFaceTB/SmolLM2-135M",
+        "requested_path": "${MODEL_SNAPSHOT}",
+        "requested_tokenizer_id": null,
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "source_kind": "local",
+        "tokenizer": "${MODEL_SNAPSHOT}",
+        "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+      },
+      "runtime": {
+        "name": "vllm",
+        "requested_version": "0.30.0+cpu",
+        "settings": {
+          "dtype": "float32",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.65,
+          "max_model_len": 128,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false
+        },
+        "version": "0.30.0+cpu"
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 96,
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0.0
+      },
+      "staged_treatments": {
+        "vllm.scheduler": {
+          "enable_chunked_prefill": false,
+          "max_num_batched_tokens": 64
+        }
+      },
+      "support": {
+        "kv_cache_dtype": "auto",
+        "max_model_len": 128,
+        "requested_runtime_version": "0.30.0+cpu",
+        "runtime": "vllm",
+        "runtime_version": "0.30.0+cpu",
+        "staged_treatments": {
+          "qualification": "staged",
+          "settings": {
+            "vllm.scheduler": {
+              "enable_chunked_prefill": false,
+              "max_num_batched_tokens": 64
+            }
+          }
+        },
+        "token_ids_capture": "native_output_token_ids",
+        "vllm_version": "0.30.0+cpu"
+      }
+    },
+    "run_id": "staged-reject",
+    "status": "failed",
+    "study_name": "vllm-gpu-staged-observation"
+  },
+  "schema": "metria.run_record.v1"
+}

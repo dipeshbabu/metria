@@ -186,6 +186,12 @@ def _add_preparation_parser(subparsers: Any) -> None:
     )
     prepare.add_argument("--policy", type=Path, help="explicit acceptance policy JSON")
     prepare.add_argument(
+        "--kv-cache-dtype",
+        choices=("fp8", "fp8_e4m3", "fp8_e5m2"),
+        help="prepare an automatic-vs-FP8 KV-cache recipe instead of prefix caching; "
+        "requires --policy and workload task checks",
+    )
+    prepare.add_argument(
         "--output",
         type=Path,
         required=True,

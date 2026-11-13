@@ -418,6 +418,12 @@ def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
     if recipe.study.runs and all(
         run.runtime.get("name") == "vllm" for run in recipe.study.runs
     ):
+        from .verification_kv_precision import is_kv_precision_recipe
+
+        if is_kv_precision_recipe(recipe):
+            from .verification_kv_precision import build_route as build_kv_route
+
+            return build_kv_route(recipe)
         from .verification_vllm import build_route
 
         return build_route(recipe)

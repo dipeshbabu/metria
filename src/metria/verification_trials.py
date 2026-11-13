@@ -15,6 +15,7 @@ from .verification import VERIFICATION_SCOPE, _write_atomic, verify_recipe
 from .verification_schema import (
     GGUF_QUANTIZATION_SCOPE,
     LLAMACPP_BUILD_SCOPE,
+    VLLM_KV_PRECISION_SCOPE,
     VLLM_UPGRADE_SCOPE,
     VLLM_VERIFICATION_SCOPE,
 )
@@ -75,6 +76,7 @@ def _baseline_identity(
         VLLM_UPGRADE_SCOPE,
         LLAMACPP_BUILD_SCOPE,
         GGUF_QUANTIZATION_SCOPE,
+        VLLM_KV_PRECISION_SCOPE,
     } or result.get("fixture_only"):
         return None
     records = result.get("records", {})
@@ -91,7 +93,11 @@ def _baseline_identity(
             for value in identity.values()
         ):
             return None
-        if result.get("scope") in {VLLM_VERIFICATION_SCOPE, VLLM_UPGRADE_SCOPE}:
+        if result.get("scope") in {
+            VLLM_VERIFICATION_SCOPE,
+            VLLM_UPGRADE_SCOPE,
+            VLLM_KV_PRECISION_SCOPE,
+        }:
             hardware = observed.get("runtime_hardware")
             if (
                 not isinstance(hardware, Mapping)

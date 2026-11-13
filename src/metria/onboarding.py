@@ -90,6 +90,7 @@ def prepare_command(args: Any, stdout: TextIO) -> int:
             warmup_trials=args.warmup_trials,
             measured_trials=args.measured_trials,
             timeout_s=args.timeout,
+            kv_cache_dtype=getattr(args, "kv_cache_dtype", None),
         )
     except importlib.metadata.PackageNotFoundError as exc:
         raise ValueError(
@@ -97,6 +98,10 @@ def prepare_command(args: Any, stdout: TextIO) -> int:
         ) from exc
     if args.policy is not None:
         recipe = replace(recipe, policy=policy_from_data(_json(_read(args.policy))))
+    if getattr(args, "kv_cache_dtype", None) is not None:
+        from .verification_kv_precision import validate_kv_precision_recipe
+
+        validate_kv_precision_recipe(recipe)
     _write_atomic(args.output, study_recipe_to_json(recipe) + "\n")
     stdout.write(f"Prepared {args.output}\nRecipe: {study_recipe_digest(recipe)}\n")
     command = ["metria", "verify", str(args.output), "--output", "verification"]
