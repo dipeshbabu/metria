@@ -34,3 +34,19 @@ def test_hostile_identifiers_are_still_escaped() -> None:
     report = render_verification(manifest)
     assert "<script>" not in report
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in report
+
+
+def test_legacy_rendering_reproduces_every_retained_report_exactly() -> None:
+    root = MANIFEST.parents[3]
+    reports = sorted(root.glob("qualification/**/report.md"))
+    assert reports
+    for report in reports:
+        manifest_path = report.with_name("verification.json")
+        if not manifest_path.exists():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        text = report.read_text(encoding="utf-8").replace("\r\n", "\n")
+        assert text in {
+            render_verification(manifest),
+            render_verification(manifest, legacy_identifiers=True),
+        }, report

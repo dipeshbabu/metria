@@ -116,10 +116,15 @@ def _read_evidence(directory: Path) -> tuple[dict[str, Any], dict[str, str]]:
         files[name] = content
     report = _bundle_file(directory, "report.md")
     try:
-        expected_report = render_verification(manifest)
+        # Reports rendered before 0.1.7 escaped identifier quotes; accept the
+        # exact rendering of either version so retained evidence stays valid.
+        expected_reports = {
+            render_verification(manifest),
+            render_verification(manifest, legacy_identifiers=True),
+        }
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("pilot verification report fields are malformed") from exc
-    if report.decode("utf-8").replace("\r\n", "\n") != expected_report:
+    if report.decode("utf-8").replace("\r\n", "\n") not in expected_reports:
         raise ValueError("pilot report does not match the saved verification")
     files["report.md"] = report
     hashes = {

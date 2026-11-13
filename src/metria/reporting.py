@@ -16,7 +16,18 @@ from .verification_schema import VERIFICATION_ROLES as _ROLES
 from .verification_schema import VERIFICATION_SCOPE, VLLM_VERIFICATION_SCOPE
 
 
-def render_verification(manifest: Mapping[str, Any]) -> str:
+def _identifier(value: Any, *, legacy: bool) -> str:
+    """Quote a user-supplied identifier; never emit live HTML.
+
+    ``legacy`` reproduces reports rendered before 0.1.7, which also escaped
+    quotes, so retained evidence remains byte-for-byte verifiable.
+    """
+    return html.escape(json.dumps(value, ensure_ascii=True), quote=legacy)
+
+
+def render_verification(
+    manifest: Mapping[str, Any], *, legacy_identifiers: bool = False
+) -> str:
     """Render a concise report without raw prompts or configuration values."""
     lines = [
         "# Metria Verification",
@@ -58,7 +69,7 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
     lines.extend(("", "## Impact:"))
     for analysis in manifest["analyses"]:
         lines.append(f"  {analysis['name']}: {analysis['status']}")
-        lines.extend(_render_impact_details(analysis))
+        lines.extend(_render_impact_details(analysis, legacy=legacy_identifiers))
         metrics = analysis["metrics"]
         for key, error in sorted(analysis.get("metric_errors", {}).items()):
             lines.append(f"    {key}: invalid metric evidence ({error['error_type']})")
@@ -109,11 +120,11 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
             lines.append(f"    Length mismatches: {diagnostics['length_mismatches']}")
             for category in diagnostics["by_category"]:
                 lines.append(
-                    f"      Category {html.escape(json.dumps(category['category'], ensure_ascii=True), quote=False)}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
+                    f"      Category {_identifier(category['category'], legacy=legacy_identifiers)}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
                 )
             for row in diagnostics["most_divergent"]:
                 lines.append(
-                    f"      {html.escape(json.dumps(row['id'], ensure_ascii=True), quote=False)}: first divergence at token {row['first_divergence']}"
+                    f"      {_identifier(row['id'], legacy=legacy_identifiers)}: first divergence at token {row['first_divergence']}"
                 )
         elif "per_prompt" in analysis["diagnostics"]:
             diverged = [
@@ -273,7 +284,9 @@ def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
     return f"    Observed threads: {facts['threads']}; context: {facts['context']}"
 
 
-def _render_impact_details(analysis: Mapping[str, Any]) -> list[str]:
+def _render_impact_details(
+    analysis: Mapping[str, Any], *, legacy: bool = False
+) -> list[str]:
     if analysis["name"] != IMPACT_NAME:
         return []
     data = analysis["diagnostics"]
@@ -296,7 +309,7 @@ def _render_impact_details(analysis: Mapping[str, Any]) -> list[str]:
         )
         for row in quality["failed_candidate_checks"][:10]:
             lines.append(
-                f"      Failed {html.escape(json.dumps(row['check_id']), quote=False)} on {html.escape(json.dumps(row['prompt_id']), quote=False)} ({row['kind']}); answer content retained by digest."
+                f"      Failed {_identifier(row['check_id'], legacy=legacy)} on {_identifier(row['prompt_id'], legacy=legacy)} ({row['kind']}); answer content retained by digest."
             )
     else:
         lines.append(
