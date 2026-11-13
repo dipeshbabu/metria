@@ -5,6 +5,11 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Record endpoint server identity as claimed (`partial`, `server_reported`):
+  launch and post-run snapshots of `/v1/models` and vLLM `/version` must match,
+  claims contradicting `runtime.declared` fail the run before any prompt, and
+  server `/tokenize` must agree with the pinned local tokenizer. Filesystem
+  model roots are retained only as hashes.
 - Add `EndpointAdapter` (`openai_endpoint`) for already-running
   OpenAI-compatible servers: prompts tokenized locally with a hash-pinned
   tokenizer and sent as token IDs, `token_ids` and staged top-20 logprob

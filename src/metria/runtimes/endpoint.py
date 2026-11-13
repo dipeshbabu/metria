@@ -30,6 +30,13 @@ from .endpoint_http import (
     bounded_retries,
     bounded_timeout,
 )
+from .endpoint_identity import (
+    TokenizerCheck,
+    check_declared,
+    collect_claims,
+    identity_evidence,
+    validate_declared,
+)
 from .vllm_logprobs import TOP_LOGPROBS_CAPTURE, TOP_LOGPROBS_K
 
 RUNTIME_NAME = "openai_endpoint"
@@ -216,6 +223,8 @@ class EndpointSession:
     connection: EndpointConnection
     resolved: Mapping[str, Any]
     tokenize: Callable[[str], list[int]] | None
+    claims: dict[str, dict[str, Any]] = field(default_factory=dict)
+    tokenizer_check: TokenizerCheck | None = None
     invocations: list[dict[str, Any]] = field(default_factory=list)
 
     def _body(
@@ -259,6 +268,8 @@ class EndpointSession:
         tops: list[Any] = []
         for request in requests:
             body, prompt_ids = self._body(request, distributions)
+            if self.tokenizer_check is not None and prompt_ids is not None:
+                self.tokenizer_check.check(request.prompt, prompt_ids)
             first_attempt = len(self.connection.attempts)
             payload, seconds = self.connection.request("POST", "/v1/completions", body)
             choices = payload.get("choices") if isinstance(payload, Mapping) else None
@@ -373,7 +384,7 @@ class EndpointAdapter:
             "runtime": runtime,
             "model": _model(spec, runtime["flavor"]),
             "decode": _decode(spec.scenario),
-            "declared": dict(spec.runtime.get("declared", {})),
+            "declared": validate_declared(spec.runtime.get("declared")),
         }
 
     def launch(
@@ -391,21 +402,34 @@ class EndpointAdapter:
         tokenize = None
         if runtime["flavor"] in TOKEN_FLAVORS:
             tokenize = load_tokenizer(model["tokenizer_path"], model["tokenizer_files"])
-        payload, _ = connection.request("GET", "/v1/models")
-        served = payload.get("data") if isinstance(payload, Mapping) else None
-        if not isinstance(served, list) or model["id"] not in {
-            row.get("id") for row in served if isinstance(row, Mapping)
-        }:
-            raise RuntimeError("the endpoint does not serve the requested model id")
-        return EndpointSession(connection, resolved, tokenize)
+        claims = collect_claims(connection, runtime["flavor"], model["id"])
+        check_declared(resolved["declared"], claims)
+        check = TokenizerCheck(connection, model["id"]) if tokenize else None
+        return EndpointSession(connection, resolved, tokenize, claims, check)
 
     def observe(self, session: EndpointSession) -> dict[str, Any]:
+        runtime = session.resolved["runtime"]
+        try:
+            after: dict[str, Any] | None = collect_claims(
+                session.connection, runtime["flavor"], session.resolved["model"]["id"]
+            )
+        except (RuntimeError, ValueError):
+            after = None
+        endpoint = session.connection.identity()
+        tokenizer = (
+            session.tokenizer_check.evidence() if session.tokenizer_check else None
+        )
         return {
-            "runtime": {
-                "name": RUNTIME_NAME,
-                "flavor": session.resolved["runtime"]["flavor"],
+            "runtime": {"name": RUNTIME_NAME, "flavor": runtime["flavor"]},
+            "identity": identity_evidence(session.claims, endpoint, tokenizer),
+            "identity_authority": "claimed",
+            "identity_snapshots": {
+                "before": session.claims,
+                "after": after,
+                "stable": after == session.claims,
             },
-            "endpoint": session.connection.identity(),
+            "declared": dict(session.resolved["declared"]),
+            "endpoint": endpoint,
             "configured": {"decode": dict(session.resolved["decode"])},
             "invocations": [dict(row) for row in session.invocations],
             "requests": [dict(row) for row in session.connection.attempts],

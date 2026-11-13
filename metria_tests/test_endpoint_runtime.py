@@ -35,6 +35,12 @@ class Server:
         self.failures = 0
         self.sleep = 0.0
         self.headers: list[str | None] = []
+        self.version = "0.30.0"
+        self.root = "org/model"
+        self.tokenize_status = 200
+        self.tokenize_offset = 0
+        self.completions = 0
+        self.drift_after: int | None = None
         self.bodies: list[dict] = []
         outer = self
 
@@ -53,14 +59,40 @@ class Server:
             def do_GET(self):
                 outer.headers.append(self.headers.get("Authorization"))
                 if self.path == "/v1/models":
-                    self._send(200, {"data": [{"id": "served-model"}]})
+                    self._send(
+                        200,
+                        {
+                            "data": [
+                                {
+                                    "id": "served-model",
+                                    "root": outer.root,
+                                    "max_model_len": 256,
+                                }
+                            ]
+                        },
+                    )
+                elif self.path == "/version":
+                    self._send(200, {"version": outer.version})
                 else:
                     self._send(404, {"error": "missing"})
 
             def do_POST(self):
                 outer.headers.append(self.headers.get("Authorization"))
                 body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                if self.path == "/tokenize":
+                    if outer.tokenize_status != 200:
+                        self._send(outer.tokenize_status, {"error": "off"})
+                        return
+                    tokens = [ord(c) + outer.tokenize_offset for c in body["prompt"]]
+                    self._send(200, {"tokens": tokens, "count": len(tokens)})
+                    return
                 outer.bodies.append(body)
+                outer.completions += 1
+                if (
+                    outer.drift_after is not None
+                    and outer.completions >= outer.drift_after
+                ):
+                    outer.version = "0.31.0"
                 if outer.failures:
                     outer.failures -= 1
                     self._send(503, {"error": "busy"})

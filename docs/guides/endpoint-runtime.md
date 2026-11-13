@@ -61,6 +61,31 @@ record = execute_run(
 - **Retries.** Transport failures and HTTP 429/500/502/503/504 are retried up to
   `max_retries` times with exponential backoff; other errors fail immediately.
 
+## Server identity is claimed, not verified
+
+Metria cannot hash a remote server's weights or binary, so everything a server
+reports about itself is recorded with authority `partial` and source
+`server_reported` in `observed["identity"]`, and `observed["identity_authority"]`
+is `claimed`. Aggregate identity can never become `verified`. Instead the
+adapter enforces consistency:
+
+| Check | When | Outcome |
+| --- | --- | --- |
+| Claims snapshot at launch equals the snapshot after the last request (`/v1/models`: id, root, `max_model_len`; vLLM `/version`) | `observe` | Recorded in `observed["identity_snapshots"]`; drift is an evidence gap |
+| A claim contradicts `runtime.declared` (`engine_version`, `max_model_len`, `model_root`) | `launch`, before any prompt | The run fails |
+| Server `/tokenize` disagrees with the pinned local tokenizer on a prompt | each new prompt | Tokenizer identity `mismatch`; evidence gap |
+| An identity endpoint is not exposed | any | That fact stays absent or `unknown`; no gap |
+
+`runtime.declared` is the operator's statement of what is deployed. It accepts
+only `engine`, `engine_version`, `model_root`, `model_revision`,
+`max_model_len`, `dtype`, `kv_cache_dtype`, `tensor_parallel_size`,
+`pipeline_parallel_size` and `hardware`, as strings or integers. Facts the
+server cannot report (hardware, cache dtype) are retained as declared only.
+
+A `root` that is a filesystem path is retained only as `root_sha256`, so a
+server's private paths never enter evidence. `metria.runtimes.endpoint_identity.identity_gaps()`
+returns the gaps a verification profile applies.
+
 ## Security and privacy
 
 - The URL and API key are read only from the named environment variables. They
@@ -74,11 +99,10 @@ record = execute_run(
 
 ## Limits
 
-- Server identity (engine version, weights, flags) is not recorded yet; see
-  [#212](https://github.com/dipeshbabu/metria/issues/212).
 - Requests are sequential; concurrency is
   [#215](https://github.com/dipeshbabu/metria/issues/215).
 - `session.reset()` supports only the `measurement` scope; an endpoint cannot
   reset a server's prefix cache.
-- Verified natively against `vllm serve` from the pinned `0.30.0+cpu` wheel
-  (token IDs and top-20 logprobs). Other servers are untested.
+- Verified natively against `vllm serve` from the pinned `0.30.0+cpu` wheel:
+  token IDs, top-20 logprobs, `/version`, `/v1/models` and `/tokenize`
+  agreement. Other servers are untested.
