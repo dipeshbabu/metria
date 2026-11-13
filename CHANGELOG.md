@@ -5,6 +5,17 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add the `local_vllm_kv_cache_precision.v1` verify profile: automatic
+  reference vs FP8 candidate KV cache on the pinned CUDA wheel, with engine
+  cache-dtype readback, and required task checks plus an acceptance policy so a
+  completed run always ends PASS or FAIL. `metria recipe prepare-vllm
+  --kv-cache-dtype fp8|fp8_e4m3|fp8_e5m2` prepares it. A complete L4 run is
+  retained; the staged FP8 template is retired.
+- Admit experimental (staged) captures in the study lifecycle only with the new
+  `metria.staged_captures` capability override; all other runs stay fail-closed.
+- Retain native trajectory-KLD evidence on Qwen2.5-0.5B with a
+  `llama-perplexity` corpus-KLD cross-check, and vLLM CPU staged-treatment runs
+  including an engine-rejected invalid value.
 - Retain native NVIDIA L4 (SM89) evidence with the pinned vLLM `0.30.0+cu129`
   wheel: FP8 KV cache requested, resolved and reported applied by the engine,
   with trajectory agreement 48.4/100 against an `auto` cache on SmolLM2-135M; the

@@ -1,0 +1,7 @@
+{
+  "candidate-q4_0.run.json": "970fbd69f0550d2f1fab0f8a6ae96b5c37162a71019db8818509a18935fbc012",
+  "candidate-q8_0.run.json": "47df8ca9b154e7bdce36e808f7e50dd467acab6fd1060400ab92835131fac2cb",
+  "reference-f16.run.json": "a9691453eb964f8e7aaf3e5d630bb76098fe47d321fc094f62cbfb0d4bff7f20",
+  "repeat-f16.run.json": "dae9d6ade85cc8e44c2748a7af572dc419ccf856f0c35bc5606ad24392bb1bd3",
+  "summary.json": "cf9e9bd99bbd7da77e6178bc5e8d79cd969d0c0bff7671c4b5dca3884878b193"
+}

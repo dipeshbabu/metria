@@ -57,8 +57,9 @@ This delivery has explicit limits:
 - A [pinned vLLM CPU runtime-stack upgrade](../guides/runtime-upgrade-verification.md)
   uses separate interpreters, independently checked environment identities and
   native CPU placement with fixed model/tokenizer and workload controls.
-- FP8 KV precision changes remain
-  [staged templates](../../examples/verification/README.md) until the full intended
+- FP8 KV-cache changes use a [dedicated profile](../guides/fp8-kv-cache-verification.md)
+  that requires task checks and an acceptance policy, qualified on SM89 hardware.
+  Earlier, they remained staged templates until the full intended
   change, observed identity, workload, and comparison path are qualified.
 - A separate [local serving profile](../guides/serving-measurements.md) measures
   streamed token delivery, bounded concurrency, throughput, and native CUDA

@@ -62,17 +62,14 @@ behavior, and reports compatible cold-process request latency. Add an explicit
 [acceptance policy](../../docs/guides/verification-policies.md) if you want PASS/FAIL;
 without one, successful comparison means VERIFIED.
 
-## Staged common-change templates
+## Readiness catalog
 
-The [catalog](catalog.json) records readiness and blockers. The versioned recipes
-under `staged/` validate structurally, but the current `metria verify` CLI rejects
-their unsupported routes. They are planning templates, not runnable support claims.
+The [catalog](catalog.json) records each example's readiness. Every listed change
+now has a qualified local route; the former staged KV-cache precision template
+was promoted to the [FP8 KV-cache profile](../../docs/guides/fp8-kv-cache-verification.md)
+after retained native SM89 evidence.
 
-| Change | Reference / candidate | Required evidence before enabling |
-|---|---|---|
-| KV-cache precision | auto cache / FP8 cache | Qualified hardware/engine support plus authoritative applied-cache readback and compatible systems measurement. |
-
-Do not enable a template merely because a fixture passes or a runtime imports.
+Do not enable a new template merely because a fixture passes or a runtime imports.
 The public CLI stays narrow until the new route meets its evidence contract.
 The source recipes and readiness catalog are validated in CI. Use the
 [CI workflow example](github-actions.yml) to retain a real verification result
@@ -84,7 +81,7 @@ and summary after preparing an appropriate runner and recipe.
 The 0.2 development verifier also supports a pinned local vLLM prefix-cache change.
 Use [vllm-prefix-workload.jsonl](vllm-prefix-workload.jsonl) and the
 [preparation/verification guide](../../docs/guides/vllm-prefix-verification.md).
-FP8 KV precision remains staged pending successful hardware qualification.
+FP8 KV-cache changes use the separate [FP8 profile](../../docs/guides/fp8-kv-cache-verification.md).
 
 ## llama.cpp build regression
 

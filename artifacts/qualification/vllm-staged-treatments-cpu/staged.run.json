@@ -1,0 +1,675 @@
+{
+  "record": {
+    "artifacts": [],
+    "events": [
+      {
+        "kind": "supported",
+        "stage": "preflight"
+      },
+      {
+        "kind": "completed",
+        "stage": "launch"
+      },
+      {
+        "kind": "completed",
+        "stage": "measurement"
+      },
+      {
+        "kind": "completed",
+        "stage": "observe"
+      },
+      {
+        "kind": "completed",
+        "stage": "close"
+      }
+    ],
+    "evidence": {
+      "measurements": {
+        "kv_fidelity.decode_time_trajectory": {
+          "method": "kv_fidelity.decode_time_trajectory",
+          "method_version": "0.3.4",
+          "n_prompts": 4,
+          "prompts": [
+            {
+              "category": null,
+              "id": "story",
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+              "token_count": 16,
+              "token_ids": [
+                28,
+                665,
+                436,
+                253,
+                1838,
+                8180,
+                3365,
+                14176,
+                30,
+                2306,
+                4161,
+                281,
+                253,
+                2066,
+                2291,
+                351
+              ]
+            },
+            {
+              "category": null,
+              "id": "dog",
+              "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+              "token_count": 16,
+              "token_ids": [
+                28,
+                198,
+                198,
+                18,
+                57,
+                744,
+                441,
+                253,
+                2767,
+                1627,
+                384,
+                1137,
+                28,
+                476,
+                5476,
+                339
+              ]
+            },
+            {
+              "category": null,
+              "id": "capital",
+              "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+              "token_count": 16,
+              "token_ids": [
+                260,
+                3575,
+                282,
+                260,
+                1798,
+                30,
+                198,
+                198,
+                504,
+                3575,
+                282,
+                4649,
+                314,
+                260,
+                3575,
+                282
+              ]
+            },
+            {
+              "category": null,
+              "id": "arithmetic",
+              "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+              "token_count": 16,
+              "token_ids": [
+                1876,
+                28,
+                588,
+                260,
+                2988,
+                314,
+                216,
+                33,
+                34,
+                30,
+                198,
+                198,
+                712,
+                1073,
+                536,
+                346
+              ]
+            }
+          ],
+          "schema": "metria.trajectory_capture.v1"
+        }
+      }
+    },
+    "metrics": {
+      "trajectory_mean_steps": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "descriptive",
+          "method": "kv_fidelity.decode_time_trajectory",
+          "name": "trajectory_mean_steps",
+          "unit": "tokens",
+          "version": "0.3.4"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_id": "story",
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+            },
+            "value": 16.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "dog",
+              "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+            },
+            "value": 16.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "capital",
+              "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+            },
+            "value": 16.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "arithmetic",
+              "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+            },
+            "value": 16.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 16.0
+      },
+      "trajectory_nonempty_capture_rate": {
+        "aggregation": "mean",
+        "coverage": 1.0,
+        "definition": {
+          "direction": "descriptive",
+          "method": "kv_fidelity.decode_time_trajectory",
+          "name": "trajectory_nonempty_capture_rate",
+          "unit": "fraction",
+          "version": "0.3.4"
+        },
+        "samples": [
+          {
+            "metadata": {
+              "prompt_id": "story",
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "dog",
+              "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "capital",
+              "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+            },
+            "value": 1.0
+          },
+          {
+            "metadata": {
+              "prompt_id": "arithmetic",
+              "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+            },
+            "value": 1.0
+          }
+        ],
+        "uncertainty": {},
+        "value": 1.0
+      }
+    },
+    "observed": {
+      "applied": {
+        "fields": {
+          "cache.cache_dtype": "auto",
+          "cache.enable_prefix_caching": false,
+          "cache.gpu_memory_utilization": 0.65,
+          "model.dtype": "torch.float32",
+          "model.max_model_len": 128,
+          "model.model": "${MODEL_SNAPSHOT}",
+          "model.revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+          "model.tokenizer": "${MODEL_SNAPSHOT}",
+          "model.tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+          "parallel.tensor_parallel_size": 1
+        },
+        "status": "introspected"
+      },
+      "cleanup": {},
+      "closed": false,
+      "configured": {
+        "kv_cache": {
+          "dtype": "auto"
+        },
+        "runtime": {
+          "dtype": "float32",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.65,
+          "max_model_len": 128,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false
+        }
+      },
+      "environment": {},
+      "hardware": {
+        "device_type": "cpu",
+        "source": "vllm_native_platform",
+        "status": "observed"
+      },
+      "identity": {
+        "applied": {
+          "checked_fields": [
+            "model.max_model_len",
+            "cache.cache_dtype",
+            "cache.gpu_memory_utilization",
+            "cache.enable_prefix_caching",
+            "parallel.tensor_parallel_size"
+          ],
+          "fields": {
+            "cache.cache_dtype": "auto",
+            "cache.enable_prefix_caching": false,
+            "cache.gpu_memory_utilization": 0.65,
+            "model.dtype": "torch.float32",
+            "model.max_model_len": 128,
+            "model.model": "${MODEL_SNAPSHOT}",
+            "model.revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+            "model.tokenizer": "${MODEL_SNAPSHOT}",
+            "model.tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+            "parallel.tensor_parallel_size": 1
+          },
+          "missing_fields": [],
+          "source": "vllm_engine_introspection",
+          "status": "partial"
+        },
+        "chat_template": {
+          "source": "tokenizer.chat_template",
+          "status": "unknown"
+        },
+        "endpoint": {},
+        "model": {
+          "identifier": "${MODEL_SNAPSHOT}",
+          "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+          "source": "vllm.model_config",
+          "status": "verified"
+        },
+        "reasons": [
+          "tokenizer chat-template identity is not observable",
+          "applied configuration contains only fields exposed by the vLLM engine"
+        ],
+        "runtime": {
+          "distribution_version": "0.30.0+cpu",
+          "local_build_label_source": "distribution_metadata",
+          "module_version": "0.30.0",
+          "name": "vllm",
+          "source": "loaded_module_and_distribution",
+          "status": "verified",
+          "version": "0.30.0+cpu"
+        },
+        "schema": "metria.runtime_identity.v1",
+        "status": "partial",
+        "tokenizer": {
+          "identifier": "${MODEL_SNAPSHOT}",
+          "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+          "source": "vllm.model_config_or_tokenizer",
+          "status": "verified"
+        }
+      },
+      "invocations": [
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 16,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 16,
+          "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+          "prompt_tokens": 4,
+          "rendered_prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 16,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 16,
+          "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+          "prompt_tokens": 3,
+          "rendered_prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 16,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 16,
+          "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+          "prompt_tokens": 5,
+          "rendered_prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+          "system_sha256": null
+        },
+        {
+          "cached_tokens": 0,
+          "finished": true,
+          "generation": {
+            "chat_template": false,
+            "max_tokens": 16,
+            "seed": 42,
+            "temperature": 0.0
+          },
+          "output_tokens": 16,
+          "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+          "prompt_tokens": 4,
+          "rendered_prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+          "system_sha256": null
+        }
+      ],
+      "model": {
+        "model": "${MODEL_SNAPSHOT}",
+        "requested_id": "HuggingFaceTB/SmolLM2-135M",
+        "requested_path": "${MODEL_SNAPSHOT}",
+        "requested_tokenizer_id": null,
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "source_kind": "local",
+        "tokenizer": "${MODEL_SNAPSHOT}",
+        "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+      },
+      "reset_count": 0,
+      "reset_events": [],
+      "runtime": {
+        "name": "vllm",
+        "version": "0.30.0+cpu"
+      },
+      "staged_treatments": {
+        "qualification": "staged",
+        "settings": {
+          "vllm.cache_layout.block_size": {
+            "observed": 32,
+            "requested": 32,
+            "source": "cache_config.block_size",
+            "status": "applied"
+          },
+          "vllm.scheduler.enable_chunked_prefill": {
+            "observed": true,
+            "requested": true,
+            "source": "scheduler_config.enable_chunked_prefill",
+            "status": "applied"
+          },
+          "vllm.scheduler.max_num_batched_tokens": {
+            "observed": 2048,
+            "requested": 2048,
+            "source": "scheduler_config.max_num_batched_tokens",
+            "status": "applied"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "capabilities": {
+        "allowed": true,
+        "blocking": [],
+        "capabilities": {
+          "model.geometry": {
+            "evidence": {
+              "source": "requested_model_metadata"
+            },
+            "reasons": [
+              "model.geometry was not provided"
+            ],
+            "status": "unknown"
+          },
+          "vllm.staged_treatments": {
+            "evidence": {
+              "experimental_override": true,
+              "qualification": "staged",
+              "runtime": "vllm",
+              "supported_treatments": [
+                "vllm.cache_layout",
+                "vllm.scheduler"
+              ],
+              "treatments": [
+                "vllm.cache_layout",
+                "vllm.scheduler"
+              ]
+            },
+            "reasons": [
+              "staged vLLM treatments (vllm.cache_layout, vllm.scheduler) have no retained native qualification; list 'vllm.staged_treatments' in trial_policy.capability_overrides to run them"
+            ],
+            "status": "experimental"
+          }
+        },
+        "checks": {
+          "metria.staged_captures": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          },
+          "turboquant.kv_cache.geometry": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          },
+          "vllm.staged_treatments": {
+            "applicable": true,
+            "override": {
+              "applied": true,
+              "requested": true,
+              "supported": true
+            },
+            "required": true,
+            "version": "1"
+          }
+        }
+      },
+      "environment": {},
+      "executor": {
+        "name": "metria.execute_run",
+        "version": "1"
+      },
+      "measurement": {
+        "name": "kv_fidelity.decode_time_trajectory",
+        "version": "0.3.4"
+      },
+      "preflight": {
+        "captures": {
+          "evidence": {
+            "captures": {
+              "token_ids": {
+                "probe_evidence_key": "token_ids_capture",
+                "probe_marker": "native_output_token_ids",
+                "status": "supported"
+              }
+            },
+            "mechanism": "runtime_probe_evidence"
+          },
+          "reasons": [],
+          "required": [
+            {
+              "kind": "token_ids",
+              "options": {}
+            }
+          ],
+          "status": "supported"
+        },
+        "evidence": {
+          "kv_cache_dtype": "auto",
+          "max_model_len": 128,
+          "requested_runtime_version": "0.30.0+cpu",
+          "runtime": "vllm",
+          "runtime_version": "0.30.0+cpu",
+          "staged_treatments": {
+            "qualification": "staged",
+            "settings": {
+              "vllm.cache_layout": {
+                "block_size": 32
+              },
+              "vllm.scheduler": {
+                "enable_chunked_prefill": true,
+                "max_num_batched_tokens": 2048
+              }
+            }
+          },
+          "token_ids_capture": "native_output_token_ids",
+          "vllm_version": "0.30.0+cpu"
+        },
+        "reasons": [],
+        "status": "supported"
+      }
+    },
+    "requested": {
+      "environment_selector": {},
+      "measurements": [
+        "kv_fidelity.decode_time_trajectory"
+      ],
+      "model": {
+        "id": "HuggingFaceTB/SmolLM2-135M",
+        "path": "${MODEL_SNAPSHOT}",
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+      },
+      "runtime": {
+        "dtype": "float32",
+        "enable_prefix_caching": false,
+        "enforce_eager": true,
+        "gpu_memory_utilization": 0.65,
+        "max_model_len": 128,
+        "max_num_seqs": 1,
+        "name": "vllm",
+        "version": "0.30.0+cpu"
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 96,
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0.0
+      },
+      "treatments": [
+        {
+          "config": {
+            "dtype": "auto"
+          },
+          "kind": "runtime_feature",
+          "name": "vllm.kv_cache"
+        },
+        {
+          "config": {
+            "enable_chunked_prefill": true,
+            "max_num_batched_tokens": 2048
+          },
+          "kind": "runtime_feature",
+          "name": "vllm.scheduler"
+        },
+        {
+          "config": {
+            "block_size": 32
+          },
+          "kind": "runtime_feature",
+          "name": "vllm.cache_layout"
+        }
+      ],
+      "trial_policy": {
+        "capability_overrides": [
+          "vllm.staged_treatments"
+        ]
+      }
+    },
+    "resolved": {
+      "kv_cache": {
+        "dtype": "auto"
+      },
+      "model": {
+        "model": "${MODEL_SNAPSHOT}",
+        "requested_id": "HuggingFaceTB/SmolLM2-135M",
+        "requested_path": "${MODEL_SNAPSHOT}",
+        "requested_tokenizer_id": null,
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "source_kind": "local",
+        "tokenizer": "${MODEL_SNAPSHOT}",
+        "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+      },
+      "runtime": {
+        "name": "vllm",
+        "requested_version": "0.30.0+cpu",
+        "settings": {
+          "dtype": "float32",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.65,
+          "max_model_len": 128,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false
+        },
+        "version": "0.30.0+cpu"
+      },
+      "scenario": {
+        "chat_template": false,
+        "context": 96,
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0.0
+      },
+      "staged_treatments": {
+        "vllm.cache_layout": {
+          "block_size": 32
+        },
+        "vllm.scheduler": {
+          "enable_chunked_prefill": true,
+          "max_num_batched_tokens": 2048
+        }
+      },
+      "support": {
+        "kv_cache_dtype": "auto",
+        "max_model_len": 128,
+        "requested_runtime_version": "0.30.0+cpu",
+        "runtime": "vllm",
+        "runtime_version": "0.30.0+cpu",
+        "staged_treatments": {
+          "qualification": "staged",
+          "settings": {
+            "vllm.cache_layout": {
+              "block_size": 32
+            },
+            "vllm.scheduler": {
+              "enable_chunked_prefill": true,
+              "max_num_batched_tokens": 2048
+            }
+          }
+        },
+        "token_ids_capture": "native_output_token_ids",
+        "vllm_version": "0.30.0+cpu"
+      }
+    },
+    "run_id": "staged",
+    "status": "completed",
+    "study_name": "vllm-gpu-staged-observation"
+  },
+  "schema": "metria.run_record.v1"
+}

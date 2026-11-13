@@ -82,10 +82,10 @@ These profiles have retained native qualification within their documented scope:
 | GGUF Q8_0 weight quantization | [Quantization](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/gguf-quantization-verification.md) |
 | vLLM prefix caching | [Prefix-cache verification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/vllm-prefix-verification.md) |
 | vLLM CPU runtime version | [Runtime upgrade](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/runtime-upgrade-verification.md) |
+| vLLM FP8 KV cache (CUDA, SM89+) | [FP8 KV-cache verification](https://github.com/dipeshbabu/metria/blob/main/docs/guides/fp8-kv-cache-verification.md) |
 | vLLM local serving concurrency | [Serving measurements](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/serving-measurements.md) |
 
 Each profile has specific runtime, model, device, and evidence requirements.
-FP8 KV-cache precision remains staged pending supported GPU qualification.
 See [runtime qualification](https://github.com/dipeshbabu/metria/blob/metria-v0.1.5/docs/guides/runtime-qualification.md)
 before using a different configuration.
 

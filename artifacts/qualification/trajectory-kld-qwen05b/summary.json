@@ -1,0 +1,100 @@
+{
+  "candidates": {
+    "q4_0": {
+      "first_divergence": {
+        "capital": 2,
+        "code": 0,
+        "history": 1,
+        "list": 2,
+        "science": 0,
+        "story": 3
+      },
+      "kld_coverage": 1.0,
+      "qualification": "staged",
+      "scored_steps": 14,
+      "trajectory_agreement_score": 2.0833333333333335,
+      "trajectory_kld_max_nats": 25.9970454699236,
+      "trajectory_kld_mean_nats": 4.894293559160497
+    },
+    "q8_0": {
+      "first_divergence": {
+        "capital": 11,
+        "code": null,
+        "history": 4,
+        "list": 18,
+        "science": 9,
+        "story": 15
+      },
+      "kld_coverage": 1.0,
+      "qualification": "staged",
+      "scored_steps": 121,
+      "trajectory_agreement_score": 30.606860158311346,
+      "trajectory_kld_max_nats": 0.5347143327078786,
+      "trajectory_kld_mean_nats": 0.03808462197994659
+    }
+  },
+  "corpus": {
+    "chunks": 8,
+    "context": 512,
+    "name": "wikitext-2-raw/wiki.test.raw",
+    "sha256": "173c87a53759e0201f33e0ccf978e510c2042d7f2cb78229d9a50d79b9e7dd08"
+  },
+  "corpus_kld": {
+    "q4_0": {
+      "kv": "q4_0",
+      "mean_kld_nats": 1.981516,
+      "ppl": null,
+      "rms_dp_pct": null,
+      "same_top_p_pct": null
+    },
+    "q8_0": {
+      "kv": "q8_0",
+      "mean_kld_nats": 0.015397,
+      "ppl": null,
+      "rms_dp_pct": null,
+      "same_top_p_pct": null
+    },
+    "reference": {
+      "kv": "f16",
+      "mean_kld_nats": null,
+      "ppl": 15.6403,
+      "rms_dp_pct": null,
+      "same_top_p_pct": null
+    }
+  },
+  "created_at": "2026-11-13T02:46:09.147786+00:00",
+  "host": {
+    "machine": "x86_64",
+    "release": "5.15.167.4-microsoft-standard-WSL2",
+    "system": "Linux"
+  },
+  "model": {
+    "file": "qwen2.5-0.5b-instruct-q8_0.gguf",
+    "id": "Qwen/Qwen2.5-0.5B-Instruct-GGUF@9217f5db79a29953eb74d5343926648285ec7e67",
+    "sha256": "ca59ca7f13d0e15a8cfa77bd17e65d24f6844b554a7b6c12e07a5f89ff76844e"
+  },
+  "provider_sha256": "b2f32cf9fa01e9745f5559a23f2d700180c1de5dcdc2188d6855f011b25552e8",
+  "scenario": {
+    "flash_attention": true,
+    "prompts": 6,
+    "temperature": 0.0,
+    "tokens": 64
+  },
+  "schema": "metria.staged_trajectory_kld_qualification.v1",
+  "self_comparison": {
+    "first_divergence": {
+      "capital": null,
+      "code": null,
+      "history": null,
+      "list": null,
+      "science": null,
+      "story": null
+    },
+    "kld_coverage": 1.0,
+    "qualification": "staged",
+    "scored_steps": 379,
+    "trajectory_agreement_score": 100.0,
+    "trajectory_kld_max_nats": 0.0,
+    "trajectory_kld_mean_nats": 0.0
+  }
+}

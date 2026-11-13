@@ -88,6 +88,20 @@ def _record(
     )
 
 
+def _capture_allowed(status: SupportLevel, spec: RunSpec) -> bool:
+    """Admit experimental captures only for an explicit staged-capture override."""
+
+    if status is SupportLevel.SUPPORTED:
+        return True
+    from .inspection import _override_names
+    from .integrations.staged_captures import STAGED_CAPTURE_CHECK
+
+    return (
+        status is SupportLevel.EXPERIMENTAL
+        and STAGED_CAPTURE_CHECK in _override_names(spec)
+    )
+
+
 def execute_run(
     *,
     study_name: str,
@@ -312,7 +326,7 @@ def execute_run(
         "required": required_capture_evidence,
         **_support_report_to_mapping(capture_support),
     }
-    if SupportLevel(capture_support.status) is not SupportLevel.SUPPORTED:
+    if not _capture_allowed(SupportLevel(capture_support.status), spec):
         events.append(
             {
                 "stage": "preflight",

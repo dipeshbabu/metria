@@ -301,7 +301,7 @@ def verify_isolated(
 
 def main() -> int:
     from .verification import _verification_route, _verify_with_profile
-    from .verification_schema import VLLM_SERVING_SCOPE
+    from .verification_schema import VLLM_KV_PRECISION_SCOPE, VLLM_SERVING_SCOPE
     from .verification_vllm import VLLM_SCOPE
 
     parser = argparse.ArgumentParser(description=__doc__)
@@ -320,7 +320,7 @@ def main() -> int:
     if study_recipe_digest(recipe) != args.digest:
         raise ValueError("worker recipe digest mismatch")
     route = _verification_route(recipe)
-    if route.scope not in {VLLM_SCOPE, VLLM_SERVING_SCOPE}:
+    if route.scope not in {VLLM_SCOPE, VLLM_SERVING_SCOPE, VLLM_KV_PRECISION_SCOPE}:
         raise ValueError("native worker accepts only the qualified vLLM profile")
     result = _verify_with_profile(
         recipe, output, route, reserved_output=True, defer_result=True

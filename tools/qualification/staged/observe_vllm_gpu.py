@@ -27,7 +27,19 @@ from metria.recipes import _json_value
 from metria.records import load_run_record, run_record_from_data, run_record_to_json
 from metria.runtimes.vllm import VLLMAdapter
 
-CUDA_WHEEL_SHA256 = "e98cb69659bfcfc849cf11ce0781a7161d40b02b51a6c3636924a5909f2aabcc"
+# backend -> (pinned wheel SHA-256, runtime version, model dtype)
+BACKENDS = {
+    "cuda": (
+        "e98cb69659bfcfc849cf11ce0781a7161d40b02b51a6c3636924a5909f2aabcc",
+        "0.30.0+cu129",
+        "float16",
+    ),
+    "cpu": (
+        "0ee75278b3626c5d0b7c310c6d62afae93e900f4eac339c91e333fde5108ed78",
+        "0.30.0+cpu",
+        "float32",
+    ),
+}
 PROMPTS = [
     {"id": "story", "prompt": "Once upon a time"},
     {"id": "dog", "prompt": "The little dog"},
@@ -47,6 +59,17 @@ VARIANTS: dict[str, dict[str, Any]] = {
             ("vllm.cache_layout", {"block_size": 32}),
         ),
     },
+    # Negative case: without chunked prefill a batch budget below the model
+    # length cannot schedule a full prompt, so the engine must refuse it.
+    "staged-reject": {
+        "kv": "auto",
+        "staged": (
+            (
+                "vllm.scheduler",
+                {"enable_chunked_prefill": False, "max_num_batched_tokens": 64},
+            ),
+        ),
+    },
 }
 
 
@@ -62,10 +85,12 @@ def _redact(value: Any, replacements: dict[str, str]) -> Any:
     return value
 
 
-def _hardware() -> dict[str, Any]:
+def _hardware(backend: str) -> dict[str, Any]:
     import torch
 
     hardware = dict(capture_hardware_fingerprint().to_mapping())
+    if backend == "cpu":
+        return hardware
     if not torch.cuda.is_available():
         raise SystemExit("CUDA is unavailable")
     props = torch.cuda.get_device_properties(0)
@@ -114,7 +139,9 @@ def _verified_inputs(
         for name, digest in descriptor["files"].items()
     ]
     wheel = verify_artifact(
-        ArtifactManifest(name="vllm", kind="runtime-wheel", sha256=CUDA_WHEEL_SHA256),
+        ArtifactManifest(
+            name="vllm", kind="runtime-wheel", sha256=BACKENDS[args.backend][0]
+        ),
         args.runtime_wheel,
         max_bytes=600_000_000,
     )
@@ -122,8 +149,12 @@ def _verified_inputs(
 
 
 def _spec(
-    variant: dict[str, Any], model_root: Path, descriptor: dict[str, Any]
+    variant: dict[str, Any],
+    model_root: Path,
+    descriptor: dict[str, Any],
+    backend: str = "cuda",
 ) -> RunSpec:
+    _, version, dtype = BACKENDS[backend]
     treatments = [
         TreatmentSpec(
             name="vllm.kv_cache",
@@ -144,8 +175,8 @@ def _spec(
         },
         runtime={
             "name": "vllm",
-            "version": "0.30.0+cu129",
-            "dtype": "float16",
+            "version": version,
+            "dtype": dtype,
             "max_model_len": 128,
             "max_num_seqs": 1,
             "enforce_eager": True,
@@ -177,7 +208,7 @@ def _run(args: argparse.Namespace) -> int:
     record = execute_run(
         study_name="vllm-gpu-staged-observation",
         run_id=args.variant,
-        spec=_spec(variant, model_root, descriptor),
+        spec=_spec(variant, model_root, descriptor, args.backend),
         adapter=VLLMAdapter(),
         measurement=TokenTrajectoryProtocol(),
         measurement_config={"prompts": PROMPTS},
@@ -202,6 +233,14 @@ def _write_outputs(
         str(args.runtime_wheel.resolve().parent): "${RUNTIME_INSTALL}",
         str(Path(__file__).resolve().parent): "${TOOL_DIR}",
     }
+    # Hugging Face snapshots symlink into the hub cache's blobs/ directory, so
+    # verified file paths resolve outside the snapshot; redact the cache too.
+    if (
+        model_root.parent.name == "snapshots"
+        and model_root.parent.parent.name.startswith("models--")
+    ):
+        replacements[str(model_root.parent.parent)] = "${MODEL_CACHE}"
+        replacements[str(model_root.parents[2])] = "${HUB_CACHE}"
     args.output.mkdir(parents=True, exist_ok=True)
     # Serialize through the record schema first: evidence uses immutable
     # mappings that plain json.dumps cannot encode.
@@ -217,7 +256,7 @@ def _write_outputs(
             "variant": args.variant,
             "status": record.status.value,
             "record_sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
-            "hardware": _json_value(_hardware(), path="observation"),
+            "hardware": _json_value(_hardware(args.backend), path="observation"),
             "runtime_artifact": _json_value(
                 artifact_to_data(wheel), path="observation"
             ),
@@ -295,6 +334,7 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     run = sub.add_parser("run")
     run.add_argument("--variant", choices=sorted(VARIANTS), required=True)
+    run.add_argument("--backend", choices=sorted(BACKENDS), default="cuda")
     run.add_argument("--model-root", type=Path, required=True)
     run.add_argument("--descriptor", type=Path, required=True)
     run.add_argument("--runtime-wheel", type=Path, required=True)
