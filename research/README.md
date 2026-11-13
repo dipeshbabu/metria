@@ -11,7 +11,11 @@ model and hardware matrix.
 - [`investigations/`](investigations/) contains experiment logs, validation
   studies, performance analysis, and engineering investigations.
 - [`archive/`](archive/) contains superseded plans, the original implementation
-  plan, and historical documentation.
+  plan, and historical documentation. [`archive/turboquant/`](archive/turboquant/)
+  holds the TurboQuant engine pages that used to be part of the documentation
+  site: benchmarks, the hardware matrix, weight-compression results,
+  configuration recommendations, the MLX port, the Windows/RDNA 4 setup log,
+  the original benchmark protocol and the historical fork index.
 
 Use the [documentation index](../docs/index.md) for current operational
 guidance. Raw outputs referenced by these reports live in

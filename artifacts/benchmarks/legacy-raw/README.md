@@ -9,5 +9,5 @@ configuration defects. They are evidence for the dated write-ups, not a
 current performance baseline.
 
 For current summaries and configuration guidance, use
-[benchmark references](../../../docs/reference/benchmarks.md) and
-[configuration guidance](../../../docs/guides/turboquant-recommendations.md).
+[benchmark references](../../../research/archive/turboquant/benchmarks.md) and
+[configuration guidance](../../../research/archive/turboquant/recommendations.md).

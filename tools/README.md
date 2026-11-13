@@ -57,7 +57,7 @@ python tools/diagnostics/turbo_hardware_diag.py --platform-support
 
 These are diagnostic boundaries, not the Metria core's platform contract.
 Historical TurboQuant measurements require their original experimental engine
-forks. The [fork registry](../docs/reference/historical-forks.md) records missing
+forks. The [fork registry](../research/archive/turboquant/historical-forks.md) records missing
 sources and reproducibility limits; current Metria verification does not require
 those historical forks.
 

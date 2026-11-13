@@ -111,7 +111,6 @@ nav:
           - Runtime upgrades: guides/runtime-upgrade-verification.md
           - Serving and memory: guides/serving-measurements.md
           - FP8 cache verification: guides/fp8-kv-cache-verification.md
-          - FP8 qualification status: guides/fp8-qualification-status.md
       - Decisions and automation:
           - Read checks and repeatability: guides/verification-decisions.md
           - Define a policy: guides/verification-policies.md
@@ -120,6 +119,7 @@ nav:
           - Repeated verification trials: guides/verification-trials.md
       - Runtime qualification: guides/runtime-qualification.md
       - vLLM qualification: guides/vllm-qualification.md
+      - Staged capabilities: guides/staged-capabilities.md
   - Reference:
       - CLI and recipes:
           - Recipe commands: guides/metria-recipe-cli.md
@@ -143,16 +143,6 @@ nav:
       - Core architecture: architecture/metria-core.md
       - Identity and evidence: architecture/identity-and-evidence.md
       - Library boundaries: architecture/library-boundaries.md
-  - Research:
-      - Staged capabilities: guides/staged-capabilities.md
-      - Benchmarks: reference/benchmarks.md
-      - Hardware matrix: reference/hardware-comparison-matrix.md
-      - Weight compression: reference/weight-compression-results.md
-      - TurboQuant recommendations: guides/turboquant-recommendations.md
-      - MLX port: guides/mlx-port.md
-      - Historical forks: reference/historical-forks.md
-      - Historical Windows/RDNA 4 setup: guides/windows-rdna4-setup.md
-      - Historical benchmark protocol: reference/test-suite-definition.md
   - Project:
       - Evidence and feedback:
           - Testing evidence: guides/testing-evidence.md

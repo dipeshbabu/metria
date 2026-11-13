@@ -47,9 +47,9 @@ The bench is baseline-only. No advanced KV compression schemes are tested.
 
 | Engine | Source | KV-cache option used |
 |---|---|---|
-| **vLLM** | [Historical TurboQuant vLLM fork](../../docs/reference/historical-forks.md#vllm-experimental-forks), branch `pr/tq-prebaked-centroids`. BF16 attention path identical to upstream main. | `kv_cache_dtype="fp8_e4m3"` (candidate); `"auto"` = bfloat16 (reference) |
+| **vLLM** | [Historical TurboQuant vLLM fork](../archive/turboquant/historical-forks.md#vllm-experimental-forks), branch `pr/tq-prebaked-centroids`. BF16 attention path identical to upstream main. | `kv_cache_dtype="fp8_e4m3"` (candidate); `"auto"` = bfloat16 (reference) |
 | **SGLang** | `lmsysorg/sglang:v0.5.10.post1-rocm720-mi30x` Docker image (stock, not a fork) | `--kv-cache-dtype fp8_e4m3` (candidate); `auto` = bfloat16 (reference); forced `--attention-backend triton` |
-| **llama.cpp** | [Historical TurboQuant llama.cpp fork](../../docs/reference/historical-forks.md#llamacpp-experimental-forks), branch `feature/turboquant-kv-cache`. Hybrid model support hardened over preceding months. | `-ctk q8_0 -ctv q8_0` (candidate); `f16/f16` (reference) |
+| **llama.cpp** | [Historical TurboQuant llama.cpp fork](../archive/turboquant/historical-forks.md#llamacpp-experimental-forks), branch `feature/turboquant-kv-cache`. Hybrid model support hardened over preceding months. | `-ctk q8_0 -ctv q8_0` (candidate); `f16/f16` (reference) |
 
 The vLLM and llama.cpp branches are the author's forks. The SGLang configuration is the published Docker image. This is a fork-vs-stock asymmetry; readers should weight bring-up smoothness accordingly.
 
@@ -258,6 +258,6 @@ KV Fidelity framework changes are now consolidated in the
 - [KV Fidelity vLLM backend](../../src/metria/fidelity/backends/vllm.py)
 - [KV Fidelity SGLang backend](../../src/metria/fidelity/backends/sglang.py)
 - [KV Fidelity leaderboard](../../components/kv-fidelity/LEADERBOARD.md)
-- [Historical llama.cpp fork](../../docs/reference/historical-forks.md#llamacpp-experimental-forks) — public URL unavailable
-- [Historical vLLM fork](../../docs/reference/historical-forks.md#vllm-experimental-forks) — public URL unavailable
+- [Historical llama.cpp fork](../archive/turboquant/historical-forks.md#llamacpp-experimental-forks) — public URL unavailable
+- [Historical vLLM fork](../archive/turboquant/historical-forks.md#vllm-experimental-forks) — public URL unavailable
 - PPL artifacts on instruct models: [attn-rotation-and-ppl-artifact.md](attn-rotation-and-ppl-artifact.md)

@@ -2,8 +2,8 @@
 
 !!! note "Historical research"
     This page records experimental engine work and its original benchmark scope.
-    Use the [workflow chooser](../guides/verification-overview.md) for current Metria verification
-    requirements and [testing evidence](../guides/testing-evidence.md) for the maintained test contract.
+    Use the [workflow chooser](../../../docs/guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../../../docs/guides/testing-evidence.md) for the maintained test contract.
 
 Tracking performance across all tested hardware configurations. Updated as new diagnostic results come in.
 

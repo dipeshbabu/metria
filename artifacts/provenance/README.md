@@ -12,10 +12,10 @@ index. The same representation records their known identity and explicit gaps.
 | Bundled KV Fidelity report examples | [Examples](../../src/metria/fidelity/examples/README.md), per-file shared manifests in `kv-fidelity-examples/` | Illustrations of report interpretation; incomplete historical model/runtime identity does not establish current qualified support. |
 | Sparse-V/threshold ablations | [Research investigations](../../research/investigations/threshold-ablation.md) and raw output in `artifacts/ablations/sparse-v-threshold/` | Historical fork availability and incomplete input/environment identity constrain reproduction; negative and superseded results remain intact. |
 | NIAH records | [Quality investigations](../../research/investigations/quality-benchmarks.md) and dated JSON/Markdown in `artifacts/niah/` | Consult each record's model/configuration fields; filenames or timestamps are not immutable model/runtime identity. |
-| MLX quality records | [MLX guide](../../docs/guides/mlx-port.md) and dated reports in `artifacts/mlx/` | Historical experimental fork source is not replaced by an upstream MLX checkout. |
+| MLX quality records | [MLX guide](../../research/archive/turboquant/mlx-port.md) and dated reports in `artifacts/mlx/` | Historical experimental fork source is not replaced by an upstream MLX checkout. |
 | EDEN scale investigation | [Paper](../../research/papers/eden-optimal-s-revisit.md) and [immutable upstream EDEN source](https://github.com/amitport/EDEN-Distributed-Mean-Estimation/tree/5c7639a6af810e08d21827dd0ed55772b8113e99) | The public EDEN side is pinned; local TurboQuant and engine-fork sides retain the gaps stated in the paper. |
 
-See [historical fork availability](../../docs/reference/historical-forks.md).
+See [historical fork availability](../../research/archive/turboquant/historical-forks.md).
 No unavailable fork was reconstructed by substituting upstream code. The existing
 llama.cpp capture patch retains its upstream MIT license; other immutable public
 references are linked without copying code whose redistribution was not reviewed.

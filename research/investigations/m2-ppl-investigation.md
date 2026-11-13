@@ -1,7 +1,7 @@
 # TurboQuant PPL Investigation (2026-03-29)
 
 Issue: historical `llama-cpp-turboquant#27`
-([public endpoint unavailable](../../docs/reference/historical-forks.md#archived-identifiers))
+([public endpoint unavailable](../archive/turboquant/historical-forks.md#archived-identifiers))
 
 ## Final Status: RESOLVED
 

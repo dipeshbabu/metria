@@ -2,8 +2,8 @@
 
 !!! note "Historical research"
     This page records experimental engine work and its original benchmark scope.
-    Use the [workflow chooser](verification-overview.md) for current Metria verification
-    requirements and [testing evidence](testing-evidence.md) for the maintained test contract.
+    Use the [workflow chooser](../../../docs/guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../../../docs/guides/testing-evidence.md) for the maintained test contract.
 
 > First-time setup log for building llama.cpp with TurboQuant KV cache compression
 > on Windows 11 with an AMD RX 9070 XT (gfx1201, RDNA 4).
@@ -19,7 +19,7 @@
 |------|---------|---------------|-------|
 | Git | 2.x | Pre-installed | `C:\Program Files\Git` |
 | Python | 3.10 | Windows Store | For the TurboQuant reference component |
-| uv | >=0.11.9 | [Development setup](../../CONTRIBUTING.md#development-setup) | Locked Python workspace |
+| uv | >=0.11.9 | [Development setup](../../../CONTRIBUTING.md#development-setup) | Locked Python workspace |
 | **VS 2022 Build Tools** | v143 | `winget install Microsoft.VisualStudio.2022.BuildTools` | **REQUIRED**: VS 2019 won't work (see Gotcha #1) |
 | CMake | 4.3.1 | `winget install Kitware.CMake` | Installs to `C:\Program Files\CMake\bin` |
 | Ninja | latest | `pip install ninja` or `winget install Ninja-build.Ninja` | pip version is more reliable for PATH |
@@ -71,7 +71,7 @@ cd C:\models\llama-cpp-tq
 git checkout feature/turboquant-kv-cache
 ```
 
-See [Historical engine forks](../reference/historical-forks.md#llamacpp-experimental-forks)
+See [Historical engine forks](historical-forks.md#llamacpp-experimental-forks)
 for source-availability details.
 
 ### 4. Apply Windows HIP patches

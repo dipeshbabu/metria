@@ -50,7 +50,7 @@ runtime, hardware, and evidence requirements.
 
 ### Inference changes
 
-Compare CPU settings, runtime builds, controlled weight quantization, prefix caching, or local serving measurements.
+Compare CPU settings, runtime builds, controlled weight quantization, vLLM prefix caching, runtime upgrades, FP8 KV caches, or local serving measurements.
 
 [Choose a workflow &rarr;](guides/verification-overview.md)
 

@@ -483,7 +483,7 @@ The deeper question — why the gemma-4 instruct fine-tunes specifically produce
 
 ### Build and weights
 
-- **llama.cpp fork:** [historical implementation; public URL unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks), branch `fix/enable-attn-rot-by-default`, commit `817e913ec` (the prior `db3595a755a9` shipped with `attn_rot_disable` defaulting to `true` for legacy compatibility, which silently blocked the new per-side override env knobs via the `&& !attn_rot_disable` guard inside both override branches; `817e913ec` flips that default to `false`. Tests in this paper that use `LLAMA_ATTN_ROT_K_OVERRIDE` / `LLAMA_ATTN_ROT_V_OVERRIDE` require the post-fix build). Per-side env knobs are in `src/llama-kv-cache.cpp` around the `attn_rot_k`/`attn_rot_v` initialization.
+- **llama.cpp fork:** [historical implementation; public URL unavailable](../archive/turboquant/historical-forks.md#llamacpp-experimental-forks), branch `fix/enable-attn-rot-by-default`, commit `817e913ec` (the prior `db3595a755a9` shipped with `attn_rot_disable` defaulting to `true` for legacy compatibility, which silently blocked the new per-side override env knobs via the `&& !attn_rot_disable` guard inside both override branches; `817e913ec` flips that default to `false`. Tests in this paper that use `LLAMA_ATTN_ROT_K_OVERRIDE` / `LLAMA_ATTN_ROT_V_OVERRIDE` require the post-fix build). Per-side env knobs are in `src/llama-kv-cache.cpp` around the `attn_rot_k`/`attn_rot_v` initialization.
 - **Build target:** `build-test/bin/llama-perplexity` (Metal-only fast iteration build, `EMBED=OFF`).
 - **GGUF SHA-256s:**
   - `gemma-4-26B-A4B-it-Q8_0.gguf` — `1157ef475f418871da843a25ce2de867eb00d75732440015d9141362ecd0145b`
@@ -491,7 +491,7 @@ The deeper question — why the gemma-4 instruct fine-tunes specifically produce
   - `google_gemma-4-E2B-it-Q4_K_L.gguf` — `2c64c8ab879d9463abb5dc7ec4ed169c65350361ca8366b39600d183cfd5b270`
 - **Corpus:** `wikitext-2-raw/wiki.test.raw`, the standard llama.cpp distribution copy.
 - **Issue thread:** historical `turboquant_plus#88`
-  ([public endpoint unavailable](../../docs/reference/historical-forks.md#archived-identifiers)) — original report from @erazortt that triggered the investigation.
+  ([public endpoint unavailable](../archive/turboquant/historical-forks.md#archived-identifiers)) — original report from @erazortt that triggered the investigation.
 - **Master PR being investigated:** [ggml-org/llama.cpp#21038](https://github.com/ggml-org/llama.cpp/pull/21038).
 - **Independent prior reports:** [#21394](https://github.com/ggml-org/llama.cpp/issues/21394), [#22407](https://github.com/ggml-org/llama.cpp/issues/22407).
 

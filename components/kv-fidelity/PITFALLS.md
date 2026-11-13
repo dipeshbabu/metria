@@ -56,7 +56,7 @@ llama-cli --help | grep -A2 'cache-type-k'
 
 If absent, use a compatible build from the historical llama.cpp
 `feature/turboquant-kv-cache` fork. Its
-[public source URL is unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks).
+[public source URL is unavailable](../../research/archive/turboquant/historical-forks.md#llamacpp-experimental-forks).
 or set `--candidate "ctk=q8_0,ctv=q8_0"` (standard quant) instead.
 
 ### MLX RotatingKVCache + quantization

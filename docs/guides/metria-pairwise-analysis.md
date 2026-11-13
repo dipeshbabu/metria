@@ -205,9 +205,9 @@ becomes `left` and the later run becomes `right`.
 
 This matters for directional analyses. A study that interprets the left side as
 a baseline/reference should therefore place the baseline earlier in the study.
-The planned `metria verify` workflow will make reference/candidate roles a
-first-class user concept, but basic comparison does not infer a baseline from
-runtime names or treatment labels.
+`metria verify` makes the roles explicit: the first run is the reference and the
+second the candidate. Basic comparison does not infer a baseline from runtime
+names or treatment labels.
 
 ## Built-in trajectory agreement
 

@@ -2,16 +2,16 @@
 
 !!! note "Historical research"
     This page records experimental engine work and its original benchmark scope.
-    Use the [workflow chooser](../guides/verification-overview.md) for current Metria verification
-    requirements and [testing evidence](../guides/testing-evidence.md) for the maintained test contract.
+    Use the [workflow chooser](../../../docs/guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../../../docs/guides/testing-evidence.md) for the maintained test contract.
 
 Post-training weight compression for llama.cpp. No retraining, no calibration data. One command.
 
 **Code:** historical llama.cpp TurboQuant fork, `feature/turboquant-kv-cache`
 ([public source URL unavailable](historical-forks.md#llamacpp-experimental-forks)).
 Historical `PR #45` contained the full testing log.
-**Paper:** [weight-compression-tq4.md](../../research/papers/weight-compression-tq4.md)
-**Historical engine setup:** [archived guide](../../research/archive/turboquant-engine-setup.md#weight-compression-tq4_1s--experimental)
+**Paper:** [weight-compression-tq4.md](../../papers/weight-compression-tq4.md)
+**Historical engine setup:** [archived guide](../turboquant-engine-setup.md#weight-compression-tq4_1s--experimental)
 
 ## At a Glance
 
@@ -105,7 +105,7 @@ Do **not** use Config I on Llama. Use Hybrid (Q4_K for all FFN) or Premium (Q5_K
 | Llama 3.2-3B | Hybrid | 3.19G | 2.10G | -34% | +1.9% | 98% (4090) | Community (CUDA) |
 | Llama 3.2-3B | Premium | 3.19G | 2.52G | -21% | +0.78% | 93% (4090) | Community (CUDA) |
 
-**Why Llama is different:** Llama amplifies per-layer quantization error 6–8x more than Qwen/Phi in FFN layers. The effect scales with depth: 3B Llama is fine, 70B needs Premium. See [paper Section 5.7](../../research/papers/weight-compression-tq4.md) for the full investigation.
+**Why Llama is different:** Llama amplifies per-layer quantization error 6–8x more than Qwen/Phi in FFN layers. The effect scales with depth: 3B Llama is fine, 70B needs Premium. See [paper Section 5.7](../../papers/weight-compression-tq4.md) for the full investigation.
 
 ### Mistral: Hybrid/Premium (better than expected)
 

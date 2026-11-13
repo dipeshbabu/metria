@@ -347,7 +347,7 @@ These findings have been independently confirmed by multiple researchers:
 - Cross-method validation: same asymmetric conclusion holds for E8 VQ as for TurboQuant PolarQuant
 
 **@redwolfweb** — Qwen3.5-27B Q4_K_M, RTX 5090, Debian 13
-(historical issue `#47`; [public endpoint unavailable](../../docs/reference/historical-forks.md#archived-identifiers)) (2026-04-04):
+(historical issue `#47`; [public endpoint unavailable](../archive/turboquant/historical-forks.md#archived-identifiers)) (2026-04-04):
 - Confirmed head_dim=256 fix works across **all 6 K/V combinations**: turbo2/turbo2, turbo3/turbo3, turbo3/q8_0, q8_0/turbo3, turbo2/q8_0, q8_0/turbo2
 - Each config tested with philosophical + mathematical prompts plus chat. Also tested 23,539-token input. No errors, correct answers, no grammar parse errors
 - Originally hit corrupt multilingual output on Madreag's fork with symmetric turbo3. Madreag's fork needs to pick up the same fix separately
@@ -388,8 +388,8 @@ The asymmetric K/V findings were first shared publicly in the [llama.cpp TurboQu
 
 - TurboQuant paper: [arXiv 2504.19874](https://arxiv.org/abs/2504.19874) (ICLR 2026)
 - TurboQuant+ implementation: [current monorepo](../../README.md)
-- llama.cpp fork: [historical implementation; public URL unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks)
+- llama.cpp fork: [historical implementation; public URL unavailable](../archive/turboquant/historical-forks.md#llamacpp-experimental-forks)
 - Sparse V dequantization: [sparse-v-dequant.md](sparse-v-dequant.md)
 - Boundary V: [layer-aware-v-compression.md](layer-aware-v-compression.md)
 - M5 Max stress test: [m5-max-stress-test.md](m5-max-stress-test.md)
-- Configuration recommendations: [turboquant-recommendations.md](../../docs/guides/turboquant-recommendations.md)
+- Configuration recommendations: [turboquant-recommendations.md](../archive/turboquant/recommendations.md)

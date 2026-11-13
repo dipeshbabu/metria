@@ -425,7 +425,7 @@ More broadly, these results indicate that a significant fraction of value-side a
 
 All code, benchmarks, and diagnostic tools are open source:
 
-- **Implementation:** [historical llama.cpp fork; public URL unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks) (branch: `experimental_decode_speed_tests`)
+- **Implementation:** [historical llama.cpp fork; public URL unavailable](../archive/turboquant/historical-forks.md#llamacpp-experimental-forks) (branch: `experimental_decode_speed_tests`)
 - **Benchmarks & diagnostics:** [current monorepo](../../README.md)
 - **Hardware analysis:** [decode-speed-hardware-analysis.md](../investigations/decode-speed-hardware-analysis.md)
 

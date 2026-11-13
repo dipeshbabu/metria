@@ -2,8 +2,8 @@
 
 !!! note "Historical research"
     This page records experimental engine work and its original benchmark scope.
-    Use the [workflow chooser](verification-overview.md) for current Metria verification
-    requirements and [testing evidence](testing-evidence.md) for the maintained test contract.
+    Use the [workflow chooser](../../../docs/guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../../../docs/guides/testing-evidence.md) for the maintained test contract.
 
 Practical guidance for choosing TurboQuant settings based on your model, weight quantization, and hardware. Based on validated testing across Metal (M1 through M5), CUDA (RTX 3080 Ti through Blackwell), and HIP (AMD RDNA 4).
 
@@ -66,9 +66,9 @@ Validated across 4 models on Metal. Consistently recovers 37-91% of the turbo2-t
 
 Validated at 512 and 8K context. NIAH retrieval passed. No speed penalty. Independently validated by @Corianas_ on NanoGPT.
 
-**Exploratory Findings (2026-03-31):** Extended validation on Qwen3.5-35B MoE Q8_0 with `q8_0-K + turbo2-V` (Boundary V auto-enabled) at 512c, 8K, and 32K context. PPL matched or beat `q8_0/turbo3` at every tested length. At 32K decode on M5 Max, turbo2+BV was ~2-3% faster than turbo3-V (n=2 runs). This makes `q8_0/turbo2` the best tested MoE long-context V config on this model. See [MoE V-compression frontier](../../research/papers/moe-v-compression-frontier.md).
+**Exploratory Findings (2026-03-31):** Extended validation on Qwen3.5-35B MoE Q8_0 with `q8_0-K + turbo2-V` (Boundary V auto-enabled) at 512c, 8K, and 32K context. PPL matched or beat `q8_0/turbo3` at every tested length. At 32K decode on M5 Max, turbo2+BV was ~2-3% faster than turbo3-V (n=2 runs). This makes `q8_0/turbo2` the best tested MoE long-context V config on this model. See [MoE V-compression frontier](../../papers/moe-v-compression-frontier.md).
 
-See [Layer-Aware V Compression](../../research/papers/layer-aware-v-compression.md) for the original Boundary V writeup.
+See [Layer-Aware V Compression](../../papers/layer-aware-v-compression.md) for the original Boundary V writeup.
 
 ## Recommended Starting Points
 
@@ -84,7 +84,7 @@ See [Layer-Aware V Compression](../../research/papers/layer-aware-v-compression.
 
 **Important framing:** Asymmetric q8_0-K + turbo-V is a **quality/robustness rescue**, not a speed optimization. You trade some decode throughput (K is uncompressed) for quality safety on sensitive models. If your model works fine with symmetric turbo, use symmetric.
 
-**MoE exception:** On the tested Qwen3.5-35B MoE Q8_0 setup, `q8_0/turbo2` with Boundary V (auto-enabled) is the best tested long-context V config: 7.53x V compression, PPL within 1% of q8_0 at 512c/8K/32K, quality matching or exceeding `q8_0/turbo3`, and 32K decode ~2-3% faster than turbo3-V (n=2 runs, M5 Max). This is a scoped result for this tested setup. See [MoE V-compression frontier](../../research/papers/moe-v-compression-frontier.md).
+**MoE exception:** On the tested Qwen3.5-35B MoE Q8_0 setup, `q8_0/turbo2` with Boundary V (auto-enabled) is the best tested long-context V config: 7.53x V compression, PPL within 1% of q8_0 at 512c/8K/32K, quality matching or exceeding `q8_0/turbo3`, and 32K decode ~2-3% faster than turbo3-V (n=2 runs, M5 Max). This is a scoped result for this tested setup. See [MoE V-compression frontier](../../papers/moe-v-compression-frontier.md).
 
 ## Why K Precision Matters More Than V
 
@@ -155,7 +155,7 @@ Long context PPL (wikitext-2-raw):
 | q8_0 | q8_0 | 48K | 3.575 |
 | turbo3 | turbo3 | 48K | 4.019 |
 
-NIAH: 30/30 perfect (turbo3 = q8_0, 5 depths x 3 context lengths). See [70B stress test](../../research/papers/m5-max-stress-test.md).
+NIAH: 30/30 perfect (turbo3 = q8_0, 5 depths x 3 context lengths). See [70B stress test](../../papers/m5-max-stress-test.md).
 
 #### Command-R+ 104B (Q4_K_M weights, M5 Max 128GB): tolerates symmetric turbo, 128K validated
 
@@ -194,7 +194,7 @@ sudo sysctl iogpu.wired_limit_mb=58982
 
 NIAH: 10/10 perfect at 4K and 8K (turbo3). 16K timed out due to slow decode on 104B, not retrieval failure.
 
-See [M5 Max stress test](../../research/papers/m5-max-stress-test.md).
+See [M5 Max stress test](../../papers/m5-max-stress-test.md).
 
 #### Qwen3.5-35B-A3B MoE (Q8_0 weights): healthy
 
@@ -331,7 +331,7 @@ Validated on:
 
 On M2 Pro (Qwen2.5-1.5B, `q8_0-K + turbo3-V`), block_size=128 improved decode speed by 3-7%. This gain was not observed on M5 Max and may be specific to bandwidth-constrained hardware.
 
-See [block size study](../../research/papers/block-size-experiment.md) for the full data.
+See [block size study](../../papers/block-size-experiment.md) for the full data.
 
 ## Notes and Caveats
 
@@ -339,7 +339,7 @@ See [block size study](../../research/papers/block-size-experiment.md) for the f
 - **Model sensitivity varies:** Qwen2.5 is consistently sensitive to symmetric turbo on Q4_K_M. Llama, Mistral, and Qwen3.5 tolerate it. Test before deploying on new model families.
 - **turbo2 as V cache:** turbo2-V with Boundary V auto-enabled gives +5-9.5% PPL depending on model. Boundary V recovers 37-91% of the quality gap.
 - **PPL is measured at 512 context with 4 chunks unless noted.** Long-context PPL validated up to 128K on Command-R+ 104B.
-- **104B at 128K context:** Confirmed on M5 Max 128GB with Command-R+ Q4_K_M. turbo3/turbo3 PPL 4.024. Requires raising macOS GPU memory cap: `sudo sysctl iogpu.wired_limit_mb=117964` (90% of 128GB, safe for sustained inference). Without this, Metal hangs at ~49K context on 70B+ models. Setting above 90% risks kernel panics under sustained load (community reported). `GGML_METAL_NO_RESIDENCY=1` is not needed (isolation testing confirmed). See [M5 Max stress test](../../research/papers/m5-max-stress-test.md).
+- **104B at 128K context:** Confirmed on M5 Max 128GB with Command-R+ Q4_K_M. turbo3/turbo3 PPL 4.024. Requires raising macOS GPU memory cap: `sudo sysctl iogpu.wired_limit_mb=117964` (90% of 128GB, safe for sustained inference). Without this, Metal hangs at ~49K context on 70B+ models. Setting above 90% risks kernel panics under sustained load (community reported). `GGML_METAL_NO_RESIDENCY=1` is not needed (isolation testing confirmed). See [M5 Max stress test](../../papers/m5-max-stress-test.md).
 - **turbo3 prefill faster than q8_0 at 32K:** Confirmed on both 70B (+7.4%) and 104B (+3.5%). Smaller KV cache reduces memory bandwidth during attention.
 - **Multi-GPU with vision models:** On multi-GPU setups where mmproj (vision encoder) causes OOM on GPU0, set `MTMD_BACKEND_DEVICE=CUDA1` to move the vision model to GPU1. This was the key to unlocking 2x128K dual-slot + vision on Qwen3.5-122B across dual L40S 48GB (reported by @sjoerdmaessen). Without this, mmproj competes with model weights for GPU0 VRAM.
 - **Community:** 50+ testers across M1/M2/M3/M5 Mac, RTX 3080 Ti/3090/4090/5090, L40S, DGX Spark Blackwell, AMD RX 9070 XT, Strix Halo, 7900 XTX.

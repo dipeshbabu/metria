@@ -1,49 +1,42 @@
 # Metria CLI
 
-Metria's command line includes one complete local verification workflow plus
-recipe validation, capability inspection, and saved-record comparison. The
-first `verify` scope is a pinned local llama.cpp CPU thread-count change.
+The `metria` command prepares, validates and runs reference/candidate
+verification, and inspects or compares saved evidence. It uses only the standard
+library; inference engines are installed separately.
 
-Current commands include:
+| Command | Purpose | Guide |
+| --- | --- | --- |
+| `metria verify <study.json> --output <new-dir> [--json]` | Run a qualified reference/candidate change and write both records, `verification.json` and `report.md` | [Choose a workflow](verification-overview.md) |
+| `metria demo --case {pass,fail,not-comparable} --output <dir>` | Write a synthetic bundle without a model | [Your first report](first-report.md) |
+| `metria recipe prepare-vllm` | vLLM prefix caching off vs on; with `--kv-cache-dtype`, automatic vs FP8 KV cache (`--staged-kld` adds trajectory KL divergence) | [Prefix caching](vllm-prefix-verification.md), [FP8](fp8-kv-cache-verification.md) |
+| `metria recipe prepare-vllm-upgrade` | Two pinned vLLM CPU environments | [Runtime upgrades](runtime-upgrade-verification.md) |
+| `metria recipe prepare-vllm-serving` | Native streaming, throughput and allocation measurements | [Serving and memory](serving-measurements.md) |
+| `metria recipe prepare-llamacpp-build` | Two pinned llama.cpp CPU capture builds | [CPU build changes](llamacpp-build-verification.md) |
+| `metria recipe prepare-gguf-quantization` | A controlled GGUF Q8_0 conversion | [GGUF quantization](gguf-quantization-verification.md) |
+| `metria recipe validate / digest / normalize <study.json>` | Check, fingerprint or canonicalize a recipe without running it | Below |
+| `metria inspect <study.json> [--json]` | Evaluate capability rules and fingerprint local hardware | [Capability inspection](metria-inspection.md) |
+| `metria compare <run.json> <run.json> ... --recipe <study.json>` | Compare saved run records under the recipe's plan | Below |
+| `metria pilot record --evidence <dir> --notes <notes.json> --output <file>` | Bind a workload decision and feedback to a retained verification bundle | [Pilot checklist](verifier-pilot.md) |
+| `metria fidelity {score,selftest,compare,repeatability,fetch}` | Expert KV-cache fidelity scoring and saved-report tools | [Fidelity commands](unified-fidelity.md) |
 
-```text
-metria verify <study.json> --output <new-directory> [--json]
-metria recipe validate <study.json>
-metria recipe digest <study.json>
-metria recipe normalize <study.json>
-metria inspect <study.json>
-metria compare <run.json> <run.json> [...] --recipe <study.json>
-```
+`metria --version` prints the installed version, and `python -m metria` is an
+equivalent entry point. Exit codes for `verify` are listed in
+[policies](verification-policies.md#evaluation-order-and-ci-exits).
 
-The implementation uses only the standard library and the versioned Metria JSON
-schemas.
-
-## Install from a source checkout
-
-The root Metria framework is installable from a checkout and provides a real
-`metria` console command:
+## Install
 
 ```bash
-git clone https://github.com/dipeshbabu/metria.git
-cd metria
-python -m pip install .
+python -m pip install metria
 metria --version
-metria recipe validate study.json
 ```
 
-The root distribution remains provisional and is not published by this
-repository. The local package metadata is not a claim that a public package
-index namespace is owned or available.
-
-Developers using the uv workspace can instead run:
+From a source checkout, `python -m pip install .` installs the same command.
+With the uv workspace:
 
 ```bash
 uv sync --all-packages
 uv run metria --version
-uv run metria recipe validate study.json
 ```
-
-`python -m metria` remains an equivalent module entry point after installation.
 
 ## Validate
 
@@ -135,13 +128,9 @@ record/recipe binding error returns `2`.
 
 See [run records and comparison](metria-run-records.md).
 
-## Local verification
+## Python API
 
-Use the [local verifier guide](metria-verify.md) to prepare a qualified provider
-and run a reference/candidate pair. The command persists both run records, checks
-model and capture-provider hashes, validates actual thread/context readback,
-applies the comparison plan, and writes a manifest and readable report.
-
-Installing the CLI does not install an inference engine or auto-load third-party
-plugins. Broader study execution remains available through `execute_run()` and
-`execute_study()` while additional verifier scopes are qualified.
+Studies beyond the qualified `verify` profiles run through `execute_run()` and
+`execute_study()`; see [run records](metria-run-records.md) and
+[pairwise analyses](metria-pairwise-analysis.md). Installing the CLI does not
+install an inference engine or auto-load third-party plugins.

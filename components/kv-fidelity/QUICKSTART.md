@@ -77,13 +77,13 @@ model or research paths assume a checkout containing those inputs.
 The llamacpp backend needs compatible patched binaries on `PATH` /
 `LD_LIBRARY_PATH`, or in the directory named by `LLAMA_CPP_BIN_DIR`. The source
 used for the cited TurboQuant experiments is a
-[historical fork whose public URL is unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks).
+[historical fork whose public URL is unavailable](../../research/archive/turboquant/historical-forks.md#llamacpp-experimental-forks).
 
 Use a separately installed, pinned vLLM environment from the
 [qualification guide](../../docs/guides/vllm-qualification.md). The root package
 does not choose an engine installation or qualify every expert scoring axis.
 Fork-specific TurboQuant schemes require the
-[historical vLLM implementation](../../docs/reference/historical-forks.md#vllm-experimental-forks),
+[historical vLLM implementation](../../research/archive/turboquant/historical-forks.md#vllm-experimental-forks),
 which does not currently have a public source URL.
 
 For SGLang, the simplest path is the published Docker image (the bench

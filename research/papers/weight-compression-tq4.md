@@ -4,7 +4,7 @@
 Independent Researcher
 GitHub: [@dipeshbabu](https://github.com/dipeshbabu)
 
-**Code:** [historical llama.cpp TurboQuant fork; public URL unavailable](../../docs/reference/historical-forks.md#llamacpp-experimental-forks), branch `feature/turboquant-kv-cache` — reported as merged to main (Metal + CUDA). Historical `PR #45` contained the full testing log.
+**Code:** [historical llama.cpp TurboQuant fork; public URL unavailable](../archive/turboquant/historical-forks.md#llamacpp-experimental-forks), branch `feature/turboquant-kv-cache` — reported as merged to main (Metal + CUDA). Historical `PR #45` contained the full testing log.
 **Getting started:** [getting-started.md](../archive/turboquant-engine-setup.md)
 
 ---
@@ -238,7 +238,7 @@ An [independent Python/PyTorch implementation](https://github.com/dhawalc/turboQ
 
 The same implementation independently confirmed boundary layer protection (first 2 + last 2 layers recovering ~90% of quality gap) and found that the original paper's QJL correction stage hurts autoregressive generation quality, consistent with our turbo4 resurrection finding that QJL should be removed.
 
-Full community results across 12+ GPUs, 11+ models, and 10+ independent testers are tracked in [weight-compression-results.md](../../docs/reference/weight-compression-results.md).
+Full community results across 12+ GPUs, 11+ models, and 10+ independent testers are tracked in [weight-compression-results.md](../archive/turboquant/weight-compression-results.md).
 
 ### 4.5 KL Divergence
 
@@ -466,7 +466,7 @@ for i in range(4, n_layers - 4):
 ```
 
 Implementation: historical `PR #45` on branch `pr/tq4-weight-compression`
-([public endpoint unavailable](../../docs/reference/historical-forks.md#archived-identifiers)).
+([public endpoint unavailable](../archive/turboquant/historical-forks.md#archived-identifiers)).
 Metal backend only — CUDA port needed before merge. See
 [getting started](../archive/turboquant-engine-setup.md) for usage.
 

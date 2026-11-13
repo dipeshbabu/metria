@@ -40,13 +40,13 @@ identifiers remain in research reports solely to identify the measured code.
 ## Retired TurboQuant+ repository
 
 The former `turboquant_plus` repository was consolidated into this monorepo.
-Current material is available in the [documentation index](../index.md), the
-[KV Fidelity component](../../components/kv-fidelity/README.md), and the
-[research archive](../../research/README.md).
+Current material is available in the [documentation index](../../../docs/index.md), the
+[KV Fidelity component](../../../components/kv-fidelity/README.md), and the
+[research archive](../../README.md).
 
 ## Archived identifiers
 
-The [retained evidence/source mapping](../../artifacts/provenance/README.md)
+The [retained evidence/source mapping](../../../artifacts/provenance/README.md)
 connects current headline and historical result families to their best available
 code, input, and environment evidence. Missing fork archives and model hashes
 remain explicit gaps; source lineage alone does not reproduce an experiment.
