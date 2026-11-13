@@ -45,6 +45,10 @@ uv audit --locked --script tools/docs/site.py
 4. Keep current release guidance separate from staged and historical evidence.
 5. Run the checks above before opening a pull request.
 
+Use commas, colons, semicolons, or parentheses instead of em dashes. Hyphens in
+compound words are fine. The documentation build enforces this rule, including
+HTML entities that render as an em dash.
+
 Links to files outside `docs/`, such as examples or retained artifacts, remain
 ordinary repository-relative links in source. A build hook changes those links
 to the matching GitHub revision for the published site. It does not copy research

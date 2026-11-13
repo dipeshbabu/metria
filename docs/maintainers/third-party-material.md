@@ -20,6 +20,14 @@ When rights are unknown, record `unknown` and retain only permissible metadata o
 links until resolved. Package builds must include their own `LICENSE` and
 `NOTICE`; source checks and wheel-content checks enforce this requirement.
 
+## Documentation icons
+
+The documentation uses [Octicons](https://github.com/primer/octicons), distributed
+under the [MIT license](../assets/icons/LICENSE). The SVGs in `docs/assets/icons/`
+come from the icon set bundled with the locked MkDocs Material 9.8.1 dependency;
+their fill color is set to the documentation accent. Callout icons use the same
+bundled set directly. These assets are separate from Metria's original logo.
+
 ## Shared representation
 
 Use the existing `ArtifactManifest` primitive for downloaded inputs, generated

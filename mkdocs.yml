@@ -17,6 +17,13 @@ theme:
     code: JetBrains Mono
   icon:
     repo: fontawesome/brands/github
+    admonition:
+      note: octicons/info-24
+      tip: octicons/light-bulb-24
+      warning: octicons/alert-24
+      danger: octicons/zap-24
+      example: octicons/beaker-24
+      success: octicons/check-circle-24
   palette:
     - scheme: slate
       primary: custom
@@ -93,7 +100,6 @@ nav:
       - Start here: guides/getting-started.md
       - Your first report: guides/first-report.md
       - Install and prepare: guides/installed-workflow.md
-      - Windows and AMD RDNA 4: guides/windows-rdna4-setup.md
   - Verification:
       - Choose a workflow: guides/verification-overview.md
       - Local llama.cpp:
@@ -145,10 +151,11 @@ nav:
       - TurboQuant recommendations: guides/turboquant-recommendations.md
       - MLX port: guides/mlx-port.md
       - Historical forks: reference/historical-forks.md
+      - Historical Windows/RDNA 4 setup: guides/windows-rdna4-setup.md
+      - Historical benchmark protocol: reference/test-suite-definition.md
   - Project:
       - Evidence and feedback:
           - Testing evidence: guides/testing-evidence.md
-          - Test suite definition: reference/test-suite-definition.md
           - Maintainer pilot: guides/representative-maintainer-pilot.md
           - Pilot checklist: guides/verifier-pilot.md
       - Releases:

@@ -152,12 +152,12 @@ Reserved identity keys cannot be redefined through extension configuration.
 
 Capability discovery uses four conservative states:
 
-- `supported` — the implemented rule has sufficient evidence to support the
+- `supported`: the implemented rule has sufficient evidence to support the
   requested capability;
-- `experimental` — the capability is intentionally available but outside the
+- `experimental`: the capability is intentionally available but outside the
   normal validated support envelope;
-- `unsupported` — available evidence proves the request is not supported;
-- `unknown` — evidence is missing, contradictory, or insufficient.
+- `unsupported`: available evidence proves the request is not supported;
+- `unknown`: evidence is missing, contradictory, or insufficient.
 
 `unknown` is distinct from `unsupported`. An adapter should not turn missing
 metadata into a confident incompatibility claim, and it should not turn a user

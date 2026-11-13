@@ -1,9 +1,15 @@
-# TurboQuant on Windows — AMD RX 9070 XT (RDNA 4) Setup Guide
+# TurboQuant on Windows: AMD RX 9070 XT (RDNA 4) Setup Guide
+
+!!! note "Historical research"
+    This page records experimental engine work and its original benchmark scope.
+    Use the [workflow chooser](verification-overview.md) for current Metria verification
+    requirements and [testing evidence](testing-evidence.md) for the maintained test contract.
 
 > First-time setup log for building llama.cpp with TurboQuant KV cache compression
 > on Windows 11 with an AMD RX 9070 XT (gfx1201, RDNA 4).
 >
-> **Status**: WIP. RDNA 4 HIP support is bleeding-edge. Expect rough edges.
+> **Status**: Historical setup notes. Reproducing these steps requires the
+> original experimental engine fork.
 
 ---
 
@@ -14,7 +20,7 @@
 | Git | 2.x | Pre-installed | `C:\Program Files\Git` |
 | Python | 3.10 | Windows Store | For the TurboQuant reference component |
 | uv | >=0.11.9 | [Development setup](../../CONTRIBUTING.md#development-setup) | Locked Python workspace |
-| **VS 2022 Build Tools** | v143 | `winget install Microsoft.VisualStudio.2022.BuildTools` | **REQUIRED** — VS 2019 won't work (see Gotcha #1) |
+| **VS 2022 Build Tools** | v143 | `winget install Microsoft.VisualStudio.2022.BuildTools` | **REQUIRED**: VS 2019 won't work (see Gotcha #1) |
 | CMake | 4.3.1 | `winget install Kitware.CMake` | Installs to `C:\Program Files\CMake\bin` |
 | Ninja | latest | `pip install ninja` or `winget install Ninja-build.Ninja` | pip version is more reliable for PATH |
 | HIP SDK for Windows | 7.1 | Manual download from AMD | ~1.6GB, installs to `C:\Program Files\AMD\ROCm\7.1` |
@@ -29,7 +35,7 @@
 # CMake
 winget install Kitware.CMake
 
-# Ninja (via pip — more reliable than winget for PATH)
+# Ninja (via pip: more reliable than winget for PATH)
 pip install ninja
 
 # VS 2022 Build Tools (MUST be 2022, not 2019)
@@ -71,12 +77,12 @@ for source-availability details.
 ### 4. Apply Windows HIP patches
 
 See the gotchas below. Key changes needed:
-- `ggml/src/ggml-hip/CMakeLists.txt` — add `-xhip -include __clang_hip_runtime_wrapper.h`
-- `ggml/src/ggml-cuda/vendors/hip.h` — add `<algorithm>` + `using std::min/max`
-- `ggml/src/ggml-turbo-quant.c` — add `M_PI` define
-- `ggml/src/ggml-cuda/turbo-innerq.cu` — add `dllexport` on Windows
-- `src/llama-kv-cache.cpp` — add `dllimport` on Windows
-- `ggml/src/ggml-cuda/fattn-tile.cu` — guard D>=576 for HIP
+- `ggml/src/ggml-hip/CMakeLists.txt`: add `-xhip -include __clang_hip_runtime_wrapper.h`
+- `ggml/src/ggml-cuda/vendors/hip.h`: add `<algorithm>` + `using std::min/max`
+- `ggml/src/ggml-turbo-quant.c`: add `M_PI` define
+- `ggml/src/ggml-cuda/turbo-innerq.cu`: add `dllexport` on Windows
+- `src/llama-kv-cache.cpp`: add `dllimport` on Windows
+- `ggml/src/ggml-cuda/fattn-tile.cu`: guard D>=576 for HIP
 
 ### 5. Build
 
@@ -102,7 +108,7 @@ cmake --build build --config Release
 ### 6. Test inference
 
 ```cmd
-:: Qwen2.5-7B Q4_K_M — use asymmetric K/V (recommended for Q4_K_M)
+:: Qwen2.5-7B Q4_K_M, use asymmetric K/V (recommended for Q4_K_M)
 build\bin\llama-cli.exe ^
     -m C:\models\qwen2.5-7b-instruct-q4_k_m.gguf ^
     -ngl 99 -c 2048 -fa on ^
@@ -120,13 +126,13 @@ Prompt:     412.0 t/s
 Generation:  52.3 t/s
 ```
 
-gfx1201 detected natively — no `HSA_OVERRIDE_GFX_VERSION` needed!
+gfx1201 was detected natively without setting `HSA_OVERRIDE_GFX_VERSION`.
 
 ---
 
 ## Gotchas
 
-### Gotcha #1: VS 2019 does NOT work — you need VS 2022
+### Gotcha #1: Use VS 2022 instead of VS 2019
 
 The `common/` library uses jinja templates that require a `<functional>` header with
 C++17/20 `reinterpret_cast` semantics that VS 2019's v14.28 MSVC headers don't support.
@@ -146,7 +152,7 @@ call them from `__device__` code.
 
 On Linux this works because glibc's math headers don't have host/device annotations.
 On Windows, the HIP device math wrappers in `__clang_hip_math.h` are only included
-when compiling with `-xhip` flag — but llama.cpp's Windows HIP build compiles `.cu`
+when compiling with `-xhip` flag, but llama.cpp's Windows HIP build compiles `.cu`
 files as CXX (C++), not HIP language.
 
 **Fix**: Add `-xhip -include __clang_hip_runtime_wrapper.h` to the compile flags for
@@ -214,7 +220,7 @@ set HIP_PATH=C:\Program Files\AMD\ROCm\7.1
 The hipconfig script concatenates paths using `HIP_PATH` and a trailing space causes
 "version file not found" warnings. Harmless but confusing.
 
-### Gotcha #9: RDNA 4 (gfx1201) target — it works!
+### Gotcha #9: RDNA 4 (gfx1201) target: it works!
 
 HIP SDK 7.1 (clang 21) includes gfx1201 support. No need for `HSA_OVERRIDE_GFX_VERSION`.
 The GPU is detected correctly by `hipinfo`:
@@ -231,8 +237,8 @@ totalGlobalMem: 15.92 GB
 The TurboQuant HIP implementation reuses CUDA `.cu` files compiled through the HIP
 backend (standard AMD approach). Key files:
 
-- `ggml/src/ggml-cuda/turbo-quant.cuh` — quantize/dequantize kernels
-- `ggml/src/ggml-cuda/turbo-wht.cu` — Walsh-Hadamard Transform
-- `ggml/src/ggml-cuda/turbo-innerq.cu` — per-channel equalization
-- `ggml/src/ggml-cuda/template-instances/fattn-vec-instance-turbo*.cu` — FlashAttention
-- `ggml/src/ggml-hip/CMakeLists.txt` — HIP build configuration
+- `ggml/src/ggml-cuda/turbo-quant.cuh`: quantize/dequantize kernels
+- `ggml/src/ggml-cuda/turbo-wht.cu`: Walsh-Hadamard Transform
+- `ggml/src/ggml-cuda/turbo-innerq.cu`: per-channel equalization
+- `ggml/src/ggml-cuda/template-instances/fattn-vec-instance-turbo*.cu`: FlashAttention
+- `ggml/src/ggml-hip/CMakeLists.txt`: HIP build configuration

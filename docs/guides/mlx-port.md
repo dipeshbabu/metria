@@ -1,5 +1,10 @@
 # MLX Framework Port (Experimental)
 
+!!! note "Historical research"
+    This page records experimental engine work and its original benchmark scope.
+    Use the [workflow chooser](verification-overview.md) for current Metria verification
+    requirements and [testing evidence](testing-evidence.md) for the maintained test contract.
+
 TurboQuant KV cache compression is being ported to Apple's [MLX framework](https://github.com/ml-explore/mlx) for native Python/Swift inference on Apple Silicon.
 
 **Fork:** historical MLX `feature/turboquant-plus` implementation
@@ -7,11 +12,11 @@ TurboQuant KV cache compression is being ported to Apple's [MLX framework](https
 
 ### Results (M5 Max)
 
-**Qwen2.5-3B 4bit — delegated KVCache (5-run avg, 500 decode tokens, historical commit `7ad7500`):**
+**Qwen2.5-3B 4bit: delegated KVCache (5-run avg, 500 decode tokens, historical commit `7ad7500`):**
 
 | Config | Decode tok/s | vs Baseline | PPL | PPL Delta |
 |--------|-------------|-------------|-----|-----------|
-| Baseline (f16 KV) | 172.6 | 100% | 1.8764 | — |
+| Baseline (f16 KV) | 172.6 | 100% | 1.8764 | n/a |
 | **Sym turbo4** | **171.2** | **99.2%** | 1.9083 | +1.70% |
 | **Asym (K=FP16, V=turbo4)** | **171.0** | **99.0%** | 1.8859 | +0.51% |
 
@@ -29,7 +34,7 @@ TurboQuant KV cache compression is being ported to Apple's [MLX framework](https
 
 | Config | PPL | PPL Delta | Decode | vs Baseline |
 |--------|-----|-----------|--------|-------------|
-| Baseline | 1.4800 | — | 17.9 | 100% |
+| Baseline | 1.4800 | n/a | 17.9 | 100% |
 | turbo4 asymmetric | 1.5082 | +1.91% | 15.5 | 87% |
 | turbo4 symmetric | 1.5219 | +2.83% | 15.4 | 86% |
 
@@ -50,7 +55,7 @@ TurboQuant KV cache compression is being ported to Apple's [MLX framework](https
 | Qwen2.5-7B 8bit | 64.2 | 64.1 | 0.00% |
 | phi-4 8bit | 32.9 | 32.7 | 0.00% |
 
-**M2 Pro — Qwen2.5-1.5B 8bit (dense, 28/28 KV layers, asymmetric):**
+**M2 Pro: Qwen2.5-1.5B 8bit (dense, 28/28 KV layers, asymmetric):**
 
 | Test | Result |
 |------|--------|
@@ -63,7 +68,7 @@ TurboQuant KV cache compression is being ported to Apple's [MLX framework](https
 | 128 | 34.8 | 35.2 | 101% |
 | 4096 | 46.9 | 21.6 | 46% |
 
-M2 Pro shows more decode regression at long context — lower memory bandwidth amplifies turbo overhead.
+M2 Pro shows more decode regression at long context; lower memory bandwidth amplifies turbo overhead.
 
 **M5 Max Context Scaling (Qwen2.5-7B 8bit, delegated KVCache, historical commit `7ad7500`):**
 
@@ -117,7 +122,7 @@ pip install mlx-lm
 
 ### How it works
 
-`TurboKVCache` is a drop-in replacement for mlx-lm's `KVCache` that adds TurboQuant 4-bit K+V compression. Compatible with **mlx-lm** and **mlx-vlm** — no framework changes needed.
+`TurboKVCache` is a drop-in replacement for mlx-lm's `KVCache` that adds TurboQuant 4-bit K+V compression. It is compatible with **mlx-lm** and **mlx-vlm** without framework changes.
 
 **Delegated KVCache architecture** (historical commit `7ad7500`): During prefill, stores raw FP16. On first decode step, compresses to packed TurboQuant storage and seeds an internal `KVCache` with decoded FP16. Subsequent decode tokens go through the native KVCache (pre-allocated buffers, zero-alloc slice-assign). Packed storage updated in background via periodic batch recompression on CPU stream.
 
@@ -127,7 +132,7 @@ pip install mlx-lm
 - Works with stock mlx-lm and mlx-vlm, no fork needed
 - All TurboQuant+ papers applied (beta centroids, dual SRHT signs, boundary layers)
 
-### Quick Start — mlx-vlm (multimodal)
+### Quick Start: mlx-vlm (multimodal)
 
 ```python
 from mlx_vlm import load
@@ -143,14 +148,14 @@ kv_indices = [i for i, c in enumerate(cache) if isinstance(c, KVCache)]
 for idx in kv_indices:
     cache[idx] = TurboKVCacheLite(cache[idx], bits=4, key_bits=4)
 
-# Generate as normal — prefill stores FP16
+# Generate as normal: prefill stores FP16
 from mlx_vlm import generate
 generate(model, processor, prompt="...", max_tokens=1, prompt_cache=cache)
 
 # Compact: compress K+V to 4-bit TurboQuant
 compact_turbo_cache(cache)
 
-# Continue generating — native SDPA at full speed
+# Continue generating: native SDPA at full speed
 generate(model, processor, prompt="Continue.", max_tokens=200, prompt_cache=cache)
 ```
 
@@ -160,7 +165,7 @@ python -m pip install -e /path/to/mlx
 pip install mlx-vlm
 ```
 
-### Quick Start — mlx-lm (text)
+### Quick Start: mlx-lm (text)
 
 ```python
 import mlx_lm
@@ -188,4 +193,4 @@ gemma-4-26b-a4b-it · BF16 · 4-bit TQ+ Compact · MM-NIAH (val) · M5 Max 128GB
 | ~60K | 75% | 76% | 99% | 42.6 | 33.7 | 0.79x | 1.30G | 0.47G | 64% |
 | **Total** | **79%** | **78%** | **99%** | **51.1** | **47.2** | **0.92x** | **0.58G** | **0.29G** | **50%** |
 
-99% answer agreement with baseline across all context lengths — zero systematic quality degradation. KV savings of 10–64% where TQ+ is active. Decode speedup scales from 0.99x at ~1K to 0.79x at ~60K (dequant-once overhead on longer prefills).
+The recorded runs reported 99% answer agreement with baseline across all context lengths and no systematic quality degradation. KV savings of 10–64% where TQ+ is active. Decode speedup scales from 0.99x at ~1K to 0.79x at ~60K (dequant-once overhead on longer prefills).
