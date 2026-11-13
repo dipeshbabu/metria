@@ -2,7 +2,7 @@
 
 > **Archived planning document.** The phases below capture the original
 > implementation plan and are retained for provenance; unchecked boxes are not
-> the current project status. See the root README, `docs/README.md`, and the
+> the current project status. See the root README, `docs/index.md`, and the
 > test suites for the implemented surface. Current production-engine work
 > lives in the external projects linked from the root README.
 

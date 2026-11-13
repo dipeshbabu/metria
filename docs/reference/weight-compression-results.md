@@ -1,4 +1,9 @@
-# TQ4_1S Weight Compression — Community Results
+# TQ4_1S Weight Compression: Community Results
+
+!!! note "Historical research"
+    This page records experimental engine work and its original benchmark scope.
+    Use the [workflow chooser](../guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../guides/testing-evidence.md) for the maintained test contract.
 
 Post-training weight compression for llama.cpp. No retraining, no calibration data. One command.
 
@@ -72,7 +77,7 @@ This table shows the largest compressed model each GPU has successfully run. It'
 
 ## Model Results
 
-### Qwen — Config I (full support)
+### Qwen: Config I (full support)
 
 | Model | Source | Compressed | Reduction | PPL Delta | Decode % | Tested By |
 |-------|--------|-----------|-----------|-----------|----------|-----------|
@@ -83,13 +88,13 @@ This table shows the largest compressed model each GPU has successfully run. It'
 | Qwen3.5-35B MoE | 34.4G | 21.6G | -37% | +1.4% | 102% (Metal) | Internal (Metal) |
 | Qwen2.5-72B | 72.0G | 45.8G | -38% | +3.9% (8ch) | 95% (Metal) | Internal (Metal) |
 
-### Phi — Config I (full support)
+### Phi: Config I (full support)
 
 | Model | Source | Compressed | Reduction | PPL Delta | Decode % | Tested By |
 |-------|--------|-----------|-----------|-----------|----------|-----------|
 | Phi-4 14B | 14.5G | 9.9G | -32% | +0.76–1.0% | 254% (Metal), 67% (4090) | Multiple testers |
 
-### Llama — Hybrid/Premium (FFN sensitive to WHT)
+### Llama: Hybrid/Premium (FFN sensitive to WHT)
 
 Do **not** use Config I on Llama. Use Hybrid (Q4_K for all FFN) or Premium (Q5_K/Q6_K for FFN).
 
@@ -100,9 +105,9 @@ Do **not** use Config I on Llama. Use Hybrid (Q4_K for all FFN) or Premium (Q5_K
 | Llama 3.2-3B | Hybrid | 3.19G | 2.10G | -34% | +1.9% | 98% (4090) | Community (CUDA) |
 | Llama 3.2-3B | Premium | 3.19G | 2.52G | -21% | +0.78% | 93% (4090) | Community (CUDA) |
 
-**Why Llama is different:** Llama amplifies per-layer quantization error 6–8x more than Qwen/Phi in FFN layers. The effect scales with depth — 3B Llama is fine, 70B needs Premium. See [paper Section 5.7](../../research/papers/weight-compression-tq4.md) for the full investigation.
+**Why Llama is different:** Llama amplifies per-layer quantization error 6–8x more than Qwen/Phi in FFN layers. The effect scales with depth: 3B Llama is fine, 70B needs Premium. See [paper Section 5.7](../../research/papers/weight-compression-tq4.md) for the full investigation.
 
-### Mistral — Hybrid/Premium (better than expected)
+### Mistral: Hybrid/Premium (better than expected)
 
 | Model | Config | Source | Compressed | Reduction | PPL Delta | Decode % | Tested By |
 |-------|--------|--------|-----------|-----------|-----------|----------|-----------|
@@ -111,7 +116,7 @@ Do **not** use Config I on Llama. Use Hybrid (Q4_K for all FFN) or Premium (Q5_K
 
 Mistral extends LlamaModel but quality impact is much lower than Llama 70B. Premium at +0.41% is effectively free.
 
-### Gemma — Working (MoE limits weight compression benefit)
+### Gemma: Working (MoE limits weight compression benefit)
 
 | Model | Source | Compressed | Reduction | PPL Delta | Decode % | Tested By |
 |-------|--------|-----------|-----------|-----------|----------|-----------|
@@ -123,7 +128,7 @@ Gemma 4 KV memory (RTX 5090, Q4_K_XL, 128k context):
 
 | KV Config | KV Size | Savings |
 |-----------|---------|---------|
-| q8_0/q8_0 | 1,519 MiB | — |
+| q8_0/q8_0 | 1,519 MiB | n/a |
 | q8_0/turbo4 | 1,140 MiB | -380 MiB (-25%) |
 | q8_0/turbo3 | 1,039 MiB | -480 MiB (-32%) |
 
@@ -155,7 +160,7 @@ Weight compression and TurboQuant KV compression stack with no additional penalt
 | Config I + turbo3 KV (27B, 32K ctx) | Community (RTX PRO 6000) | Config I+turbo3 beats Q8_0+turbo3 by 7% decode, -2.5 GiB working set |
 | TQ4_1S + turbo3 KV (8B, 100K ctx) | Community (RTX 4090) | 5.8 GiB total, turbo3 actually faster than f16 at long ctx |
 
-### Independent Validation — TurboQuantDC (662 tests, RTX 4090)
+### Independent Validation: TurboQuantDC (662 tests, RTX 4090)
 
 An [independent implementation](https://github.com/dhawalc/turboQuantDC) built from scratch in Python/PyTorch (MIT license) tested TQ4_1S weight compression + TurboQuant KV stacking and ran a 600+ configuration sweep. This is the most comprehensive independent validation of the approach.
 

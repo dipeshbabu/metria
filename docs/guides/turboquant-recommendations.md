@@ -1,5 +1,10 @@
 # TurboQuant Configuration Recommendations
 
+!!! note "Historical research"
+    This page records experimental engine work and its original benchmark scope.
+    Use the [workflow chooser](verification-overview.md) for current Metria verification
+    requirements and [testing evidence](testing-evidence.md) for the maintained test contract.
+
 Practical guidance for choosing TurboQuant settings based on your model, weight quantization, and hardware. Based on validated testing across Metal (M1 through M5), CUDA (RTX 3080 Ti through Blackwell), and HIP (AMD RDNA 4).
 
 > **Multi-backend validated:** Metal (Apple Silicon), CUDA (NVIDIA), and HIP (AMD) all produce consistent quality results. Speed characteristics vary by backend. CUDA decode is faster than q8_0 on some models (dusterbloom fused MMA FA). Metal prefill beats q8_0 at 32K+ context on 70B.
@@ -99,7 +104,7 @@ This is why asymmetric `-ctk q8_0 -ctv turbo3` can rescue models where symmetric
 
 All results from Metal flash attention. PPL measured on wikitext-2-raw (512 context, 4 chunks) unless noted.
 
-#### phi-4-14B (Q8_0 weights) — healthy across all configs
+#### phi-4-14B (Q8_0 weights): healthy across all configs
 
 | K | V | M5 PPL | M2 PPL | vs q8_0 | Status |
 |---|---|--------|--------|---------|--------|
@@ -107,25 +112,25 @@ All results from Metal flash attention. PPL measured on wikitext-2-raw (512 cont
 | turbo4 | turbo4 | 4.770 | 4.787 | +1.7% / +2.0% | healthy |
 | turbo3 | turbo3 | 4.886 | 4.956 | +4.2% / +5.7% | healthy |
 | q8_0 | turbo4 | 4.702 | 4.693 | +0.3% | healthy |
-| q8_0 | turbo3 | 4.742 | — | +1.1% | healthy |
-| q8_0 | turbo2 | 4.835 | — | +3.1% | healthy |
+| q8_0 | turbo3 | 4.742 | n/a | +1.1% | healthy |
+| q8_0 | turbo2 | 4.835 | n/a | +3.1% | healthy |
 
 Cross-hardware matched: M2 Pro and M5 Max produce equivalent results.
 
-#### Qwen2.5-7B-Instruct (Q4_K_M weights) — sensitive to symmetric turbo, rescued by asymmetric K/V
+#### Qwen2.5-7B-Instruct (Q4_K_M weights): sensitive to symmetric turbo, rescued by asymmetric K/V
 
 | K | V | M5 PPL | M2 PPL | vs q8_0 | Status |
 |---|---|--------|--------|---------|--------|
 | q8_0 | q8_0 | 6.577 | 6.579 | baseline | healthy |
 | q8_0 | turbo4 | 6.644 | 6.603 | +1.0% | rescued |
 | q8_0 | turbo3 | 6.707 | 6.715 | +2.0% | rescued |
-| q8_0 | turbo2 | 6.911 | — | +5.1% | rescued |
+| q8_0 | turbo2 | 6.911 | n/a | +5.1% | rescued |
 | turbo4 | turbo4 | 217.7 | 227.5 | catastrophic | avoid |
 | turbo3 | turbo3 | 3556 | 3778 | catastrophic | avoid |
 
 Cross-hardware matched: both machines show identical quality patterns.
 
-#### Llama-3.1-70B-Instruct (Q4_K_M weights, M5 Max 128GB) — tolerates symmetric turbo
+#### Llama-3.1-70B-Instruct (Q4_K_M weights, M5 Max 128GB): tolerates symmetric turbo
 
 | K | V | PPL | vs q8_0 | Status |
 |---|---|-----|---------|--------|
@@ -152,7 +157,7 @@ Long context PPL (wikitext-2-raw):
 
 NIAH: 30/30 perfect (turbo3 = q8_0, 5 depths x 3 context lengths). See [70B stress test](../../research/papers/m5-max-stress-test.md).
 
-#### Command-R+ 104B (Q4_K_M weights, M5 Max 128GB) — tolerates symmetric turbo, 128K validated
+#### Command-R+ 104B (Q4_K_M weights, M5 Max 128GB): tolerates symmetric turbo, 128K validated
 
 | K | V | PPL | vs q8_0 | Status |
 |---|---|-----|---------|--------|
@@ -191,20 +196,20 @@ NIAH: 10/10 perfect at 4K and 8K (turbo3). 16K timed out due to slow decode on 1
 
 See [M5 Max stress test](../../research/papers/m5-max-stress-test.md).
 
-#### Qwen3.5-35B-A3B MoE (Q8_0 weights) — healthy
+#### Qwen3.5-35B-A3B MoE (Q8_0 weights): healthy
 
 | K | V | M5 PPL | Status |
 |---|---|--------|--------|
 | turbo3 | turbo3 | 5.130 | healthy |
 | turbo4 | turbo4 | 5.078 | healthy |
 
-#### Qwen3.5-27B Dense (Q8_0 weights) — healthy
+#### Qwen3.5-27B Dense (Q8_0 weights): healthy
 
 | K | V | M5 PPL | Status |
 |---|---|--------|--------|
 | turbo3 | turbo3 | 6.339 | healthy |
 
-#### Mistral-Small-24B-Instruct (Q4_K_M weights) — healthy at this size
+#### Mistral-Small-24B-Instruct (Q4_K_M weights): healthy at this size
 
 | K | V | M5 PPL | Status |
 |---|---|--------|--------|
@@ -216,11 +221,11 @@ This shows Q4_K_M is not universally incompatible with symmetric turbo. The 24B 
 
 Community-validated on RTX 3080 Ti, RTX 3090, RTX 4090, RTX 5090, and DGX Spark (Blackwell sm_121).
 
-#### seanrasch — Qwen3.5-4B Q4_K_M (RTX 3090, block_size=128)
+#### seanrasch: Qwen3.5-4B Q4_K_M (RTX 3090, block_size=128)
 
 | K | V | PPL | vs fp16 | Status |
 |---|---|-----|---------|--------|
-| fp16 | fp16 | 10.037 | baseline | — |
+| fp16 | fp16 | 10.037 | baseline | n/a |
 | q8_0 | turbo4 | 10.124 | +0.9% | healthy |
 | q8_0 | turbo3 | 10.163 | +1.3% | healthy |
 | turbo3 | turbo3 | 10.247 | +2.1% | healthy |
@@ -228,7 +233,7 @@ Community-validated on RTX 3080 Ti, RTX 3090, RTX 4090, RTX 5090, and DGX Spark 
 
 Qwen3.5 hybrid architecture handles symmetric turbo without the blowup seen on Qwen2.x.
 
-#### dusterbloom — Decode Speed (RTX 3090, block_size=128, fused MMA FA)
+#### dusterbloom: Decode Speed (RTX 3090, block_size=128, fused MMA FA)
 
 | Model | Decode vs q8_0 |
 |-------|---------------|
@@ -239,11 +244,11 @@ Qwen3.5 hybrid architecture handles symmetric turbo without the blowup seen on Q
 
 Prefill near parity (-0.3% to +2.5% at pp8192).
 
-#### Char__Bob — Mistral-Small-24B (RTX 3090)
+#### Char__Bob: Mistral-Small-24B (RTX 3090)
 
 q8_0 OOMs at 128K on 3090. turbo3 enables 128K (18,430 MiB fits). Decode flat ~43 t/s.
 
-#### seanrasch — NIAH (RTX 3080 Ti)
+#### seanrasch: NIAH (RTX 3080 Ti)
 
 Qwen3.5-9B turbo3/turbo3: 33/33 (100%), matches f16.
 
@@ -257,7 +262,7 @@ First AMD validation. RX 9070 XT (RDNA 4, gfx1201), Windows 11, HIP SDK 7.1. Fir
 |---|---|-----|---------|--------|
 | q8_0 | q8_0 | 7.794 | baseline | OK |
 | q8_0 | turbo4 | 7.876 | +1.0% | recommended |
-| q8_0 | turbo3 | NaN | — | HIP-specific issue |
+| q8_0 | turbo3 | NaN | n/a | HIP-specific issue |
 | turbo4 | turbo4 | 401.4 | catastrophic | Q4_K_M sensitivity |
 | turbo3 | turbo3 | 81,277 | catastrophic | Q4_K_M sensitivity |
 

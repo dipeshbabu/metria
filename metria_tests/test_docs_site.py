@@ -56,6 +56,26 @@ def test_missing_repository_target_fails_the_build():
         )
 
 
+@pytest.mark.parametrize(
+    "text", ["one\u2014two", "one &mdash; two", "one &#8212; two", "one &#x2014; two"]
+)
+def test_documentation_rejects_em_dashes(text):
+    source = hooks.DOCS / "guides" / "a.md"
+    page = SimpleNamespace(file=SimpleNamespace(abs_src_path=str(source)))
+    with pytest.raises(ValueError, match="instead of em dashes"):
+        hooks.on_page_markdown(text, page=page, config=SimpleNamespace(extra={}))
+
+
+def test_documentation_keeps_compound_word_hyphens():
+    source = hooks.DOCS / "guides" / "a.md"
+    page = SimpleNamespace(file=SimpleNamespace(abs_src_path=str(source)))
+    text = "A reference-candidate comparison with end-to-end evidence.\n"
+    assert (
+        hooks.on_page_markdown(text, page=page, config=SimpleNamespace(extra={}))
+        == text
+    )
+
+
 def _site(tmp_path):
     (tmp_path / "search").mkdir()
     (tmp_path / "search" / "search_index.json").write_text(

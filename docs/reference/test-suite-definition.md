@@ -1,20 +1,25 @@
 # TurboQuant Full Test Suite Definition
 
+!!! note "Historical research"
+    This page records experimental engine work and its original benchmark scope.
+    Use the [workflow chooser](../guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../guides/testing-evidence.md) for the maintained test contract.
+
 Standard validation suite for any KV cache format or optimization change. All tests must pass before results are published or code is merged.
 
 ## Suite A: Quality (must pass for any change)
 
-1. **PPL — Short context baseline**
+1. **PPL: Short context baseline**
    - wikitext-2, c=512, 8 chunks
    - Compare: ON vs OFF vs q8_0 baseline
    - Pass: delta < 0.5% vs baseline
 
-2. **PPL — Long context (primary validation)**
+2. **PPL: Long context (primary validation)**
    - wikitext-103, c=32768, 50 chunks
    - Compare: ON vs OFF vs q8_0 baseline vs q4_0 baseline
    - Pass: ON/OFF delta = 0.000 (within CI)
 
-3. **PPL — Multi-context sweep**
+3. **PPL: Multi-context sweep**
    - wikitext-2, c=8192 (20ch), c=16384 (10ch), c=32768 (5ch)
    - Compare: ON vs OFF with q8_0 baseline at each depth
    - Pass: ON/OFF delta = 0.000 at all depths
@@ -24,7 +29,7 @@ Standard validation suite for any KV cache format or optimization change. All te
    - Report: mean KLD, delta-p RMS, same-top-p %
    - Compare against q8_0 and q4_0
 
-5. **NIAH — Retrieval accuracy**
+5. **NIAH: Retrieval accuracy**
    - Single needle: 3 depths (0%, 50%, 100%) × 3 contexts (4K, 8K, 16K)
    - Multi-key with distractors: 4K through 32K
    - Compare: ON vs OFF
@@ -32,15 +37,15 @@ Standard validation suite for any KV cache format or optimization change. All te
 
 ## Suite B: Performance (must pass for any change)
 
-6. **Decode speed — Short context**
+6. **Decode speed: Short context**
    - llama-bench, tg128
    - Compare: ON vs OFF vs q8_0 baseline
 
-7. **Decode speed — Long context**
+7. **Decode speed: Long context**
    - llama-bench, pp8192+tg128, pp16384+tg128, pp32768+tg128
    - Compare: ON vs OFF vs q8_0 baseline
 
-8. **Prefill speed — Context scaling**
+8. **Prefill speed: Context scaling**
    - llama-bench or llama-perplexity at 2K, 4K, 8K, 16K, 32K
    - Compare: ON vs OFF vs q8_0
 

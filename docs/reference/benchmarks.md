@@ -1,8 +1,14 @@
 # Benchmarks
 
-Full benchmark and validation data for TurboQuant+ on llama.cpp. The headline quality table lives in the [README](../../README.md); everything else is here. Hardware is M5 Max 128GB unless a section says otherwise.
+!!! note "Historical research"
+    This page records experimental engine work and its original benchmark scope.
+    Use the [workflow chooser](../guides/verification-overview.md) for current Metria verification
+    requirements and [testing evidence](../guides/testing-evidence.md) for the maintained test contract.
 
-## Asymmetric K/V (NEW)
+Retained benchmark and validation data for experimental TurboQuant+ engine
+forks. Hardware is M5 Max 128GB unless a section says otherwise.
+
+## Asymmetric K/V
 
 TurboQuant supports independent K and V cache types. In current testing, keeping K at q8_0 while compressing V with turbo rescues quality on low-bit models where symmetric turbo degrades:
 
@@ -34,7 +40,7 @@ Validated at 512 and 8K context. NIAH retrieval passed. Benefit scales with mode
 **Enabled by default.** Activate manually on older builds with `TURBO_LAYER_ADAPTIVE=7` env var.
 
 ```bash
-# Boundary V — boundary layers q8_0-V, rest turbo2-V
+# Boundary V: boundary layers q8_0-V, rest turbo2-V
 llama-server -m model.gguf -ctk q8_0 -ctv turbo2 -fa 1
 ```
 
@@ -52,11 +58,11 @@ See [full paper](../../research/papers/layer-aware-v-compression.md).
 
 **Prefill: both turbo3 and turbo4 match or exceed q8_0 speed.** Compressed cache uses less bandwidth.
 
-## Decode Speed — MoE (M5 Max 128GB, Qwen3.5-35B-A3B, Sparse V)
+## Decode Speed: MoE (M5 Max 128GB, Qwen3.5-35B-A3B, Sparse V)
 
 | Config | Short (tg128) | pp32768+tg128 | Short vs q8_0 |
 |--------|--------------|---------------|--------------|
-| q8_0 | 85.71 tok/s | 1173.91 tok/s | — |
+| q8_0 | 85.71 tok/s | 1173.91 tok/s | n/a |
 | **turbo4** | **79.87 tok/s** | **1060.12 tok/s** | **0.93x** |
 | turbo3 | 76.84 tok/s | 1141.74 tok/s | 0.90x |
 
@@ -66,7 +72,7 @@ turbo4 decode is faster than turbo3 due to simpler nibble packing and direct-ext
 
 | Config | Prefill tok/s | Decode tok/s | Decode vs q8_0 |
 |--------|-------------|-------------|---------------|
-| q8_0 | 1449.9 | 68.2 | — |
+| q8_0 | 1449.9 | 68.2 | n/a |
 | turbo4 | 1405.9 | 63.7 | 0.93x |
 | turbo3 | 1417.8 | 53.3 | 0.78x |
 
@@ -104,7 +110,7 @@ See [M5 Max stress test](../../research/papers/m5-max-stress-test.md) for the fu
 
 turbo4 KLD is 40% lower than turbo3. Same top-p agreement matches q4_0.
 
-## Decode Speed — Dense (M5 Max 128GB, Qwen3.5-27B, Sparse V)
+## Decode Speed: Dense (M5 Max 128GB, Qwen3.5-27B, Sparse V)
 
 | Test | With sparse V | Without | Delta |
 |------|-------------|---------|-------|
@@ -112,9 +118,9 @@ turbo4 KLD is 40% lower than turbo3. Same top-p agreement matches q4_0.
 | 8K (pp8192+tg128) | 298.27 | 294.52 | +1.3% |
 | 16K (pp16384+tg128) | 316.98 | 311.24 | +1.8% |
 
-Dense models see smaller gains (attention is <5% of decode — FFN dominates). No regressions. Safe to enable by default.
+Dense models see smaller gains (attention is <5% of decode; FFN dominates). No regressions were observed in these runs.
 
-**Sparse V dequant** skips V dequantization for positions where softmax attention weight < 1e-6. At long context, most attention weights are negligible — this saves approximately half the total dequant cost. +22.8% decode at 32K vs turbo3 without sparse V, pushing the ratio from 0.76x to 0.93x of q8_0. Sparse V introduces no additional PPL degradation beyond the underlying compression (validated at 32K with 50 chunks on wikitext-103, CI ±0.021). Benefit scales with context length. This is implemented as a minimal kernel modification.
+**Sparse V dequant** skips V dequantization for positions where softmax attention weight < 1e-6. At long context, most attention weights are negligible: this saves approximately half the total dequant cost. +22.8% decode at 32K vs turbo3 without sparse V, pushing the ratio from 0.76x to 0.93x of q8_0. Sparse V introduces no additional PPL degradation beyond the underlying compression (validated at 32K with 50 chunks on wikitext-103, CI ±0.021). Benefit scales with context length. This is implemented as a minimal kernel modification.
 
 Sparse V is not TurboQuant-specific: on q8_0 KV cache it yields a +5% decode speedup with identical PPL and NIAH, confirming this is a general attention-aware optimization rather than a compression-specific trick. See the [full paper](../../research/papers/sparse-v-dequant.md).
 
@@ -128,7 +134,7 @@ signalnine's historical CUDA fork, `PR #24`
 
 | Config | K | V | PPL (wikitext-2) | vs q8_0 | Decode t/s | Prefill t/s |
 |--------|---|---|-----------------|---------|-----------|------------|
-| q8_0 | q8_0 | q8_0 | 8.2018 | — | 102.69 | 3774 |
+| q8_0 | q8_0 | q8_0 | 8.2018 | n/a | 102.69 | 3774 |
 | turbo3 | turbo3 | turbo3 | 8.3124 | +1.3% | 98.68 | 3707 |
 | turbo4 | turbo4 | turbo4 | 8.3012 | +1.2% | 95.87 | 3628 |
 | turbo2 | turbo2 | turbo2 | 8.6639 | +5.6% | 98.05 | 3680 |
@@ -143,12 +149,12 @@ Tested by @mariotomich. Model: Qwen3.5-35B-A3B Q8_0, Sparse V ON. Real prompt: 3
 
 | KV | Prefill t/s | Decode t/s | vs q8_0 |
 |----|------------|-----------|---------|
-| q8_0 | 399.0 | 12.4 | — |
+| q8_0 | 399.0 | 12.4 | n/a |
 | turbo2 | 406.2 | 10.8 | -12.9% |
 | turbo3 | 370.4 | 7.7 | -37.9% |
 | **turbo4** | **365.0** | **16.6** | **+33.9%** |
 
-**turbo4 decode beats q8_0 by +33.9% at long context on M1 Max.** At 38K tokens, KV bandwidth savings outweigh dequant cost. Sparse V amplifies the gain. turbo3 decode regression (-37.9%) is the known M1 L2 cache wall — turbo3 dequant complexity causes cache eviction on pre-M5 hardware.
+**turbo4 decode beats q8_0 by +33.9% at long context on M1 Max.** At 38K tokens, KV bandwidth savings outweigh dequant cost. Sparse V amplifies the gain. turbo3 decode regression (-37.9%) is the known M1 L2 cache wall: turbo3 dequant complexity causes cache eviction on pre-M5 hardware.
 
 **Asymmetric q8_0-K + turbo4-V (recommended for pre-M5):**
 
@@ -165,7 +171,7 @@ KV cache memory at 262K context:
 
 | KV | Cache MiB | Saved | Compression |
 |----|-----------|-------|-------------|
-| q8_0 | 2782 | — | baseline |
+| q8_0 | 2782 | n/a | baseline |
 | turbo4 | 1422 | 1360 MiB | 1.96x |
 | q8_0-K + turbo4-V | 2102 | 680 MiB | 1.32x |
 
@@ -173,7 +179,7 @@ PPL on real document (70-pages.md, ctx=512, 20 chunks): q8_0 16.29, turbo4 16.44
 
 ## Community Hardware: AMD RX 9070 XT (RDNA 4, gfx1201, Windows 11)
 
-First AMD GPU validation. First attempt — no debugging, no analysis, just raw testing out of the box. Qwen2.5-7B Q4_K_M on HIP SDK 7.1. gfx1201 detected natively — no `HSA_OVERRIDE_GFX_VERSION` needed.
+First AMD GPU validation. This first attempt used out-of-the-box testing without debugging or analysis. Qwen2.5-7B Q4_K_M on HIP SDK 7.1. gfx1201 was detected natively without setting `HSA_OVERRIDE_GFX_VERSION`.
 
 | K | V | PPL (wikitext-2) | vs q8_0 | Prefill t/s | Decode t/s | Status |
 |---|---|-----------------|---------|-------------|-----------|--------|
@@ -184,9 +190,9 @@ First AMD GPU validation. First attempt — no debugging, no analysis, just raw 
 | turbo3 | turbo3 | 81,277 | catastrophic | 580.3 | 86.0 | broken (Q4_K_M) |
 
 **Key findings:**
-- **q8_0-K + turbo4-V confirmed on AMD** — +1.0% PPL, no speed penalty, 25% KV memory savings
+- **q8_0-K + turbo4-V confirmed on AMD**: +1.0% PPL, no speed penalty, 25% KV memory savings
 - Symmetric turbo catastrophic on Q4_K_M, consistent with Metal/CUDA results
-- q8_0/turbo3 produces NaN on this model (Metal gets +2.0%) — HIP-specific, under investigation
+- q8_0/turbo3 produces NaN on this model (Metal gets +2.0%): HIP-specific, under investigation
 - Speed flat across configs (~85 t/s decode, ~590 t/s prefill at pp512)
 - Context scaling: 0.96-0.99x vs q8_0 at pp2048-8192
 
@@ -229,7 +235,7 @@ turbo3 + sparse V achieves 9/9 in this setup (vs 7/9 baseline), suggesting a pot
 
 Sparse V shows no measurable impact on perplexity across all tested contexts and datasets. Observed improvements in retrieval tasks (e.g., NIAH) are treated as secondary signals and may reflect reduced quantization noise rather than fundamental model quality changes.
 
-**Single Needle — Depth (0-100%) x Context Length (pre-sparse-V):**
+**Single Needle: Depth (0-100%) x Context Length (pre-sparse-V):**
 
 | Depth | 4K | 8K | 16K | 32K |
 |-------|----|----|-----|-----|
@@ -253,9 +259,9 @@ Sparse V shows no measurable impact on perplexity across all tested contexts and
 
 | Config | PPL | vs q8_0 | Sparse V Δ |
 |--------|-----|---------|------------|
-| q8_0 (8-bit KV) | 7.0638 | — | — |
-| q4_0 (4-bit KV) | 7.0857 | +0.31% | — |
-| turbo3 WITHOUT sparse V (3.5-bit) | 7.1796 | +1.64% | — |
+| q8_0 (8-bit KV) | 7.0638 | n/a | n/a |
+| q4_0 (4-bit KV) | 7.0857 | +0.31% | n/a |
+| turbo3 WITHOUT sparse V (3.5-bit) | 7.1796 | +1.64% | n/a |
 | turbo3 WITH sparse V (3.5-bit) | 7.1796 | +1.64% | **0.0000** |
 
 Note: q4_0 is included as a reference baseline. No optimization was applied to q4_0 in this work. Development focused on q8_0 and turbo3 paths.

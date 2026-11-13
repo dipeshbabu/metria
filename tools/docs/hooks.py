@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import os
 import re
 from pathlib import Path
@@ -45,6 +46,10 @@ def repository_link(url: str, source: Path, ref: str = "main") -> str:
 
 def on_page_markdown(markdown: str, *, page: Any, config: Any, **kwargs: Any) -> str:
     source = Path(page.file.abs_src_path)
+    if "\u2014" in html.unescape(markdown):
+        raise ValueError(
+            f"{source.name}: use commas, colons, or parentheses instead of em dashes"
+        )
     ref = config.extra.get("source_ref", "main")
 
     def replace_link(match: re.Match[str]) -> str:
