@@ -1,0 +1,107 @@
+name: Pilot feedback (participants)
+description: Report how Metria worked on your own inference change, with your permission to record it.
+title: "[Pilot]: "
+labels: ["area:verification", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for trying Metria on a real inference change. Maintainers record
+        this form with `metria pilot record` as `participant_feedback`, kept separate
+        from automated and maintainer validation. Share only what you are allowed to
+        share; never paste prompts, outputs, credentials or private data. Hashes and
+        the retained report are enough.
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Permission
+      description: Required. Your answers are recorded exactly as written; nothing is inferred.
+      options:
+        - label: I am a pilot participant (not a Metria maintainer) and I give permission for this feedback to be recorded and published with the pilot evidence.
+          required: true
+
+  - type: input
+    id: reporter
+    attributes:
+      label: How should we credit you?
+      description: A name, handle or "anonymous". This becomes the `reporter` field.
+    validations:
+      required: true
+
+  - type: input
+    id: change
+    attributes:
+      label: Inference change you verified
+      description: For example "vLLM FP8 KV cache", "llama.cpp build upgrade", "GGUF Q8_0".
+      placeholder: vLLM prefix caching on SmolLM2-360M-Instruct
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Metria version and recipe digest
+      description: Output of `metria --version` and the `Recipe:` digest from the report.
+      placeholder: metria 0.1.6; recipe 34a99074…
+    validations:
+      required: true
+
+  - type: dropdown
+    id: decision
+    attributes:
+      label: Your keep/reject decision
+      options:
+        - keep
+        - reject
+        - inconclusive
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why did you decide that?
+      description: Refer to the verdict, task checks or measurements that mattered.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Your acceptance criteria
+      description: What had to be true for you to keep the change (your policy in words).
+    validations:
+      required: true
+
+  - type: input
+    id: setup_minutes
+    attributes:
+      label: Setup time in minutes
+      description: From installation to your first completed report. A number.
+      placeholder: "25"
+    validations:
+      required: true
+
+  - type: textarea
+    id: friction
+    attributes:
+      label: Setup friction
+      description: One observation per line. Leave empty if none.
+
+  - type: dropdown
+    id: would_reuse
+    attributes:
+      label: Would you use Metria again for this kind of change?
+      options:
+        - "yes"
+        - "no"
+        - "not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: report
+    attributes:
+      label: Retained evidence (optional)
+      description: Attach or link `verification.json` and `report.md` only if you may share them.

@@ -279,3 +279,22 @@ def test_prepared_fp8_recipe_validates_once_a_policy_is_set(kv_case, monkeypatch
             prompts,
             kv_cache_dtype="int8",
         )
+
+
+def test_fp8_policy_can_gate_performance_and_quality_together(kv_case, tmp_path):
+    kv_case["recipe"] = replace(
+        kv_case["recipe"],
+        policy=VerificationPolicy(
+            (
+                PolicyCriterion("quality.pass_rate_delta", "1", minimum=0.0),
+                PolicyCriterion("performance.latency_ratio", "1", maximum=1000.0),
+            )
+        ),
+    )
+    result = _execute(kv_case, tmp_path / "performance")
+    rows = {
+        row["criterion"]["target"]: row for row in result.manifest["policy"]["criteria"]
+    }
+    assert rows["quality.pass_rate_delta"]["result"] == "PASS"
+    assert rows["performance.latency_ratio"]["result"] == "PASS"
+    assert result.manifest["verdict"] == "PASS"

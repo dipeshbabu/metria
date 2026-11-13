@@ -3,6 +3,17 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
+## Unreleased
+
+- Add a **Pilot feedback** issue form with a required permission checkbox and
+  `tools/maintenance/pilot_notes_from_issue.py`, which converts a submitted form
+  into validated `participant_feedback` notes for `metria pilot record` without
+  editing the participant's words.
+- Retry the published-package smoke test for up to ten minutes while the PyPI
+  index propagates, instead of failing release verification immediately.
+- Test that FP8 KV-cache policies can gate performance (`performance.latency_ratio`)
+  together with quality.
+
 ## 0.1.6
 
 - Add the `local_vllm_kv_cache_precision.v1` verify profile: automatic
