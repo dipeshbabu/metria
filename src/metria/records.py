@@ -346,9 +346,11 @@ def load_run_record(path: str | Path) -> RunRecord:
             record_path.read_text(encoding="utf-8"),
             object_pairs_hook=_unique_json_object,
         )
+        return run_record_from_data(raw)
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid JSON run record {record_path}: {exc.msg}") from exc
-    return run_record_from_data(raw)
+    except RecursionError:
+        raise ValueError(f"run record {record_path} is nested too deeply") from None
 
 
 def dump_run_record(path: str | Path, record: RunRecord) -> None:

@@ -24,9 +24,12 @@ def _reject_constant(value: str) -> None:
 
 
 def _json(text: str) -> Any:
-    return json.loads(
-        text, object_pairs_hook=_unique_json_object, parse_constant=_reject_constant
-    )
+    try:
+        return json.loads(
+            text, object_pairs_hook=_unique_json_object, parse_constant=_reject_constant
+        )
+    except RecursionError:
+        raise ValueError("JSON input is nested too deeply") from None
 
 
 def _read(path: Path) -> str:
