@@ -22,6 +22,7 @@ from ..protocols import (
     CaptureRequest,
     InferenceBatch,
     InferenceRequest,
+    RuntimeSession,
     SupportReport,
 )
 from .endpoint_http import (
@@ -407,7 +408,9 @@ class EndpointAdapter:
         check = TokenizerCheck(connection, model["id"]) if tokenize else None
         return EndpointSession(connection, resolved, tokenize, claims, check)
 
-    def observe(self, session: EndpointSession) -> dict[str, Any]:
+    def observe(self, session: RuntimeSession) -> dict[str, Any]:
+        if not isinstance(session, EndpointSession):
+            raise TypeError("EndpointAdapter can observe only its own sessions")
         runtime = session.resolved["runtime"]
         try:
             after: dict[str, Any] | None = collect_claims(
@@ -432,5 +435,4 @@ class EndpointAdapter:
             "endpoint": endpoint,
             "configured": {"decode": dict(session.resolved["decode"])},
             "invocations": [dict(row) for row in session.invocations],
-            "requests": [dict(row) for row in session.connection.attempts],
         }

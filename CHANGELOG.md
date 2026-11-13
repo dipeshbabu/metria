@@ -5,6 +5,13 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- STAGED: `remote_endpoint_change.v1` verifies a declared change between two
+  running OpenAI-compatible servers. `metria recipe prepare-endpoint` pins the
+  tokenizer, names URL/key environment variables, and derives
+  `comparison.vary` from `--reference-declared`/`--candidate-declared`; any
+  undeclared server difference is `NOT_COMPARABLE`, identity drift or tokenizer
+  disagreement is `INSUFFICIENT_EVIDENCE`, and a policy is always required.
+  Reports state that server identity was reported, not verified.
 - Record endpoint server identity as claimed (`partial`, `server_reported`):
   launch and post-run snapshots of `/v1/models` and vLLM `/version` must match,
   claims contradicting `runtime.declared` fail the run before any prompt, and

@@ -161,9 +161,11 @@ def _add_preparation_parser(subparsers: Any) -> None:
     _add_cpu_build_parser(subparsers)
     _add_quantization_parser(subparsers)
     _add_upgrade_parser(subparsers)
+    from .preparation_endpoint import add_endpoint_parser
     from .preparation_serving import add_serving_parser
 
     add_serving_parser(subparsers)
+    add_endpoint_parser(subparsers)
     prepare = subparsers.add_parser(
         "prepare-vllm", help="prepare a pinned local vLLM prefix-cache recipe"
     )
@@ -288,6 +290,10 @@ def _add_upgrade_parser(subparsers: Any) -> None:
 
 
 def _prepare_recipe_command(args: Any, out: TextIO) -> int:
+    if args.recipe_command == "prepare-endpoint":
+        from .preparation_endpoint import prepare_endpoint_command
+
+        return prepare_endpoint_command(args, out)
     if args.recipe_command == "prepare-vllm-serving":
         from .preparation_serving import prepare_serving_command
 
@@ -619,6 +625,7 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
             "prepare-gguf-quantization",
             "prepare-vllm-upgrade",
             "prepare-vllm-serving",
+            "prepare-endpoint",
         }:
             return _prepare_recipe_command(args, out)
         if args.command == "compare":

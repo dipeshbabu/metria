@@ -3,9 +3,9 @@
 `metria.runtimes.EndpointAdapter` (runtime name `openai_endpoint`) runs a
 measurement against an inference server that is **already running**, through
 its OpenAI-compatible completions API. Metria does not start or stop the
-server. There is no `metria verify` profile for endpoints yet
-([#213](https://github.com/dipeshbabu/metria/issues/213)); use the adapter
-from Python with `execute_run()`.
+server. To compare two servers with `metria verify`, use
+[remote endpoint verification](endpoint-verification.md); the adapter can also
+be used directly from Python with `execute_run()`.
 
 ## Run spec
 

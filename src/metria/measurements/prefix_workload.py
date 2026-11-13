@@ -182,6 +182,7 @@ def _merge_results(
     timings: list[dict[str, Any]],
     warmups: int,
     trials: int,
+    isolation: str = "public prefix-cache reset before every warmup/measured trial",
 ) -> MeasurementResult:
     prompts = tuple(row for result in results for row in result.evidence["prompts"])
     metrics = {}
@@ -219,7 +220,7 @@ def _merge_results(
                 "warmup_trials": warmups,
                 "measured_trials": trials,
                 "schedule": "sequential prompts in declared order",
-                "isolation": "public prefix-cache reset before every warmup/measured trial",
+                "isolation": isolation,
                 "clock": "perf_counter_ns",
                 "timing_boundary": "session.infer call after engine launch",
                 "timing_excludes": ["engine startup", "warmup", "cache reset"],
@@ -231,6 +232,10 @@ def _merge_results(
 
 class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
     """Retain trajectory evidence across bounded warmup and measured trials."""
+
+    # Session reset scope before each trial; None states that no reset happens.
+    reset_scope: str | None = "prefix-cache"
+    isolation = "public prefix-cache reset before every warmup/measured trial"
 
     def requirements(self, config: Mapping[str, Any]) -> tuple[CaptureRequest, ...]:
         base = super().requirements(trajectory_config(config))
@@ -254,7 +259,8 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
         for index in range(warmups + trials):
             measured = index >= warmups
             trial = index - warmups
-            session.reset("prefix-cache")
+            if self.reset_scope is not None:
+                session.reset(self.reset_scope)
             rows = [{**row, "id": f"{trial}:{row['id']}"} for row in base["prompts"]]
             sequential = _SequentialSession(
                 session,
@@ -272,7 +278,7 @@ class PrefixWorkloadProtocol(TokenTrajectoryProtocol):
                     sequential.extra.get(DISTRIBUTION_CAPTURE.kind, ())
                 )
             timings.extend(sequential.timings)
-        captured = _merge_results(results, timings, warmups, trials)
+        captured = _merge_results(results, timings, warmups, trials, self.isolation)
         quality, metric = summarize_checks(
             check_rows, check_specs, config["prompts"], trials
         )

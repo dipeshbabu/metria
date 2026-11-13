@@ -37,6 +37,7 @@ class Server:
         self.headers: list[str | None] = []
         self.version = "0.30.0"
         self.root = "org/model"
+        self.token_offset = 0
         self.tokenize_status = 200
         self.tokenize_offset = 0
         self.completions = 0
@@ -106,7 +107,8 @@ class Server:
 
     def completion(self, body: dict) -> dict:
         prompt = body["prompt"]
-        generated = [prompt[-1] + 1, prompt[-1] + 2, 7]
+        shift = self.token_offset
+        generated = [prompt[-1] + 1 + shift, prompt[-1] + 2 + shift, 7]
         choice: dict = {
             "text": "out",
             "finish_reason": "length",
