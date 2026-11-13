@@ -5,6 +5,12 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add `EndpointAdapter` (`openai_endpoint`) for already-running
+  OpenAI-compatible servers: prompts tokenized locally with a hash-pinned
+  tokenizer and sent as token IDs, `token_ids` and staged top-20 logprob
+  captures, client-side timing, bounded retries, and URLs and API keys read
+  only from named environment variables and never retained. Checked natively
+  against `vllm serve` 0.30.0 on CPU.
 - STAGED: FP8 KV-cache verification can gate on trajectory KL divergence.
   `metria recipe prepare-vllm --kv-cache-dtype ... --staged-kld` captures raw
   top-20 logprobs alongside the trajectory evidence and declares the
