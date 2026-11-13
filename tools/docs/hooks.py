@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import importlib
 import os
 import re
-import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
@@ -19,11 +17,6 @@ _FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 
 
 def on_config(config: Any) -> Any:
-    parser = importlib.import_module(
-        "tomllib" if sys.version_info >= (3, 11) else "tomli"
-    )
-    project = parser.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    config.extra["release_version"] = project["project"]["version"]
     config.extra["source_ref"] = os.environ.get("GITHUB_SHA", "main")
     return config
 

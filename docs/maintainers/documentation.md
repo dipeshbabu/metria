@@ -50,8 +50,8 @@ ordinary repository-relative links in source. A build hook changes those links
 to the matching GitHub revision for the published site. It does not copy research
 data, local notes, or private inputs into the site.
 
-The release banner reads the version from `pyproject.toml`. The logo and custom
-styles are in `docs/assets/`; the small template override is in `tools/docs/theme/`.
+The SVG logo and custom styles are in `docs/assets/`. The same transparent
+symbol is used in the header and as the site favicon.
 
 ## GitHub Pages deployment
 

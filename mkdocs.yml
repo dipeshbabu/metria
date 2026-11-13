@@ -9,10 +9,9 @@ site_dir: site
 
 theme:
   name: material
-  custom_dir: tools/docs/theme
   language: en
-  logo: assets/metria-mark.svg
-  favicon: assets/metria-mark.svg
+  logo: assets/metria-symbol.svg
+  favicon: assets/metria-symbol.svg
   font:
     text: Inter
     code: JetBrains Mono
