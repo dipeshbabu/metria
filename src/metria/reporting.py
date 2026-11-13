@@ -109,11 +109,11 @@ def render_verification(manifest: Mapping[str, Any]) -> str:
             lines.append(f"    Length mismatches: {diagnostics['length_mismatches']}")
             for category in diagnostics["by_category"]:
                 lines.append(
-                    f"      Category {html.escape(json.dumps(category['category'], ensure_ascii=True))}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
+                    f"      Category {html.escape(json.dumps(category['category'], ensure_ascii=True), quote=False)}: {category['diverged_prompts']}/{category['n_prompts']} diverged"
                 )
             for row in diagnostics["most_divergent"]:
                 lines.append(
-                    f"      {html.escape(json.dumps(row['id'], ensure_ascii=True))}: first divergence at token {row['first_divergence']}"
+                    f"      {html.escape(json.dumps(row['id'], ensure_ascii=True), quote=False)}: first divergence at token {row['first_divergence']}"
                 )
         elif "per_prompt" in analysis["diagnostics"]:
             diverged = [
@@ -296,7 +296,7 @@ def _render_impact_details(analysis: Mapping[str, Any]) -> list[str]:
         )
         for row in quality["failed_candidate_checks"][:10]:
             lines.append(
-                f"      Failed {html.escape(json.dumps(row['check_id']))} on {html.escape(json.dumps(row['prompt_id']))} ({row['kind']}); answer content retained by digest."
+                f"      Failed {html.escape(json.dumps(row['check_id']), quote=False)} on {html.escape(json.dumps(row['prompt_id']), quote=False)} ({row['kind']}); answer content retained by digest."
             )
     else:
         lines.append(
