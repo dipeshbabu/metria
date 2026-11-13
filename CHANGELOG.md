@@ -3,7 +3,7 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
-## Unreleased
+## 0.1.5
 
 - Report recipes, run records, policies and other JSON inputs nested too
   deeply to parse or validate as invalid input (exit `2`) instead of crashing
