@@ -90,6 +90,12 @@ explicitly:
 "trial_policy": {"capability_overrides": ["vllm.staged_treatments"]}
 ```
 
-**Remaining qualification:** retain native CPU and CUDA runs with the pinned
-vLLM 0.30.0 wheels showing each setting applied, plus a negative run where the
+**CUDA observation.** On an NVIDIA L4 with the pinned `0.30.0+cu129` wheel,
+`enable_chunked_prefill=true`, `max_num_batched_tokens=2048` and `block_size=32`
+were all read back from the engine as `applied`, and greedy trajectories matched
+an untreated reference exactly. See the
+[retained L4 evidence](../../artifacts/qualification/l4-native-gpu/README.md).
+
+**Remaining qualification:** retain a native CPU run with the pinned
+`0.30.0+cpu` wheel showing each setting applied, plus a negative run where the
 engine rejects an unsupported value.

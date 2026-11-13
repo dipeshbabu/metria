@@ -30,6 +30,19 @@ After building it on top of a qualified source tree with the same CMake flags,
 `staged/check_topk_provider.py` checks the layered provider against the
 qualified one. See [staged capabilities](../../docs/guides/staged-capabilities.md).
 
+## Staged vLLM GPU observations
+
+`staged/setup_vllm_cuda.sh NEW_WORK_DIR` prepares the pinned `0.30.0+cu129`
+environment on a Linux GPU host: it verifies the wheel hash, installs the
+recorded torch/setuptools pins, and downloads only the descriptor's model files.
+Some GPU images set `UV_NO_CACHE=1` and `UV_LINK_MODE=copy`, which stores every
+package twice; the script keeps one symlinked copy so the stack fits on a 16 GB
+disk. `staged/observe_vllm_gpu.py run --variant reference|fp8|staged` then
+launches one engine per process through Metria's adapter, and `compare` derives
+trajectory agreement from the saved records. The retained
+[L4 observations](../../artifacts/qualification/l4-native-gpu/README.md) were
+produced this way.
+
 ## Linux toolchain
 
 The build scripts need Linux (or WSL2) with `git`, CMake 3.28 or newer, GNU

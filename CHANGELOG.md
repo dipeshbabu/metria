@@ -3,6 +3,16 @@
 This changelog covers the root `metria` distribution, including KV Fidelity's
 canonical implementation. TurboQuant Reference retains its source-only history.
 
+## Unreleased
+
+- Retain native NVIDIA L4 (SM89) evidence with the pinned vLLM `0.30.0+cu129`
+  wheel: FP8 KV cache requested, resolved and reported applied by the engine,
+  with trajectory agreement 48.4/100 against an `auto` cache on SmolLM2-135M; the
+  staged scheduler and cache-layout treatments read back as applied; and the
+  standard adapter qualification completed. No verify profile is promoted.
+- Add `tools/qualification/staged/setup_vllm_cuda.sh` and `observe_vllm_gpu.py`
+  to reproduce those GPU observations.
+
 ## 0.1.5
 
 - Report recipes, run records, policies and other JSON inputs nested too
