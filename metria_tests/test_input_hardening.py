@@ -24,14 +24,40 @@ def _nest(document: str, depth: int) -> str:
 
 
 def test_deeply_nested_recipe_and_record_are_input_errors(tmp_path: Path) -> None:
+    # Whether the JSON decoder itself recurses too deeply depends on the Python
+    # build (3.14 on Linux parses this); either way it must be an input error.
     path = tmp_path / "deep.json"
     path.write_text(TOO_DEEP, encoding="utf-8")
+    with pytest.raises((ValueError, TypeError)):
+        load_study_recipe(path)
+    with pytest.raises((ValueError, TypeError)):
+        load_run_record(path)
+    try:
+        _json(TOO_DEEP)
+    except ValueError as exc:
+        assert "nested too deeply" in str(exc)
+
+
+def test_recursion_during_parsing_is_reported_as_nesting(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import metria.onboarding as onboarding
+    import metria.recipes as recipes
+    import metria.records as records
+
+    def recurse(*args, **kwargs):
+        raise RecursionError("maximum recursion depth exceeded")
+
+    path = tmp_path / "any.json"
+    path.write_text("{}", encoding="utf-8")
+    for module in (recipes, records, onboarding):
+        monkeypatch.setattr(module.json, "loads", recurse)
     with pytest.raises(ValueError, match="nested too deeply"):
         load_study_recipe(path)
     with pytest.raises(ValueError, match="nested too deeply"):
         load_run_record(path)
     with pytest.raises(ValueError, match="nested too deeply"):
-        _json(TOO_DEEP)
+        _json("{}")
 
 
 @pytest.mark.parametrize("depth", [950, 5_000])
