@@ -1,0 +1,11 @@
+{
+  "adapter/qualification.json": "92e69d80102d36253e773b693b802486c60deb290ac443778076e271119a10aa",
+  "adapter/qualification.run.json": "7d35e66f9d25577f39813c26138ea2274d71674d0771df477fe8d9a8eb813473",
+  "fp8-kv-cache/comparison.json": "604da4e1686098618250b189a465042e7f70e51226d5d7d231cac7917550d96d",
+  "fp8-kv-cache/fp8.run.json": "9affba6032cd00bd5643d8d1148bb5324b5ef57426e026c44b779716783208f0",
+  "fp8-kv-cache/reference.run.json": "d5de9882e58226001e2f236880ff30276a876fa4b1944db6d903a1e2b79c34c9",
+  "setup.log": "a19acc8459ee74f501c24be712e8edcf2ad56e7f6df8fe0d734ac2c078f60529",
+  "staged-treatments/comparison.json": "7fc4ad32e66c4fc61fb5f3b68df4c68a3fa37abc6e3e89d8cc4daea13035c739",
+  "staged-treatments/reference.run.json": "d5de9882e58226001e2f236880ff30276a876fa4b1944db6d903a1e2b79c34c9",
+  "staged-treatments/staged.run.json": "97a1b25b61688845b2f1803777971c4fb29a4d37ac767a4888fff29baa8cbdda"
+}

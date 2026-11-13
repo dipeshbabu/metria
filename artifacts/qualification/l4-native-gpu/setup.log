@@ -1,0 +1,34 @@
+nohup: ignoring input
+
+== host
+name, compute_cap, driver_version, memory.total [MiB]
+NVIDIA L4, 8.9, 595.84, 23034 MiB
+overlay          16G  640M   16G   4% /
+Python 3.12.15
+
+== uv
+uv 0.13.4 (x86_64-unknown-linux-gnu)
+
+== metria
+363ef4a017146808a5128d8343d8ffd45404a770
+
+== wheel
+wheels/vllm-0.30.0+cu129-cp38-abi3-manylinux_2_28_x86_64.whl: OK
+
+== venv
+11G	${WORK}/uv-cache
+15M	venv
+vllm==0.30.0+cu129
+torch==2.13.0+cu129
+setuptools==84.0.0
+transformers==5.22.2
+triton==3.7.1
+flashinfer-python==0.6.18.post1
+cuda available: True 12.9 NVIDIA L4 (8, 9)
+
+== model
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 8 files:  12%|█▎        | 1/8 [00:00<00:01,  4.02it/s]Fetching 8 files: 100%|██████████| 8/8 [00:11<00:00,  1.53s/it]Fetching 8 files: 100%|██████████| 8/8 [00:11<00:00,  1.48s/it]
+${WORK}/hf/models--HuggingFaceTB--SmolLM2-135M/snapshots/93efa2f097d58c2a74874c7e644dbc9b0cee75a2
+overlay          16G   12G  4.7G  72% /
+SETUP_OK
