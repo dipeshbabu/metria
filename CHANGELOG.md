@@ -5,6 +5,14 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- STAGED: `local_vllm_parallelism.v1` compares a single-device vLLM reference
+  with a tensor and/or pipeline parallel candidate on the pinned CUDA wheel
+  (`prepare-vllm --candidate-tensor-parallel-size N` /
+  `--candidate-pipeline-parallel-size N`), requiring engine readback of the
+  requested sizes, enough visible CUDA devices, task checks and a policy. The
+  vLLM adapter accepts `pipeline_parallel_size`, reads back both parallel
+  sizes, and records every visible CUDA device. Natively checked on the CPU
+  backend at tensor parallel 1 and 3; a two-GPU run is still pending.
 - Add `metria recipe import-traffic`: deterministic, seeded sampling of a
   production request log into a workload JSONL, with built-in redaction of
   credentials and personal data, custom patterns and literal secret files, a

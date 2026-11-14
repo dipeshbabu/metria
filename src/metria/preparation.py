@@ -14,6 +14,41 @@ from .runtimes.vllm_artifacts import installed_runtime_identity, verify_model_fi
 from .verification_vllm import VLLM_VARIATIONS, trial_identity, validate_vllm_recipe
 
 
+def _check_change_options(
+    kv_cache_dtype: str | None,
+    staged_distributions: bool,
+    candidate_parallel: Mapping[str, int] | None,
+) -> None:
+    if kv_cache_dtype is not None and candidate_parallel is not None:
+        raise ValueError("prepare either a KV-cache or a parallelism change, not both")
+    if staged_distributions and kv_cache_dtype is None and candidate_parallel is None:
+        raise ValueError(
+            "staged trajectory KLD requires a KV-cache precision or parallelism recipe"
+        )
+
+
+def _change_recipe(
+    parts: tuple[Any, ...],
+    kv_cache_dtype: str | None,
+    candidate_parallel: Mapping[str, int] | None,
+) -> StudyRecipe | None:
+    """Build a KV-cache or parallelism recipe when one was requested."""
+
+    model, runtime, scenario, config, identity, timeout_s = parts
+
+    if kv_cache_dtype is not None:
+        return _kv_precision_recipe(
+            model, runtime, scenario, config, identity, timeout_s, kv_cache_dtype
+        )
+    if candidate_parallel is not None:
+        from .preparation_parallel import parallel_recipe
+
+        return parallel_recipe(
+            model, runtime, scenario, config, identity, timeout_s, candidate_parallel
+        )
+    return None
+
+
 def prepare_vllm_prefix_recipe(
     model_dir: str | Path,
     descriptor: Mapping[str, Any],
@@ -27,10 +62,10 @@ def prepare_vllm_prefix_recipe(
     gpu_memory_utilization: float = 0.35,
     kv_cache_dtype: str | None = None,
     staged_distributions: bool = False,
+    candidate_parallel: Mapping[str, int] | None = None,
 ) -> StudyRecipe:
     """Pin current runtime content and verify a separately trusted model manifest."""
-    if staged_distributions and kv_cache_dtype is None:
-        raise ValueError("staged trajectory KLD requires a KV-cache precision recipe")
+    _check_change_options(kv_cache_dtype, staged_distributions, candidate_parallel)
     directory = Path(model_dir).expanduser().resolve()
     files = descriptor.get("files")
     verify_model_files(directory, files)
@@ -64,16 +99,13 @@ def prepare_vllm_prefix_recipe(
         "seed": 42,
         "chat_template": False,
     }
-    if kv_cache_dtype is not None:
-        return _kv_precision_recipe(
-            model,
-            runtime,
-            scenario,
-            config,
-            runtime_identity,
-            timeout_s,
-            kv_cache_dtype,
-        )
+    special = _change_recipe(
+        (model, runtime, scenario, config, runtime_identity, timeout_s),
+        kv_cache_dtype,
+        candidate_parallel,
+    )
+    if special is not None:
+        return special
     runs = tuple(
         RunSpec(
             model=model,

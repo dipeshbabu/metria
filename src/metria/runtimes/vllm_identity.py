@@ -112,6 +112,7 @@ def _expected_applied_fields(
         "cache.gpu_memory_utilization": settings.get("gpu_memory_utilization"),
         "cache.enable_prefix_caching": settings.get("enable_prefix_caching"),
         "parallel.tensor_parallel_size": settings.get("tensor_parallel_size"),
+        "parallel.pipeline_parallel_size": settings.get("pipeline_parallel_size"),
     }
 
 

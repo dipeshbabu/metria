@@ -23,6 +23,7 @@ model and runtime. Read each guide's preparation requirements before execution.
 | A CPU runtime upgrade in separate environments | [Runtime-upgrade verification](runtime-upgrade-verification.md) |
 | Local streaming, throughput, and native allocation behavior | [Serving measurements](serving-measurements.md) |
 | Automatic versus FP8 KV cache (CUDA, SM89+) | [FP8 KV-cache verification](fp8-kv-cache-verification.md) |
+| Single device versus tensor/pipeline parallel (CUDA, staged) | [Parallelism verification](parallelism-verification.md) |
 
 Use the [runtime qualification guide](runtime-qualification.md) to understand
 the retained evidence for a platform. Staged options, such as trajectory KL

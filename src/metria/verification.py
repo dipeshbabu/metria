@@ -430,6 +430,12 @@ def _verification_route(recipe: StudyRecipe) -> VerificationRoute:
             from .verification_kv_precision import build_route as build_kv_route
 
             return build_kv_route(recipe)
+        from .verification_parallelism import is_parallelism_recipe
+
+        if is_parallelism_recipe(recipe):
+            from .verification_parallelism import build_route as build_parallel
+
+            return build_parallel(recipe)
         from .verification_vllm import build_route
 
         return build_route(recipe)

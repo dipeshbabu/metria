@@ -213,7 +213,7 @@ def test_prepared_staged_kld_recipe(kv_case, monkeypatch):  # noqa: F811
         "auto",
         "fp8",
     )
-    with pytest.raises(ValueError, match="KV-cache precision recipe"):
+    with pytest.raises(ValueError, match="KV-cache precision"):
         preparation.prepare_vllm_prefix_recipe(
             run.model["path"],
             {"files": run.model["files"]},

@@ -8,7 +8,7 @@ library; inference engines are installed separately.
 | --- | --- | --- |
 | `metria verify <study.json> --output <new-dir> [--json]` | Run a qualified reference/candidate change and write both records, `verification.json` and `report.md` | [Choose a workflow](verification-overview.md) |
 | `metria demo --case {pass,fail,not-comparable} --output <dir>` | Write a synthetic bundle without a model | [Your first report](first-report.md) |
-| `metria recipe prepare-vllm` | vLLM prefix caching off vs on; with `--kv-cache-dtype`, automatic vs FP8 KV cache (`--staged-kld` adds trajectory KL divergence) | [Prefix caching](vllm-prefix-verification.md), [FP8](fp8-kv-cache-verification.md) |
+| `metria recipe prepare-vllm` | vLLM prefix caching off vs on; with `--kv-cache-dtype`, automatic vs FP8 KV cache; with `--candidate-tensor-parallel-size` / `--candidate-pipeline-parallel-size`, single device vs parallel (staged). `--staged-kld` adds trajectory KL divergence | [Prefix caching](vllm-prefix-verification.md), [FP8](fp8-kv-cache-verification.md), [parallelism](parallelism-verification.md) |
 | `metria recipe prepare-vllm-upgrade` | Two pinned vLLM CPU environments | [Runtime upgrades](runtime-upgrade-verification.md) |
 | `metria recipe prepare-vllm-serving` | Native streaming, throughput and allocation measurements | [Serving and memory](serving-measurements.md) |
 | `metria recipe prepare-llamacpp-build` | Two pinned llama.cpp CPU capture builds | [CPU build changes](llamacpp-build-verification.md) |

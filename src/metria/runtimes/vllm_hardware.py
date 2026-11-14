@@ -43,6 +43,32 @@ def native_hardware() -> dict[str, Any]:
             if uuid is not None
             else None,
             "cuda_runtime": torch.version.cuda,
+            "devices": cuda_devices(torch),
         }
     except (ImportError, AttributeError, RuntimeError):
         return unknown
+
+
+def cuda_devices(torch: Any) -> list[dict[str, Any]]:
+    """Every visible CUDA device, so multi-GPU runs record what they spanned."""
+
+    count = getattr(torch.cuda, "device_count", None)
+    if count is None:
+        # Without a device count, record nothing rather than guess.
+        return []
+    devices = []
+    for index in range(count()):
+        properties = torch.cuda.get_device_properties(index)
+        uuid = getattr(properties, "uuid", None)
+        devices.append(
+            {
+                "logical_device": index,
+                "name": properties.name,
+                "compute_capability": [properties.major, properties.minor],
+                "capacity_bytes": properties.total_memory,
+                "uuid_sha256": hashlib.sha256(str(uuid).encode()).hexdigest()
+                if uuid is not None
+                else None,
+            }
+        )
+    return devices

@@ -80,6 +80,12 @@ def prepare_command(args: Any, stdout: TextIO) -> int:
         raise ValueError(
             "run preparation from a qualified vLLM environment on Linux (including WSL); this host is not qualified for native vLLM verification"
         )
+    from .preparation_parallel import candidate_parallel
+
+    parallel = candidate_parallel(
+        getattr(args, "candidate_tensor_parallel_size", None),
+        getattr(args, "candidate_pipeline_parallel_size", None),
+    )
     try:
         recipe = prepare_vllm_prefix_recipe(
             args.model,
@@ -92,6 +98,7 @@ def prepare_command(args: Any, stdout: TextIO) -> int:
             timeout_s=args.timeout,
             kv_cache_dtype=getattr(args, "kv_cache_dtype", None),
             staged_distributions=getattr(args, "staged_kld", False),
+            candidate_parallel=parallel,
         )
     except importlib.metadata.PackageNotFoundError as exc:
         raise ValueError(
@@ -103,6 +110,10 @@ def prepare_command(args: Any, stdout: TextIO) -> int:
         from .verification_kv_precision import validate_kv_precision_recipe
 
         validate_kv_precision_recipe(recipe)
+    if parallel is not None:
+        from .verification_parallelism import validate_parallelism_recipe
+
+        validate_parallelism_recipe(recipe)
     _write_atomic(args.output, study_recipe_to_json(recipe) + "\n")
     stdout.write(f"Prepared {args.output}\nRecipe: {study_recipe_digest(recipe)}\n")
     command = ["metria", "verify", str(args.output), "--output", "verification"]
