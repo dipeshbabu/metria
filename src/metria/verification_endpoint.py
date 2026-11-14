@@ -17,6 +17,7 @@ from typing import Any
 
 from .measurements import TokenTrajectoryProtocol, TrajectoryDivergenceAnalysis
 from .measurements import batch_invariance as invariance
+from .measurements.endpoint_sampling import expand_seeds, validate_scenario
 from .measurements.prefix_distributions import DISTRIBUTIONS_KEY, staged_distributions
 from .measurements.prefix_workload import (
     WORKLOAD_METHOD,
@@ -60,6 +61,7 @@ class EndpointWorkloadProtocol(PrefixWorkloadProtocol):
     ) -> Any:
         from .protocols import MeasurementResult
 
+        config = expand_seeds(config, scenario)
         settings = invariance.concurrency_settings(config)
         result = super().execute(
             session, scenario, invariance.without_concurrency(config)
@@ -156,11 +158,13 @@ def _validate_runs(left: RunSpec, right: RunSpec, config: Mapping[str, Any]) -> 
             raise ValueError("endpoint run trial policy does not match the workload")
         if run.measurements != (TokenTrajectoryProtocol.name,):
             raise ValueError("endpoint runs measure exactly the trajectory workload")
-        scenario = run.scenario
-        if scenario.get("temperature") != 0 or not isinstance(
-            scenario.get("seed"), int
+        validate_scenario(run.scenario)
+        if run.scenario.get("chat_template") and "tokenizer_config.json" not in (
+            run.model.get("tokenizer_files", {})
         ):
-            raise ValueError("endpoint verification requires temperature 0 and a seed")
+            raise ValueError(
+                "scenario.chat_template requires a pinned tokenizer_config.json"
+            )
     if left.model != right.model or left.scenario != right.scenario:
         raise ValueError(
             "endpoint verification requires identical model and scenario inputs"
@@ -366,7 +370,10 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
         evidence_gaps=partial(
             evidence_gaps,
             trials=trials,
-            quality_identity=task_check_identity(config, trials["measured_trials"]),
+            quality_identity=task_check_identity(
+                expand_seeds(config, recipe.study.runs[0].scenario),
+                trials["measured_trials"],
+            ),
             distributions=distributions,
             concurrency=concurrency,
         ),

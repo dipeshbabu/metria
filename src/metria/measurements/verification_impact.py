@@ -135,10 +135,14 @@ def compare_task_checks(
         left["passed"] / left["check_count"],
         right["passed"] / right["check_count"],
     )
+    from .pass_rate_intervals import intervals
+
+    interval, bounds = intervals(left["passed"], right["passed"], left["check_count"])
     values = {
         "reference_task_pass_rate": left_value,
         "candidate_task_pass_rate": right_value,
         "task_pass_rate_delta": right_value - left_value,
+        **bounds,
     }
     evidence = {
         "status": "available",
@@ -148,6 +152,7 @@ def compare_task_checks(
         "check_count_per_role": left["check_count"],
         "reference_passed": left["passed"],
         "candidate_passed": right["passed"],
+        "interval": interval,
         "failed_candidate_checks": [
             {
                 key: row[key]

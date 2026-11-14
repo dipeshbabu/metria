@@ -50,7 +50,7 @@ FLAVORS = TOKEN_FLAVORS | {"generic"}
 _RUNTIME_KEYS = frozenset(
     {"name", "flavor", "base_url_env", "api_key_env", "timeout_s", "max_retries"}
 )
-_DECODE_KEYS = ("max_tokens", "temperature", "seed")
+_DECODE_KEYS = ("max_tokens", "temperature", "seed", "top_p", "stop")
 _TOKENIZER_FILES = frozenset(
     {
         "tokenizer.json",
@@ -126,6 +126,21 @@ def _model(spec: RunSpec, flavor: str) -> dict[str, Any]:
     }
 
 
+def _chat_requested(spec: RunSpec, flavor: str) -> bool:
+    chat = spec.scenario.get("chat_template", False)
+    if not isinstance(chat, bool):
+        raise ValueError("scenario.chat_template must be a boolean")
+    if chat and flavor not in TOKEN_FLAVORS:
+        raise ValueError(
+            "chat templates are rendered locally for token-ID flavors only"
+        )
+    if chat and "tokenizer_config.json" not in spec.model.get("tokenizer_files", {}):
+        raise ValueError(
+            "scenario.chat_template requires a pinned tokenizer_config.json"
+        )
+    return chat
+
+
 def _decode(scenario: Mapping[str, Any]) -> dict[str, Any]:
     result = {key: scenario[key] for key in _DECODE_KEYS if key in scenario}
     tokens = result.get("max_tokens")
@@ -138,7 +153,7 @@ def _decode(scenario: Mapping[str, Any]) -> dict[str, Any]:
     return result
 
 
-def load_tokenizer(path: str, files: Mapping[str, str]) -> Callable[[str], list[int]]:
+def load_tokenizer(path: str, files: Mapping[str, str]) -> Callable[..., list[int]]:
     """Verify the pinned tokenizer files, then load ``tokenizer.json`` lazily."""
 
     import hashlib
@@ -159,7 +174,11 @@ def load_tokenizer(path: str, files: Mapping[str, str]) -> Callable[[str], list[
             "token-ID endpoints need the 'tokenizers' package to tokenize prompts locally"
         ) from exc
     tokenizer = Tokenizer.from_file(str(root / "tokenizer.json"))
-    return lambda text: list(tokenizer.encode(text).ids)
+
+    def encode(text: str, special: bool = True) -> list[int]:
+        return list(tokenizer.encode(text, add_special_tokens=special).ids)
+
+    return encode
 
 
 def _token_id(key: Any) -> int:
@@ -239,11 +258,22 @@ class EndpointSession:
 
     connection: EndpointConnection
     resolved: Mapping[str, Any]
-    tokenize: Callable[[str], list[int]] | None
+    tokenize: Callable[..., list[int]] | None
     claims: dict[str, dict[str, Any]] = field(default_factory=dict)
     tokenizer_check: TokenizerCheck | None = None
     invocations: list[dict[str, Any]] = field(default_factory=list)
     concurrent_invocations: list[dict[str, Any]] = field(default_factory=list)
+    chat: Any = None
+
+    def _prompt_ids(self, prompt: str) -> tuple[str, list[int], bool]:
+        """Return the text sent for tokenization, its IDs and the special flag."""
+
+        assert self.tokenize is not None
+        if self.chat is None:
+            return prompt, self.tokenize(prompt), True
+        rendered = self.chat.render(prompt)
+        # The template already wrote any BOS/EOS text; do not add them again.
+        return rendered, self.tokenize(rendered, special=False), False
 
     def _body(
         self, request: InferenceRequest, distributions: bool
@@ -264,7 +294,7 @@ class EndpointSession:
         if self.tokenize is None:
             body["prompt"] = request.prompt
             return body, None
-        prompt_ids = self.tokenize(request.prompt)
+        _, prompt_ids, _ = self._prompt_ids(request.prompt)
         body.update(prompt=prompt_ids, return_token_ids=True)
         if distributions:
             body.update(logprobs=TOP_LOGPROBS_K, return_tokens_as_token_ids=True)
@@ -287,7 +317,8 @@ class EndpointSession:
         for request in requests:
             body, prompt_ids = self._body(request, distributions)
             if self.tokenizer_check is not None and prompt_ids is not None:
-                self.tokenizer_check.check(request.prompt, prompt_ids)
+                text, _, special = self._prompt_ids(request.prompt)
+                self.tokenizer_check.check(text, prompt_ids, special=special)
             first_attempt = len(self.connection.attempts)
             payload, seconds = self.connection.request("POST", "/v1/completions", body)
             choice = _choice(payload)
@@ -436,6 +467,7 @@ class EndpointAdapter:
             "model": _model(spec, runtime["flavor"]),
             "decode": _decode(spec.scenario),
             "declared": validate_declared(spec.runtime.get("declared")),
+            "chat_template": _chat_requested(spec, runtime["flavor"]),
         }
 
     def launch(
@@ -456,7 +488,14 @@ class EndpointAdapter:
         claims = collect_claims(connection, runtime["flavor"], model["id"])
         check_declared(resolved["declared"], claims)
         check = TokenizerCheck(connection, model["id"]) if tokenize else None
-        return EndpointSession(connection, resolved, tokenize, claims, check)
+        session = EndpointSession(connection, resolved, tokenize, claims, check)
+        if resolved.get("chat_template"):
+            from .endpoint_chat import ChatTemplate
+
+            session.chat = ChatTemplate(
+                model["tokenizer_path"], model["tokenizer_files"]
+            )
+        return session
 
     def observe(self, session: RuntimeSession) -> dict[str, Any]:
         if not isinstance(session, EndpointSession):
@@ -474,7 +513,12 @@ class EndpointAdapter:
         )
         return {
             "runtime": {"name": RUNTIME_NAME, "flavor": runtime["flavor"]},
-            "identity": identity_evidence(session.claims, endpoint, tokenizer),
+            "identity": identity_evidence(
+                session.claims,
+                endpoint,
+                tokenizer,
+                session.chat.evidence() if session.chat is not None else None,
+            ),
             "identity_authority": "claimed",
             "identity_snapshots": {
                 "before": session.claims,

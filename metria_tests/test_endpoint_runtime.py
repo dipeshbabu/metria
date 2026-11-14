@@ -23,7 +23,7 @@ KEY = "sk-test-secret-value-0123456789"
 PROMPTS = [{"id": "a", "prompt": "ab"}, {"id": "b", "prompt": "abc"}]
 
 
-def _tokenize(text: str) -> list[int]:
+def _tokenize(text: str, special: bool = True) -> list[int]:
     return [ord(char) for char in text]
 
 

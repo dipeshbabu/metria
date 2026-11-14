@@ -42,7 +42,7 @@ def _recipe(tmp_path, *, max_in_flight=4, rounds=2, policy=POLICY):
 
 def test_invariant_servers_pass_under_concurrency(servers, tmp_path):  # noqa: F811
     for server in servers:
-        server.sleep = 0.05
+        server.sleep = 0.3
     result = _verify(_recipe(tmp_path), tmp_path / "out")
     manifest = result.manifest
     assert manifest["verdict"] == "PASS", json.dumps(manifest, default=str)[:3000]
@@ -63,7 +63,7 @@ def test_invariant_servers_pass_under_concurrency(servers, tmp_path):  # noqa: F
 
 def test_batch_variant_candidate_fails(servers, tmp_path):  # noqa: F811
     for server in servers:
-        server.sleep = 0.05
+        server.sleep = 0.3
     servers[1].batch_variant = True
     manifest = _verify(_recipe(tmp_path), tmp_path / "out").manifest
     assert manifest["verdict"] == "FAIL"
