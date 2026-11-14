@@ -1,0 +1,356 @@
+{
+  "acceptance_policy_evaluated": false,
+  "analyses": [
+    {
+      "diagnostics": {},
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {},
+      "name": "kv_fidelity.trajectory_match",
+      "reason": "pair is not directly comparable under the study plan",
+      "status": "skipped",
+      "version": "0.3.4"
+    },
+    {
+      "diagnostics": {},
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {},
+      "name": "metria.verification_impact",
+      "reason": "pair is not directly comparable under the study plan",
+      "status": "skipped",
+      "version": "1"
+    },
+    {
+      "diagnostics": {},
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {},
+      "name": "metria.trajectory_kld",
+      "reason": "pair is not directly comparable under the study plan",
+      "status": "skipped",
+      "version": "0.1.0"
+    }
+  ],
+  "change": {
+    "candidate": {
+      "dtype": "float32"
+    },
+    "identity_authority": "claimed",
+    "parameter": "declared_endpoint_configuration",
+    "reference": {
+      "dtype": "float32"
+    }
+  },
+  "comparison": {
+    "comparable_metrics": [
+      "request_latency_seconds",
+      "task_check_pass_rate",
+      "trajectory_mean_steps",
+      "trajectory_nonempty_capture_rate"
+    ],
+    "compatible": false,
+    "incompatible_metrics": {},
+    "issues": [
+      {
+        "dimension": "observed.identity.model.max_model_len",
+        "reason": "controlled dimension differs"
+      },
+      {
+        "dimension": "observed.identity_snapshots.after.model.max_model_len",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.before.model.max_model_len",
+        "reason": "undeclared comparison-relevant difference"
+      }
+    ],
+    "waived_differences": []
+  },
+  "comparison_plan": {
+    "block_by": [],
+    "control": [
+      "measurements",
+      "model",
+      "scenario",
+      "trial_policy"
+    ],
+    "vary": [
+      "observed.endpoint",
+      "observed.identity.endpoint",
+      "resolved.runtime.base_url_env",
+      "runtime.base_url_env"
+    ]
+  },
+  "comparison_status": "NOT_COMPARABLE",
+  "controls": [
+    {
+      "dimension": "measurements",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "model",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "scenario",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "trial_policy",
+      "role": "control",
+      "status": "matched"
+    }
+  ],
+  "exit_code": 3,
+  "hardware": {
+    "accelerators": [],
+    "host": {
+      "cpu_count": 12,
+      "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+    },
+    "metadata": {
+      "accelerator_detection": "runtime_or_adapter_required"
+    },
+    "platform": {
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "release": "5.15.167.4-microsoft-standard-WSL2",
+      "system": "Linux",
+      "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+    },
+    "software": {
+      "python_executable": "python",
+      "python_implementation": "CPython",
+      "python_version": "3.12.3"
+    }
+  },
+  "implementation": {
+    "name": "metria.verify",
+    "source_sha256": "9d579caeca8aed4d59f702621bdea827f77bb87278e4ec0b4b6620b439b15b5a",
+    "version": "0.1.6"
+  },
+  "lifecycle": {
+    "records": {
+      "candidate": "completed",
+      "reference": "completed"
+    },
+    "status": "completed"
+  },
+  "performance": {
+    "available": false,
+    "label": "Client-side request latency (includes network)",
+    "reason": "reference/candidate comparison gate did not pass",
+    "schema": "metria.performance_impact.v1",
+    "unsupported_metrics": [
+      "ttft",
+      "inter_token_latency",
+      "decode_throughput",
+      "peak_device_memory",
+      "kv_memory"
+    ]
+  },
+  "policy": {
+    "criteria": [
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "quality.candidate_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: NOT_COMPARABLE",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "quality.candidate_pass_rate",
+          "source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "candidate_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "behavior.reference_repeatability",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: NOT_COMPARABLE",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "behavior.reference_repeatability",
+          "source": {
+            "aggregation": "derived",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.observed_reference_repeatability",
+              "name": "reference_repeatability",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "behavior.trajectory_agreement",
+          "unit": "fraction",
+          "version": "0.3.4"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: NOT_COMPARABLE",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "behavior.trajectory_agreement",
+          "source": {
+            "aggregation": "weighted_by_max_trajectory_length",
+            "analysis": {
+              "name": "kv_fidelity.trajectory_match",
+              "version": "0.3.4"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "kv_fidelity.trajectory_match",
+              "name": "trajectory_agreement_score",
+              "unit": "score_0_100",
+              "version": "0.3.4"
+            },
+            "normalization_divisor": 100.0
+          },
+          "unit": "fraction",
+          "version": "0.3.4"
+        }
+      },
+      {
+        "criterion": {
+          "max": 1e-09,
+          "target": "behavior.trajectory_kld_mean",
+          "unit": "nats",
+          "version": "0.1.0"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: NOT_COMPARABLE",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "lower_is_better",
+          "kind": "number",
+          "name": "behavior.trajectory_kld_mean",
+          "qualification": "staged",
+          "source": {
+            "aggregation": "mean_over_shared_context_steps",
+            "analysis": {
+              "name": "metria.trajectory_kld",
+              "version": "0.1.0"
+            },
+            "metric": {
+              "direction": "lower_is_better",
+              "method": "metria.trajectory_kld",
+              "name": "trajectory_kld_mean",
+              "unit": "nats",
+              "version": "0.1.0"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "nats",
+          "version": "0.1.0"
+        }
+      }
+    ],
+    "gate": "NOT_COMPARABLE",
+    "policy_schema": "metria.verification_policy.v1",
+    "schema": "metria.policy_evaluation.v1",
+    "status": "NOT_EVALUATED"
+  },
+  "policy_status": "NOT_EVALUATED",
+  "recipe_digest": "9c4e3a1d6bf25d99eb62c911296ca9995be8a5bae1a2a728c7f499b8ac9faf1c",
+  "records": {
+    "candidate": {
+      "evidence_digest": "79167012b35beac3f612dd9067731f95c55d8e35c2a913522daa4e4d657325fe",
+      "evidence_gaps": [],
+      "observed": {
+        "claimed_model": "smollm2",
+        "claimed_runtime_version": "0.30.0",
+        "context": 512,
+        "declared": {
+          "dtype": "float32"
+        },
+        "identity_authority": "claimed",
+        "identity_status": "partial"
+      },
+      "path": "candidate.run.json",
+      "record_digest": "4925dab953d0c58302a7cb3a775f0ce18bba3f26be47188a6e15ef4e970cebfe",
+      "run_id": "run-0001",
+      "status": "completed"
+    },
+    "reference": {
+      "evidence_digest": "55e89c40648283fa3416e242b8ad635694452f52f17bd42d8c7690394a5a8e32",
+      "evidence_gaps": [],
+      "observed": {
+        "claimed_model": "smollm2",
+        "claimed_runtime_version": "0.30.0",
+        "context": 256,
+        "declared": {
+          "dtype": "float32"
+        },
+        "identity_authority": "claimed",
+        "identity_status": "partial"
+      },
+      "path": "reference.run.json",
+      "record_digest": "d3b50e05d3beef5330fcc4f7842be97811789a121620316d0a26b01cd5697703",
+      "run_id": "run-0000",
+      "status": "completed"
+    }
+  },
+  "schema": "metria.verification.v1",
+  "scope": "remote_endpoint_change.v1",
+  "study": "remote-endpoint-change",
+  "systems": {
+    "candidate": {
+      "available": false
+    },
+    "reference": {
+      "available": false
+    }
+  },
+  "verdict": "NOT_COMPARABLE"
+}

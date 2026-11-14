@@ -1,0 +1,212 @@
+{
+  "record": {
+    "artifacts": [],
+    "events": [
+      {
+        "kind": "supported",
+        "stage": "preflight"
+      },
+      {
+        "error_type": "RuntimeError",
+        "kind": "error",
+        "message_sha256": "a22a881f060dd53af89f1c4620be2b9518d37bef02680a999fd1308237cb89fc",
+        "stage": "launch"
+      }
+    ],
+    "evidence": {},
+    "metrics": {},
+    "observed": {},
+    "provenance": {
+      "capabilities": {
+        "allowed": true,
+        "blocking": [],
+        "capabilities": {
+          "model.geometry": {
+            "evidence": {
+              "source": "requested_model_metadata"
+            },
+            "reasons": [
+              "model.geometry was not provided"
+            ],
+            "status": "unknown"
+          }
+        },
+        "checks": {
+          "metria.staged_captures": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": true,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          },
+          "turboquant.kv_cache.geometry": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          },
+          "vllm.staged_treatments": {
+            "applicable": false,
+            "override": {
+              "applied": false,
+              "requested": false,
+              "supported": true
+            },
+            "required": false,
+            "version": "1"
+          }
+        }
+      },
+      "environment": {},
+      "executor": {
+        "name": "metria.execute_run",
+        "version": "1"
+      },
+      "measurement": {
+        "name": "kv_fidelity.decode_time_trajectory",
+        "version": "0.3.4"
+      },
+      "preflight": {
+        "captures": {
+          "evidence": {
+            "top_k": 20
+          },
+          "reasons": [
+            "server-reported top-k logprobs are staged pending qualification"
+          ],
+          "required": [
+            {
+              "kind": "token_ids",
+              "options": {}
+            },
+            {
+              "kind": "token_top_logprobs",
+              "options": {}
+            }
+          ],
+          "status": "experimental"
+        },
+        "evidence": {
+          "flavor": "vllm",
+          "network": "client_side_timing_includes_network"
+        },
+        "reasons": [],
+        "status": "supported"
+      },
+      "verification": {
+        "hardware": {
+          "accelerators": [],
+          "host": {
+            "cpu_count": 12,
+            "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+          },
+          "metadata": {
+            "accelerator_detection": "runtime_or_adapter_required"
+          },
+          "platform": {
+            "machine": "x86_64",
+            "processor": "x86_64",
+            "release": "5.15.167.4-microsoft-standard-WSL2",
+            "system": "Linux",
+            "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+          },
+          "software": {
+            "python_executable": "python",
+            "python_implementation": "CPython",
+            "python_version": "3.12.3"
+          }
+        },
+        "implementation": {
+          "name": "metria.verify",
+          "source_sha256": "9d579caeca8aed4d59f702621bdea827f77bb87278e4ec0b4b6620b439b15b5a",
+          "version": "0.1.6"
+        },
+        "recipe_digest": "5b2c0ff14a2e176dc92a26c4b06e3a8af31a401dd902e529df7ebb25c42c012e",
+        "scope": "remote_endpoint_change.v1"
+      }
+    },
+    "requested": {
+      "environment_selector": {},
+      "measurements": [
+        "kv_fidelity.decode_time_trajectory"
+      ],
+      "model": {
+        "id": "smollm2",
+        "tokenizer_files": {
+          "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+          "special_tokens_map.json": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3",
+          "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+          "tokenizer_config.json": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424",
+          "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+        },
+        "tokenizer_path": "/opt/metria-endpoint-qual/tokenizer"
+      },
+      "runtime": {
+        "base_url_env": "METRIA_CANDIDATE_URL",
+        "declared": {
+          "engine_version": "0.29.0"
+        },
+        "flavor": "vllm",
+        "max_retries": 2,
+        "name": "openai_endpoint",
+        "timeout_s": 600.0
+      },
+      "scenario": {
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0
+      },
+      "treatments": [],
+      "trial_policy": {
+        "capability_overrides": [
+          "metria.staged_captures"
+        ],
+        "isolation": "none_remote_server",
+        "measured_trials": 2,
+        "method": "metria.prefix_cache_trials.v1",
+        "schedule": "sequential",
+        "warmup_trials": 0
+      }
+    },
+    "resolved": {
+      "declared": {
+        "engine_version": "0.29.0"
+      },
+      "decode": {
+        "max_tokens": 16,
+        "seed": 42,
+        "temperature": 0
+      },
+      "model": {
+        "id": "smollm2",
+        "tokenizer_files": {
+          "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+          "special_tokens_map.json": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3",
+          "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+          "tokenizer_config.json": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424",
+          "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+        },
+        "tokenizer_path": "/opt/metria-endpoint-qual/tokenizer"
+      },
+      "runtime": {
+        "api_key_env": null,
+        "base_url_env": "METRIA_CANDIDATE_URL",
+        "flavor": "vllm",
+        "max_retries": 2,
+        "name": "openai_endpoint",
+        "timeout_s": 600.0
+      }
+    },
+    "run_id": "run-0001",
+    "status": "failed",
+    "study_name": "remote-endpoint-change"
+  },
+  "schema": "metria.run_record.v1"
+}

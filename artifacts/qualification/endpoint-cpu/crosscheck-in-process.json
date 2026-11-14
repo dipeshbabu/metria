@@ -1,0 +1,31 @@
+{
+  "schema": "metria.endpoint_crosscheck.v1",
+  "compared_prompts": 4,
+  "all_matched": true,
+  "per_prompt": [
+    {
+      "id": "arithmetic",
+      "matched": true,
+      "endpoint_tokens": 16,
+      "in_process_tokens": 16
+    },
+    {
+      "id": "capital",
+      "matched": true,
+      "endpoint_tokens": 16,
+      "in_process_tokens": 16
+    },
+    {
+      "id": "dog",
+      "matched": true,
+      "endpoint_tokens": 16,
+      "in_process_tokens": 16
+    },
+    {
+      "id": "story",
+      "matched": true,
+      "endpoint_tokens": 16,
+      "in_process_tokens": 16
+    }
+  ]
+}
