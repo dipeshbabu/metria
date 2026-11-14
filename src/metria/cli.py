@@ -166,6 +166,9 @@ def _add_preparation_parser(subparsers: Any) -> None:
 
     add_serving_parser(subparsers)
     add_endpoint_parser(subparsers)
+    from .traffic_import import add_traffic_parser
+
+    add_traffic_parser(subparsers)
     prepare = subparsers.add_parser(
         "prepare-vllm", help="prepare a pinned local vLLM prefix-cache recipe"
     )
@@ -290,6 +293,10 @@ def _add_upgrade_parser(subparsers: Any) -> None:
 
 
 def _prepare_recipe_command(args: Any, out: TextIO) -> int:
+    if args.recipe_command == "import-traffic":
+        from .traffic_import import import_traffic_command
+
+        return import_traffic_command(args, out)
     if args.recipe_command == "prepare-endpoint":
         from .preparation_endpoint import prepare_endpoint_command
 
@@ -626,6 +633,7 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
             "prepare-vllm-upgrade",
             "prepare-vllm-serving",
             "prepare-endpoint",
+            "import-traffic",
         }:
             return _prepare_recipe_command(args, out)
         if args.command == "compare":

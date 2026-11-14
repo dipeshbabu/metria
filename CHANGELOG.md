@@ -5,6 +5,11 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add `metria recipe import-traffic`: deterministic, seeded sampling of a
+  production request log into a workload JSONL, with built-in redaction of
+  credentials and personal data, custom patterns and literal secret files, a
+  refusal to write if any rule still matches after redaction, and a provenance
+  manifest that records counts and hashes but never original text.
 - Task-check pass rates now carry approximate 95% confidence intervals (Wilson
   for each rate, Newcombe for the difference) with policy targets
   `quality.candidate_pass_rate_lower_bound`,

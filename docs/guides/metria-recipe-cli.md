@@ -14,6 +14,7 @@ library; inference engines are installed separately.
 | `metria recipe prepare-llamacpp-build` | Two pinned llama.cpp CPU capture builds | [CPU build changes](llamacpp-build-verification.md) |
 | `metria recipe prepare-gguf-quantization` | A controlled GGUF Q8_0 conversion | [GGUF quantization](gguf-quantization-verification.md) |
 | `metria recipe prepare-endpoint` | STAGED: two running OpenAI-compatible servers with a declared change | [Remote endpoints](endpoint-verification.md) |
+| `metria recipe import-traffic` | Sample and redact production prompts into a workload JSONL | [Import production traffic](traffic-import.md) |
 | `metria recipe validate / digest / normalize <study.json>` | Check, fingerprint or canonicalize a recipe without running it | Below |
 | `metria inspect <study.json> [--json]` | Evaluate capability rules and fingerprint local hardware | [Capability inspection](metria-inspection.md) |
 | `metria compare <run.json> <run.json> ... --recipe <study.json>` | Compare saved run records under the recipe's plan | Below |
