@@ -39,6 +39,8 @@ _RESOLVED_NON_COMPARISON_ROOTS = frozenset({"support"})
 _OBSERVED_NON_COMPARISON_ROOTS = frozenset(
     {
         "invocations",
+        # Concurrent request timings differ every run by design.
+        "concurrent_invocations",
         "reset_count",
         "closed",
         "cleanup",

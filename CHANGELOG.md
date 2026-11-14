@@ -5,6 +5,13 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Endpoint verification can declare a concurrent schedule
+  (`prepare-endpoint --concurrency N --concurrency-rounds R`). After the
+  sequential trials each run sends every prompt under load and measures batch
+  invariance against its sequential output; new policy targets
+  `behavior.reference_batch_invariance`, `behavior.candidate_batch_invariance`,
+  and client-side `client.requests_per_second_ratio` and
+  `client.request_latency_ratio` (network-inclusive).
 - Retain native CPU evidence for `remote_endpoint_change.v1` against
   `vllm serve` 0.30.0: identical servers PASS, a declared float32 → bfloat16
   change PASS a policy with results identical to the in-process engine, a

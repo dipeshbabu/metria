@@ -11,8 +11,11 @@ observed, plus safe endpoint fields.
 
 from __future__ import annotations
 
+import dataclasses
 import math
+import time
 from collections.abc import Callable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -202,6 +205,19 @@ def _top_logprobs(
     return tuple(result)
 
 
+def _choice(payload: Any) -> Mapping[str, Any]:
+    choices = payload.get("choices") if isinstance(payload, Mapping) else None
+    if (
+        not isinstance(choices, list)
+        or len(choices) != 1
+        or not isinstance(choices[0], Mapping)
+    ):
+        raise RuntimeError("endpoint completion response must contain one choice")
+    if not isinstance(choices[0].get("text"), str):
+        raise RuntimeError("endpoint completion text is missing")
+    return choices[0]
+
+
 def _token_ids(choice: Mapping[str, Any], prompt_ids: Sequence[int]) -> tuple[int, ...]:
     tokens = choice.get("token_ids")
     if not isinstance(tokens, list) or any(
@@ -227,6 +243,7 @@ class EndpointSession:
     claims: dict[str, dict[str, Any]] = field(default_factory=dict)
     tokenizer_check: TokenizerCheck | None = None
     invocations: list[dict[str, Any]] = field(default_factory=list)
+    concurrent_invocations: list[dict[str, Any]] = field(default_factory=list)
 
     def _body(
         self, request: InferenceRequest, distributions: bool
@@ -273,18 +290,7 @@ class EndpointSession:
                 self.tokenizer_check.check(request.prompt, prompt_ids)
             first_attempt = len(self.connection.attempts)
             payload, seconds = self.connection.request("POST", "/v1/completions", body)
-            choices = payload.get("choices") if isinstance(payload, Mapping) else None
-            if (
-                not isinstance(choices, list)
-                or len(choices) != 1
-                or not isinstance(choices[0], Mapping)
-            ):
-                raise RuntimeError(
-                    "endpoint completion response must contain one choice"
-                )
-            choice = choices[0]
-            if not isinstance(choice.get("text"), str):
-                raise RuntimeError("endpoint completion text is missing")
+            choice = _choice(payload)
             outputs.append(choice["text"])
             row: dict[str, Any] = {
                 "seconds": seconds,
@@ -315,6 +321,50 @@ class EndpointSession:
             captures=captures,
             metadata={"invocations": tuple(self.invocations[-len(requests) :])},
         )
+
+    def _concurrent_one(
+        self, prepared: tuple[dict[str, Any], list[int]]
+    ) -> tuple[tuple[int, ...], dict[str, Any]]:
+        body, prompt_ids = prepared
+        # A private connection keeps each thread's attempt log separate.
+        connection = dataclasses.replace(self.connection, attempts=[])
+        started = time.perf_counter_ns()
+        payload, seconds = connection.request("POST", "/v1/completions", body)
+        finished = time.perf_counter_ns()
+        generated = _token_ids(_choice(payload), prompt_ids)
+        return generated, {
+            "seconds": seconds,
+            "started_ns": started,
+            "finished_ns": finished,
+            "prompt_tokens": len(prompt_ids),
+            "completion_tokens": len(generated),
+            "attempts": [dict(row) for row in connection.attempts],
+        }
+
+    def infer_concurrent(
+        self, requests: Sequence[InferenceRequest], *, max_in_flight: int
+    ) -> tuple[list[tuple[int, ...]], list[dict[str, Any]]]:
+        """Send requests with up to ``max_in_flight`` outstanding; keep order."""
+
+        if self.tokenize is None:
+            raise RuntimeError("concurrent token capture needs a token-ID flavor")
+        prepared = []
+        for request in requests:
+            body, prompt_ids = self._body(request, False)
+            if prompt_ids is None:  # pragma: no cover - guarded above
+                raise RuntimeError("concurrent requests require token-ID prompts")
+            prepared.append((body, prompt_ids))
+        with ThreadPoolExecutor(max_workers=max_in_flight) as pool:
+            results = list(pool.map(self._concurrent_one, prepared))
+        origin = min((row["started_ns"] for _, row in results), default=0)
+        rows = []
+        for _, row in results:
+            started, finished = row.pop("started_ns"), row.pop("finished_ns")
+            row["start_offset_seconds"] = (started - origin) / 1_000_000_000
+            row["end_offset_seconds"] = (finished - origin) / 1_000_000_000
+            rows.append(row)
+        self.concurrent_invocations.extend(rows)
+        return [tokens for tokens, _ in results], rows
 
     def reset(self, scope: str = "measurement") -> None:
         if scope != "measurement":
@@ -435,4 +485,7 @@ class EndpointAdapter:
             "endpoint": endpoint,
             "configured": {"decode": dict(session.resolved["decode"])},
             "invocations": [dict(row) for row in session.invocations],
+            "concurrent_invocations": [
+                dict(row) for row in session.concurrent_invocations
+            ],
         }
