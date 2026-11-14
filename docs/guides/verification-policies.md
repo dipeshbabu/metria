@@ -96,6 +96,17 @@ nonnegative:
 
 Ratio targets use unit `ratio`.
 
+**Batch invariance and client load** (`metria.batch_invariance`, version
+`1`), available only in [endpoint verification](endpoint-verification.md#concurrency-and-batch-invariance)
+with a declared `--concurrency`:
+
+| Target | Unit | Criteria |
+|---|---|---|
+| `behavior.reference_batch_invariance` | `fraction` | Numeric bounds within 0–1 |
+| `behavior.candidate_batch_invariance` | `fraction` | Numeric bounds within 0–1 |
+| `client.requests_per_second_ratio` | `ratio` | Nonnegative; higher is better; client-side, includes the network |
+| `client.request_latency_ratio` | `ratio` | Nonnegative; lower is better; client-side, includes the network |
+
 **STAGED: trajectory KL divergence** (`metria.trajectory_kld`, version `0.1.0`).
 Only the FP8 KV-cache profile accepts these, and only when prepared with
 `--staged-kld`. Their report rows carry `"qualification": "staged"` and the

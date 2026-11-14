@@ -1,0 +1,52 @@
+# Metria Verification
+
+**Verdict: PASS**
+
+Recipe: `83a3d29269da46dbdfe06be7f2dd07682325fd56e0b6363aa3aa1ce06eb4bd96`
+Scope: STAGED remote endpoint comparison; server identity was reported by the server, not verified by Metria
+
+## Change:
+  Declared endpoint configuration: {'dtype': 'float32'} -> {'dtype': 'float32'}
+
+## Evidence:
+  reference: completed (reference.run.json)
+    Claimed runtime: 0.30.0; context: 256; identity: partial (claimed)
+  candidate: completed (candidate.run.json)
+    Claimed runtime: 0.30.0; context: 256; identity: partial (claimed)
+  Lifecycle: completed
+  measurements: matched
+  model: matched
+  scenario: matched
+  trial_policy: matched
+
+## Comparison:
+  VALID
+
+## Impact:
+  kv_fidelity.trajectory_match: completed
+    Token prefix agreement: 100/100
+    Exact token-sequence matches: 100%
+    Divergent prompts: 0/8
+    Trajectory evidence: complete; unavailable prompts: 0
+    Length mismatches: 0
+  metria.verification_impact: completed
+    Task checks: reference 8/8, candidate 8/8 passed.
+    Checked workload: 4/4 unique prompts; results describe declared checks only.
+    Reference repeatability: 0/4 repeat pairs differed across 4 prompts.
+    Observed sample repeatability; not a statistical guarantee or a quality score.
+    Token differences are behavioral drift; task checks determine the declared quality outcomes.
+  metria.batch_invariance: completed
+  Client-side request latency (includes network): -0.187098s (improved)
+    Relative change: -9.39793%
+    Client-side wall time per sequential request, including the network, load balancer and any concurrent traffic on the server. Descriptive only; not a policy target.
+  TTFT, decode throughput, inter-token latency, and device/KV memory: unavailable.
+
+## Verdict:
+  PASS
+  Policy: PASS
+
+Policy checks:
+  quality.candidate_pass_rate@1 >= 1.0: PASS (observed 1.0 fraction)
+  behavior.reference_batch_invariance@1 >= 0.0: PASS (observed 1.0 fraction)
+  behavior.candidate_batch_invariance@1 >= 0.0: PASS (observed 1.0 fraction)
+  PASS means the user-defined criteria were met; it is not a universal deployment-safety judgment.

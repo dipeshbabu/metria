@@ -229,7 +229,40 @@ def _divergence_targets() -> dict[str, _Target]:
     }
 
 
-_TARGETS = MappingProxyType({**_TARGETS, **_serving_targets(), **_divergence_targets()})
+def _invariance_targets() -> dict[str, _Target]:
+    from .measurements import batch_invariance as invariance
+
+    names = {
+        "reference_batch_invariance": "behavior.reference_batch_invariance",
+        "candidate_batch_invariance": "behavior.candidate_batch_invariance",
+        "client_requests_per_second_ratio": "client.requests_per_second_ratio",
+        "client_request_latency_ratio": "client.request_latency_ratio",
+    }
+    return {
+        target: _Target(
+            name=target,
+            kind="number",
+            unit=invariance.DEFINITIONS[metric].unit,
+            metric=invariance.DEFINITIONS[metric],
+            aggregation="derived",
+            version=invariance.VERSION,
+            analysis=invariance.NAME,
+            analysis_version=invariance.VERSION,
+            evidence_schema=invariance.COMPARISON_SCHEMA,
+            domain_max=1.0 if metric.endswith("invariance") else None,
+        )
+        for metric, target in names.items()
+    }
+
+
+_TARGETS = MappingProxyType(
+    {
+        **_TARGETS,
+        **_serving_targets(),
+        **_divergence_targets(),
+        **_invariance_targets(),
+    }
+)
 
 
 def _target(name: str, version: str) -> _Target:

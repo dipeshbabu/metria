@@ -99,8 +99,10 @@ returns the gaps a verification profile applies.
 
 ## Limits
 
-- Requests are sequential; concurrency is
-  [#215](https://github.com/dipeshbabu/metria/issues/215).
+- `infer()` is sequential. `EndpointSession.infer_concurrent()` sends a batch
+  with a bounded number of requests in flight; each thread uses its own
+  connection copy, and timings are retained under
+  `observed["concurrent_invocations"]`, which run comparison ignores.
 - `session.reset()` supports only the `measurement` scope; an endpoint cannot
   reset a server's prefix cache.
 - Verified natively against `vllm serve` from the pinned `0.30.0+cpu` wheel:

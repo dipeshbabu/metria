@@ -1,0 +1,194 @@
+{
+  "environment": {},
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "concurrency": {
+        "max_in_flight": 4,
+        "rounds": 3
+      },
+      "measured_trials": 2,
+      "prompts": [
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "story",
+          "prompt": "Once upon a time"
+        },
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "dog",
+          "prompt": "The little dog"
+        },
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "capital",
+          "prompt": "The capital of France is"
+        },
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "arithmetic",
+          "prompt": "Two plus two equals"
+        }
+      ],
+      "warmup_trials": 0
+    }
+  },
+  "policy": {
+    "criteria": [
+      {
+        "min": 1.0,
+        "target": "quality.candidate_pass_rate",
+        "unit": "fraction",
+        "version": "1"
+      },
+      {
+        "min": 0.0,
+        "target": "behavior.reference_batch_invariance",
+        "unit": "fraction",
+        "version": "1"
+      },
+      {
+        "min": 0.0,
+        "target": "behavior.candidate_batch_invariance",
+        "unit": "fraction",
+        "version": "1"
+      }
+    ],
+    "schema": "metria.verification_policy.v1"
+  },
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "comparison": {
+      "analyses": [
+        "kv_fidelity.trajectory_match",
+        "metria.verification_impact",
+        "metria.batch_invariance"
+      ],
+      "block_by": [],
+      "control": [
+        "measurements",
+        "model",
+        "scenario",
+        "trial_policy"
+      ],
+      "vary": [
+        "observed.endpoint",
+        "observed.identity.endpoint",
+        "resolved.runtime.base_url_env",
+        "runtime.base_url_env"
+      ]
+    },
+    "constants": {},
+    "metadata": {},
+    "name": "remote-endpoint-change",
+    "runs": [
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "id": "smollm2",
+          "tokenizer_files": {
+            "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+            "special_tokens_map.json": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3",
+            "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+            "tokenizer_config.json": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424",
+            "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+          },
+          "tokenizer_path": "/opt/metria-endpoint-qual/tokenizer"
+        },
+        "runtime": {
+          "base_url_env": "METRIA_REFERENCE_URL",
+          "declared": {
+            "dtype": "float32"
+          },
+          "flavor": "vllm",
+          "max_retries": 2,
+          "name": "openai_endpoint",
+          "timeout_s": 600.0
+        },
+        "scenario": {
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0
+        },
+        "treatments": [],
+        "trial_policy": {
+          "concurrency": {
+            "max_in_flight": 4,
+            "rounds": 3
+          },
+          "isolation": "none_remote_server",
+          "measured_trials": 2,
+          "method": "metria.prefix_cache_trials.v1",
+          "schedule": "sequential",
+          "warmup_trials": 0
+        }
+      },
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "id": "smollm2",
+          "tokenizer_files": {
+            "merges.txt": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+            "special_tokens_map.json": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3",
+            "tokenizer.json": "9ca9acddb6525a194ec8ac7a87f24fbba7232a9a15ffa1af0c1224fcd888e47c",
+            "tokenizer_config.json": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424",
+            "vocab.json": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+          },
+          "tokenizer_path": "/opt/metria-endpoint-qual/tokenizer"
+        },
+        "runtime": {
+          "base_url_env": "METRIA_CANDIDATE_URL",
+          "declared": {
+            "dtype": "float32"
+          },
+          "flavor": "vllm",
+          "max_retries": 2,
+          "name": "openai_endpoint",
+          "timeout_s": 600.0
+        },
+        "scenario": {
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0
+        },
+        "treatments": [],
+        "trial_policy": {
+          "concurrency": {
+            "max_in_flight": 4,
+            "rounds": 3
+          },
+          "isolation": "none_remote_server",
+          "measured_trials": 2,
+          "method": "metria.prefix_cache_trials.v1",
+          "schedule": "sequential",
+          "warmup_trials": 0
+        }
+      }
+    ]
+  }
+}

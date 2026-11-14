@@ -42,6 +42,11 @@ class Server:
         self.tokenize_offset = 0
         self.completions = 0
         self.drift_after: int | None = None
+        # Batch-variant servers change output while other requests are in flight.
+        self.batch_variant = False
+        self.in_flight = 0
+        self.max_seen_in_flight = 0
+        self.lock = threading.Lock()
         self.bodies: list[dict] = []
         outer = self
 
@@ -98,16 +103,28 @@ class Server:
                     outer.failures -= 1
                     self._send(503, {"error": "busy"})
                     return
-                time.sleep(outer.sleep)
-                self._send(200, outer.completion(body))
+                with outer.lock:
+                    outer.in_flight += 1
+                    outer.max_seen_in_flight = max(
+                        outer.max_seen_in_flight, outer.in_flight
+                    )
+                try:
+                    time.sleep(outer.sleep)
+                    with outer.lock:
+                        batched = outer.in_flight > 1
+                    payload = outer.completion(body, batched=batched)
+                finally:
+                    with outer.lock:
+                        outer.in_flight -= 1
+                self._send(200, payload)
 
         self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
         self.url = f"http://127.0.0.1:{self.httpd.server_address[1]}"
 
-    def completion(self, body: dict) -> dict:
+    def completion(self, body: dict, *, batched: bool = False) -> dict:
         prompt = body["prompt"]
-        shift = self.token_offset
+        shift = self.token_offset + (1 if batched and self.batch_variant else 0)
         generated = [prompt[-1] + 1 + shift, prompt[-1] + 2 + shift, 7]
         choice: dict = {
             "text": "out",

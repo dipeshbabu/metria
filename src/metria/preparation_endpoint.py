@@ -64,6 +64,8 @@ def prepare_endpoint_recipe(
     measured_trials: int = 2,
     timeout_s: float = 120,
     staged_distributions: bool = False,
+    concurrency: int | None = None,
+    concurrency_rounds: int = 2,
 ) -> StudyRecipe:
     from .verification_endpoint import (
         analyses,
@@ -79,6 +81,11 @@ def prepare_endpoint_recipe(
     }
     if staged_distributions:
         config["staged_distributions"] = True
+    if concurrency is not None:
+        config["concurrency"] = {
+            "max_in_flight": concurrency,
+            "rounds": concurrency_rounds,
+        }
     model = {
         "id": model_id,
         "tokenizer_path": str(Path(tokenizer_dir).expanduser().resolve()),
@@ -160,6 +167,13 @@ def add_endpoint_parser(subparsers: Any) -> None:
     parser.add_argument("--measured-trials", type=int, default=2)
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--staged-kld", action="store_true")
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        help="after sequential trials, send every prompt with this many requests "
+        "in flight and measure batch invariance",
+    )
+    parser.add_argument("--concurrency-rounds", type=int, default=2)
 
 
 def prepare_endpoint_command(args: Any, stdout: TextIO) -> int:
@@ -189,6 +203,8 @@ def prepare_endpoint_command(args: Any, stdout: TextIO) -> int:
         measured_trials=args.measured_trials,
         timeout_s=args.timeout,
         staged_distributions=args.staged_kld,
+        concurrency=args.concurrency,
+        concurrency_rounds=args.concurrency_rounds,
     )
     _write_atomic(args.output, study_recipe_to_json(recipe) + "\n")
     stdout.write(f"Prepared {args.output}\nRecipe: {study_recipe_digest(recipe)}\n")

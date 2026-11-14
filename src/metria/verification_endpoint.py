@@ -16,6 +16,7 @@ from functools import partial
 from typing import Any
 
 from .measurements import TokenTrajectoryProtocol, TrajectoryDivergenceAnalysis
+from .measurements import batch_invariance as invariance
 from .measurements.prefix_distributions import DISTRIBUTIONS_KEY, staged_distributions
 from .measurements.prefix_workload import (
     WORKLOAD_METHOD,
@@ -42,10 +43,36 @@ _CLAIMED = {
 
 
 class EndpointWorkloadProtocol(PrefixWorkloadProtocol):
-    """Sequential trials against a server Metria cannot reset."""
+    """Sequential trials against a server Metria cannot reset.
+
+    With a ``concurrency`` block, a concurrent pass follows the sequential
+    trials and its batch-invariance evidence joins the trajectory evidence.
+    """
 
     reset_scope = None
     isolation = ISOLATION
+
+    def requirements(self, config: Mapping[str, Any]) -> tuple[Any, ...]:
+        return super().requirements(invariance.without_concurrency(config))
+
+    def execute(
+        self, session: Any, scenario: Mapping[str, Any], config: Mapping[str, Any]
+    ) -> Any:
+        from .protocols import MeasurementResult
+
+        settings = invariance.concurrency_settings(config)
+        result = super().execute(
+            session, scenario, invariance.without_concurrency(config)
+        )
+        if settings is None:
+            return result
+        evidence = dict(result.evidence)
+        evidence[invariance.EVIDENCE_KEY] = invariance.measure(
+            session, config, settings, result.evidence
+        )
+        return MeasurementResult(
+            metrics=result.metrics, evidence=evidence, artifacts=result.artifacts
+        )
 
 
 def is_endpoint_recipe(recipe: StudyRecipe) -> bool:
@@ -65,6 +92,9 @@ def trial_identity(config: Mapping[str, Any]) -> dict[str, Any]:
     }
     if staged_distributions(config):
         identity["capability_overrides"] = (STAGED_CAPTURE_CHECK,)
+    settings = invariance.concurrency_settings(config)
+    if settings is not None:
+        identity["concurrency"] = settings
     return identity
 
 
@@ -75,6 +105,8 @@ def analyses(config: Mapping[str, Any]) -> tuple[str, ...]:
     )
     if staged_distributions(config):
         names += (TrajectoryDivergenceAnalysis.name,)
+    if invariance.concurrency_settings(config) is not None:
+        names += (invariance.NAME,)
     return names
 
 
@@ -150,7 +182,8 @@ def validate_endpoint_recipe(recipe: StudyRecipe) -> dict[str, Any]:
     if set(recipe.measurement_configs) != {TokenTrajectoryProtocol.name}:
         raise ValueError("endpoint verification requires one trajectory workload")
     config = recipe.measurement_configs[TokenTrajectoryProtocol.name]
-    trajectory_config(config)
+    trajectory_config(invariance.without_concurrency(config))
+    invariance.concurrency_settings(config)
     if recipe.policy is None:
         raise ValueError("endpoint verification requires an explicit acceptance policy")
     if task_check_identity(config) is None:
@@ -166,7 +199,8 @@ def validate_endpoint_recipe(recipe: StudyRecipe) -> dict[str, Any]:
     if comparison.analyses != analyses(config):
         raise ValueError(
             "endpoint verification requires trajectory and impact analyses, plus "
-            "metria.trajectory_kld exactly when staged_distributions is true"
+            "metria.trajectory_kld exactly when staged_distributions is true, "
+            "and metria.batch_invariance exactly when concurrency is declared"
         )
     if comparison.waivers or comparison.vary != derived_vary(left, right):
         raise ValueError(
@@ -228,12 +262,39 @@ def _distribution_gaps(record: RunRecord) -> list[str]:
     return []
 
 
+def _concurrency_gaps(record: RunRecord, settings: Mapping[str, int]) -> list[str]:
+    measurements = record.evidence.get("measurements")
+    capture = (
+        measurements.get(TokenTrajectoryProtocol.name)
+        if isinstance(measurements, Mapping)
+        else None
+    )
+    capture = capture if isinstance(capture, Mapping) else {}
+    retained = capture.get(invariance.EVIDENCE_KEY)
+    workload = capture.get("workload")
+    prompts = capture.get("n_prompts")
+    trials = workload.get("measured_trials") if isinstance(workload, Mapping) else None
+    concurrent = record.observed.get("concurrent_invocations", ())
+    if (
+        not isinstance(retained, Mapping)
+        or not isinstance(prompts, int)
+        or not isinstance(trials, int)
+        or trials < 1
+        or retained.get("max_in_flight") != settings["max_in_flight"]
+        or retained.get("requests") != prompts // trials * settings["rounds"]
+        or len(concurrent) != retained.get("requests")
+    ):
+        return ["declared concurrent schedule evidence is missing or incomplete"]
+    return []
+
+
 def evidence_gaps(
     record: RunRecord,
     *,
     trials: Mapping[str, Any],
     quality_identity: Mapping[str, Any] | None,
     distributions: bool,
+    concurrency: Mapping[str, int] | None = None,
 ) -> tuple[str, ...]:
     gaps = [
         *identity_gaps(record.observed),
@@ -242,6 +303,8 @@ def evidence_gaps(
     ]
     if distributions:
         gaps += _distribution_gaps(record)
+    if concurrency is not None:
+        gaps += _concurrency_gaps(record, concurrency)
     return tuple(dict.fromkeys(gaps))
 
 
@@ -292,6 +355,9 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
     }
     if distributions:
         registered[TrajectoryDivergenceAnalysis.name] = TrajectoryDivergenceAnalysis()
+    concurrency = invariance.concurrency_settings(config)
+    if concurrency is not None:
+        registered[invariance.NAME] = invariance.BatchInvarianceAnalysis()
     return VerificationRoute(
         scope=ENDPOINT_SCOPE,
         adapters={RUNTIME_NAME: EndpointAdapter()},
@@ -302,6 +368,7 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
             trials=trials,
             quality_identity=task_check_identity(config, trials["measured_trials"]),
             distributions=distributions,
+            concurrency=concurrency,
         ),
         observed_facts=observed_facts,
         change={

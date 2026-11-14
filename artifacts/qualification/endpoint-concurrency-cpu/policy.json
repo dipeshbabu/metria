@@ -1,0 +1,4 @@
+{"schema": "metria.verification_policy.v1", "criteria": [
+ {"target": "quality.candidate_pass_rate", "version": "1", "min": 1.0},
+ {"target": "behavior.reference_batch_invariance", "version": "1", "min": 0.0},
+ {"target": "behavior.candidate_batch_invariance", "version": "1", "min": 0.0}]}

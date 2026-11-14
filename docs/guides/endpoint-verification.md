@@ -75,6 +75,34 @@ state what each deployment is. Allowed keys: `engine`, `engine_version`,
 Trials run sequentially. Server state, including any prefix cache, is not
 reset between trials, and the workload evidence says so.
 
+## Concurrency and batch invariance
+
+Production servers batch concurrent requests, and batching can change the
+numerics of a forward pass. Add `--concurrency N` (2–64) and optionally
+`--concurrency-rounds R` (1–10, default 2) to `prepare-endpoint`. After the
+sequential trials, each run sends every prompt `R` times with up to `N`
+requests in flight, and compares each output with the same prompt's first
+sequential output. The schedule is part of both runs' trial policy.
+
+| Policy target | Meaning |
+| --- | --- |
+| `behavior.reference_batch_invariance`, `behavior.candidate_batch_invariance` | Fraction of concurrent requests whose token IDs equal the sequential output |
+| `client.requests_per_second_ratio` | Candidate/reference throughput of the concurrent pass, higher is better |
+| `client.request_latency_ratio` | Candidate/reference mean request time in the concurrent pass, lower is better |
+
+All four use analysis `metria.batch_invariance` version `1`. The `client.*`
+targets are measured on the client clock and **include the network and
+anything else sharing the server**, so use them only between deployments
+measured from the same place under comparable load. A server started with a
+single sequence slot (vLLM `--max-num-seqs 1`) queues requests instead of
+batching them, which makes invariance trivially 1.
+
+On real CPU servers with `--max-num-seqs 4`, the
+[retained run](../../artifacts/qualification/endpoint-concurrency-cpu/README.md)
+measured batch invariance 1.0 for both deployments (12 of 12 concurrent
+requests), while client throughput differed 2× between two identically
+configured servers because of host contention.
+
 ## Decision
 
 Trajectory agreement, task-check pass rates and reference repeatability (with
