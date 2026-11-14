@@ -145,7 +145,7 @@ class TokenizerCheck:
         self.mismatched = 0
         self.available = True
 
-    def check(self, text: str, local: Sequence[int]) -> None:
+    def check(self, text: str, local: Sequence[int], *, special: bool = True) -> None:
         if not self.available or text in self._seen:
             return
         self._seen.add(text)
@@ -153,7 +153,11 @@ class TokenizerCheck:
             payload, _ = self._connection.request(
                 "POST",
                 "/tokenize",
-                {"model": self._model_id, "prompt": text, "add_special_tokens": True},
+                {
+                    "model": self._model_id,
+                    "prompt": text,
+                    "add_special_tokens": special,
+                },
             )
         except EndpointError:
             self.available = False
@@ -182,6 +186,7 @@ def identity_evidence(
     claims: Mapping[str, Mapping[str, Any]],
     endpoint: Mapping[str, Any],
     tokenizer: Mapping[str, Any] | None,
+    chat_template: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build ``RuntimeIdentityEvidence`` with every server claim as partial."""
 
@@ -191,13 +196,14 @@ def identity_evidence(
         else {}
     )
     runtime = {"status": "partial", "source": "server_reported", **claims["runtime"]}
-    components = [model, runtime, tokenizer or {}]
+    components = [model, runtime, tokenizer or {}, chat_template or {}]
     status = aggregate_identity_status([row["status"] for row in components if row])
     evidence = RuntimeIdentityEvidence(
         status=status,
         model=model,
         runtime=runtime,
         tokenizer=tokenizer or {},
+        chat_template=chat_template or {},
         endpoint=endpoint,
         reasons=("server-reported identity is claimed, not verified by Metria",),
     )

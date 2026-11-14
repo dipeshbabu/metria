@@ -5,6 +5,16 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Task-check pass rates now carry approximate 95% confidence intervals (Wilson
+  for each rate, Newcombe for the difference) with policy targets
+  `quality.candidate_pass_rate_lower_bound`,
+  `quality.pass_rate_delta_lower_bound` and
+  `quality.pass_rate_delta_upper_bound`, in every profile with task checks.
+- Endpoint verification supports production decoding: seeded sampling
+  (`--temperature` with `--seeds`, one row per prompt and seed), `--top-p`,
+  `--stop`, and `--chat-template`, which renders the pinned
+  `tokenizer_config.json` template locally (sandboxed Jinja) and records it as
+  verified identity.
 - Endpoint verification can declare a concurrent schedule
   (`prepare-endpoint --concurrency N --concurrency-rounds R`). After the
   sequential trials each run sends every prompt under load and measures batch

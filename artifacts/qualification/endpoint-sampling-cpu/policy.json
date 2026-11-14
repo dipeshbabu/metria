@@ -1,0 +1,4 @@
+{"schema": "metria.verification_policy.v1", "criteria": [
+ {"target": "quality.candidate_pass_rate_lower_bound", "version": "1", "min": 0.5},
+ {"target": "quality.pass_rate_delta_lower_bound", "version": "1", "min": -0.5},
+ {"target": "behavior.trajectory_agreement", "version": "0.3.4", "min": 1.0}]}

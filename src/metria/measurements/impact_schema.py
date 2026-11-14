@@ -27,6 +27,27 @@ DEFINITIONS = {
         "metria.task_check_comparison",
         "1",
     ),
+    "candidate_task_pass_rate_lower": MetricDefinition(
+        "candidate_task_pass_rate_lower",
+        "fraction",
+        MetricDirection.HIGHER_IS_BETTER,
+        "metria.task_pass_rate_interval",
+        "1",
+    ),
+    "task_pass_rate_delta_lower": MetricDefinition(
+        "task_pass_rate_delta_lower",
+        "fraction_delta",
+        MetricDirection.HIGHER_IS_BETTER,
+        "metria.task_pass_rate_interval",
+        "1",
+    ),
+    "task_pass_rate_delta_upper": MetricDefinition(
+        "task_pass_rate_delta_upper",
+        "fraction_delta",
+        MetricDirection.HIGHER_IS_BETTER,
+        "metria.task_pass_rate_interval",
+        "1",
+    ),
     "reference_repeatability": MetricDefinition(
         "reference_repeatability",
         "fraction",

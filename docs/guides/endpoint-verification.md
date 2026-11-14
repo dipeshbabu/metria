@@ -75,6 +75,40 @@ state what each deployment is. Allowed keys: `engine`, `engine_version`,
 Trials run sequentially. Server state, including any prefix cache, is not
 reset between trials, and the workload evidence says so.
 
+## Sampling, stop sequences and chat templates
+
+Endpoint runs accept production decode settings in addition to greedy decoding:
+
+| Option (`prepare-endpoint`) | Effect |
+| --- | --- |
+| `--temperature T` (0–2) with `--seeds 1,2,3` (1–32 distinct) | Each prompt runs once per seed with that per-request seed, so reference and candidate draw the same seeded samples. Greedy runs keep a single `--seed`. |
+| `--top-p P` (0–1] | Nucleus sampling on both servers |
+| `--stop TEXT` (repeatable, up to 4) | Stop sequences on both servers |
+| `--chat-template` | Metria renders the chat template from the pinned `tokenizer_config.json` (one user turn, generation prompt added) in a sandboxed Jinja environment, tokenizes it without adding special tokens again, and sends token IDs. The server's own template is never used. Requires `jinja2`. |
+
+The rendered template is the one identity component that is `verified`: Metria
+rendered it from hashed bytes. Its SHA-256 is retained under
+`observed.identity.chat_template`.
+
+With sampling, exact token agreement is a strict criterion. Judge sampled
+changes by task pass rates with **95% confidence intervals**:
+
+| Policy target | Meaning |
+| --- | --- |
+| `quality.candidate_pass_rate_lower_bound` | Lower Wilson bound of the candidate pass rate |
+| `quality.pass_rate_delta_lower_bound` / `quality.pass_rate_delta_upper_bound` | Newcombe hybrid score interval of candidate minus reference |
+
+Intervals treat each check outcome as an independent trial. Checks sharing a
+prompt or seed are correlated, so the intervals are approximate; more prompts
+narrow them more honestly than more seeds. They are available in every profile
+with task checks, not only endpoints.
+
+The [retained native run](../../artifacts/qualification/endpoint-sampling-cpu/README.md)
+used temperature 0.8 with three seeds, `top_p` 0.95, a stop string and a
+locally rendered ChatML template against two `vllm serve` processes: the server
+tokenizer agreed with every rendered prompt, identical servers drew identical
+seeded samples, and 24 of 24 checks passing gave a lower bound of 0.862.
+
 ## Concurrency and batch invariance
 
 Production servers batch concurrent requests, and batching can change the

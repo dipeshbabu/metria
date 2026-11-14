@@ -161,6 +161,20 @@ _TARGETS = MappingProxyType(
                     "quality.pass_rate_delta", "task_pass_rate_delta", lower=-1
                 ),
                 _impact_target(
+                    "quality.candidate_pass_rate_lower_bound",
+                    "candidate_task_pass_rate_lower",
+                ),
+                _impact_target(
+                    "quality.pass_rate_delta_lower_bound",
+                    "task_pass_rate_delta_lower",
+                    lower=-1,
+                ),
+                _impact_target(
+                    "quality.pass_rate_delta_upper_bound",
+                    "task_pass_rate_delta_upper",
+                    lower=-1,
+                ),
+                _impact_target(
                     "behavior.reference_repeatability", "reference_repeatability"
                 ),
                 _impact_target(

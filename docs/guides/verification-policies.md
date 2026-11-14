@@ -74,6 +74,9 @@ version `1`). These need declared task checks or repeated reference trials; see
 | `quality.reference_pass_rate` | `fraction` | Numeric bounds within 0–1 |
 | `quality.pass_rate_delta` | `fraction_delta` | Candidate minus reference, within −1–1 |
 | `behavior.reference_repeatability` | `fraction` | Numeric bounds within 0–1 |
+| `quality.candidate_pass_rate_lower_bound` | `fraction` | Lower 95% Wilson bound of the candidate pass rate |
+| `quality.pass_rate_delta_lower_bound` | `fraction_delta` | Lower 95% Newcombe bound of candidate minus reference, within −1–1 |
+| `quality.pass_rate_delta_upper_bound` | `fraction_delta` | Upper 95% Newcombe bound of candidate minus reference, within −1–1 |
 | `performance.candidate_latency_seconds` | `seconds` | Nonnegative; lower is better |
 | `performance.latency_ratio` | `ratio` | Candidate/reference, nonnegative; lower is better |
 

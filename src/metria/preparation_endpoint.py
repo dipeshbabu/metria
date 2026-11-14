@@ -45,6 +45,29 @@ def hash_tokenizer(directory: str | Path) -> dict[str, str]:
     return tokenizer_pins(pins)
 
 
+def _scenario(
+    max_tokens: int,
+    seed: int,
+    temperature: float,
+    seeds: Sequence[int] | None,
+    top_p: float | None,
+    stop: Sequence[str] | None,
+    chat_template: bool,
+) -> dict[str, Any]:
+    scenario: dict[str, Any] = {"max_tokens": max_tokens, "temperature": temperature}
+    if temperature > 0:
+        scenario["seeds"] = list(seeds or ())
+    else:
+        scenario["seed"] = seed
+    if top_p is not None:
+        scenario["top_p"] = top_p
+    if stop:
+        scenario["stop"] = list(stop)
+    if chat_template:
+        scenario["chat_template"] = True
+    return scenario
+
+
 def prepare_endpoint_recipe(
     *,
     model_id: str,
@@ -66,6 +89,11 @@ def prepare_endpoint_recipe(
     staged_distributions: bool = False,
     concurrency: int | None = None,
     concurrency_rounds: int = 2,
+    temperature: float = 0.0,
+    seeds: Sequence[int] | None = None,
+    top_p: float | None = None,
+    stop: Sequence[str] | None = None,
+    chat_template: bool = False,
 ) -> StudyRecipe:
     from .verification_endpoint import (
         analyses,
@@ -92,6 +120,10 @@ def prepare_endpoint_recipe(
         "tokenizer_files": hash_tokenizer(tokenizer_dir),
     }
 
+    scenario = _scenario(
+        max_tokens, seed, temperature, seeds, top_p, stop, chat_template
+    )
+
     def run(url_env: str, key_env: str | None, declared: Mapping[str, Any]) -> RunSpec:
         runtime: dict[str, Any] = {
             "name": "openai_endpoint",
@@ -106,7 +138,7 @@ def prepare_endpoint_recipe(
         return RunSpec(
             model=model,
             runtime=runtime,
-            scenario={"max_tokens": max_tokens, "temperature": 0, "seed": seed},
+            scenario=scenario,
             measurements=(TokenTrajectoryProtocol.name,),
             trial_policy=trial_identity(config),
         )
@@ -174,6 +206,19 @@ def add_endpoint_parser(subparsers: Any) -> None:
         "in flight and measure batch invariance",
     )
     parser.add_argument("--concurrency-rounds", type=int, default=2)
+    parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument(
+        "--seeds",
+        type=lambda text: [int(item) for item in text.split(",") if item],
+        help="comma-separated seeds; required when --temperature is above 0",
+    )
+    parser.add_argument("--top-p", type=float)
+    parser.add_argument("--stop", action="append", help="stop sequence (repeatable)")
+    parser.add_argument(
+        "--chat-template",
+        action="store_true",
+        help="render the pinned tokenizer_config.json chat template locally",
+    )
 
 
 def prepare_endpoint_command(args: Any, stdout: TextIO) -> int:
@@ -205,6 +250,11 @@ def prepare_endpoint_command(args: Any, stdout: TextIO) -> int:
         staged_distributions=args.staged_kld,
         concurrency=args.concurrency,
         concurrency_rounds=args.concurrency_rounds,
+        temperature=args.temperature,
+        seeds=args.seeds,
+        top_p=args.top_p,
+        stop=args.stop,
+        chat_template=args.chat_template,
     )
     _write_atomic(args.output, study_recipe_to_json(recipe) + "\n")
     stdout.write(f"Prepared {args.output}\nRecipe: {study_recipe_digest(recipe)}\n")
