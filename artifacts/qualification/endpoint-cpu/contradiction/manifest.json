@@ -1,0 +1,472 @@
+{
+  "acceptance_policy_evaluated": false,
+  "analyses": [
+    {
+      "diagnostics": {},
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {},
+      "name": "kv_fidelity.trajectory_match",
+      "reason": "pair is not directly comparable under the study plan",
+      "status": "skipped",
+      "version": "0.3.4"
+    },
+    {
+      "diagnostics": {},
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {},
+      "name": "metria.verification_impact",
+      "reason": "pair is not directly comparable under the study plan",
+      "status": "skipped",
+      "version": "1"
+    },
+    {
+      "diagnostics": {},
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {},
+      "name": "metria.trajectory_kld",
+      "reason": "pair is not directly comparable under the study plan",
+      "status": "skipped",
+      "version": "0.1.0"
+    }
+  ],
+  "change": {
+    "candidate": {
+      "engine_version": "0.29.0"
+    },
+    "identity_authority": "claimed",
+    "parameter": "declared_endpoint_configuration",
+    "reference": {
+      "engine_version": "0.30.0"
+    }
+  },
+  "comparison": {
+    "comparable_metrics": [],
+    "compatible": false,
+    "incompatible_metrics": {},
+    "issues": [
+      {
+        "dimension": "status",
+        "reason": "both runs must be completed for direct comparison"
+      },
+      {
+        "dimension": "observed.declared.engine_version",
+        "reason": "required vary dimension is missing"
+      },
+      {
+        "dimension": "observed.endpoint",
+        "reason": "required vary dimension is missing"
+      },
+      {
+        "dimension": "observed.identity.endpoint",
+        "reason": "required vary dimension is missing"
+      },
+      {
+        "dimension": "observed.identity.runtime",
+        "reason": "required vary dimension is missing"
+      },
+      {
+        "dimension": "observed.identity_snapshots.after.runtime",
+        "reason": "required vary dimension is missing"
+      },
+      {
+        "dimension": "observed.identity_snapshots.before.runtime",
+        "reason": "required vary dimension is missing"
+      },
+      {
+        "dimension": "observed.configured.decode.max_tokens",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.configured.decode.seed",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.configured.decode.temperature",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity.applied",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity.chat_template",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.model.id",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.model.max_model_len",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.model.root_sha256",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.model.status",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.schema",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity.status",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity.tokenizer.checked_prompts",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.tokenizer.mismatched_prompts",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity.tokenizer.status",
+        "reason": "required control evidence is missing"
+      },
+      {
+        "dimension": "observed.identity_authority",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.after.model.id",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.after.model.max_model_len",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.after.model.root_sha256",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.before.model.id",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.before.model.max_model_len",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.before.model.root_sha256",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.identity_snapshots.stable",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.runtime.flavor",
+        "reason": "undeclared comparison-relevant difference"
+      },
+      {
+        "dimension": "observed.runtime.name",
+        "reason": "undeclared comparison-relevant difference"
+      }
+    ],
+    "waived_differences": []
+  },
+  "comparison_plan": {
+    "block_by": [],
+    "control": [
+      "measurements",
+      "model",
+      "scenario",
+      "trial_policy"
+    ],
+    "vary": [
+      "observed.declared.engine_version",
+      "observed.endpoint",
+      "observed.identity.endpoint",
+      "observed.identity.runtime",
+      "observed.identity_snapshots.after.runtime",
+      "observed.identity_snapshots.before.runtime",
+      "resolved.declared.engine_version",
+      "resolved.runtime.base_url_env",
+      "runtime.base_url_env",
+      "runtime.declared.engine_version"
+    ]
+  },
+  "comparison_status": "NOT_EVALUATED",
+  "controls": [
+    {
+      "dimension": "measurements",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "model",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "scenario",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "trial_policy",
+      "role": "control",
+      "status": "matched"
+    }
+  ],
+  "exit_code": 5,
+  "hardware": {
+    "accelerators": [],
+    "host": {
+      "cpu_count": 12,
+      "hostname_sha256": "cec8bcd33a48dc99561fa5a832b1ba03e53f33e72b4350296db44ea0ba2eeb04"
+    },
+    "metadata": {
+      "accelerator_detection": "runtime_or_adapter_required"
+    },
+    "platform": {
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "release": "5.15.167.4-microsoft-standard-WSL2",
+      "system": "Linux",
+      "version": "#1 SMP Tue Nov 5 00:21:55 UTC 2024"
+    },
+    "software": {
+      "python_executable": "python",
+      "python_implementation": "CPython",
+      "python_version": "3.12.3"
+    }
+  },
+  "implementation": {
+    "name": "metria.verify",
+    "source_sha256": "9d579caeca8aed4d59f702621bdea827f77bb87278e4ec0b4b6620b439b15b5a",
+    "version": "0.1.6"
+  },
+  "lifecycle": {
+    "records": {
+      "candidate": "failed",
+      "reference": "completed"
+    },
+    "status": "failed"
+  },
+  "performance": {
+    "available": false,
+    "label": "Client-side request latency (includes network)",
+    "reason": "reference/candidate comparison gate did not pass",
+    "schema": "metria.performance_impact.v1",
+    "unsupported_metrics": [
+      "ttft",
+      "inter_token_latency",
+      "decode_throughput",
+      "peak_device_memory",
+      "kv_memory"
+    ]
+  },
+  "policy": {
+    "criteria": [
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "quality.candidate_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: EXECUTION_FAILED",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "quality.candidate_pass_rate",
+          "source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "candidate_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "behavior.reference_repeatability",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: EXECUTION_FAILED",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "behavior.reference_repeatability",
+          "source": {
+            "aggregation": "derived",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.observed_reference_repeatability",
+              "name": "reference_repeatability",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "behavior.trajectory_agreement",
+          "unit": "fraction",
+          "version": "0.3.4"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: EXECUTION_FAILED",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "behavior.trajectory_agreement",
+          "source": {
+            "aggregation": "weighted_by_max_trajectory_length",
+            "analysis": {
+              "name": "kv_fidelity.trajectory_match",
+              "version": "0.3.4"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "kv_fidelity.trajectory_match",
+              "name": "trajectory_agreement_score",
+              "unit": "score_0_100",
+              "version": "0.3.4"
+            },
+            "normalization_divisor": 100.0
+          },
+          "unit": "fraction",
+          "version": "0.3.4"
+        }
+      },
+      {
+        "criterion": {
+          "max": 1e-09,
+          "target": "behavior.trajectory_kld_mean",
+          "unit": "nats",
+          "version": "0.1.0"
+        },
+        "observed_source": {},
+        "observed_value": null,
+        "reason": "verification gate: EXECUTION_FAILED",
+        "result": "NOT_EVALUATED",
+        "target_identity": {
+          "direction": "lower_is_better",
+          "kind": "number",
+          "name": "behavior.trajectory_kld_mean",
+          "qualification": "staged",
+          "source": {
+            "aggregation": "mean_over_shared_context_steps",
+            "analysis": {
+              "name": "metria.trajectory_kld",
+              "version": "0.1.0"
+            },
+            "metric": {
+              "direction": "lower_is_better",
+              "method": "metria.trajectory_kld",
+              "name": "trajectory_kld_mean",
+              "unit": "nats",
+              "version": "0.1.0"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "nats",
+          "version": "0.1.0"
+        }
+      }
+    ],
+    "gate": "EXECUTION_FAILED",
+    "policy_schema": "metria.verification_policy.v1",
+    "schema": "metria.policy_evaluation.v1",
+    "status": "NOT_EVALUATED"
+  },
+  "policy_status": "NOT_EVALUATED",
+  "recipe_digest": "5b2c0ff14a2e176dc92a26c4b06e3a8af31a401dd902e529df7ebb25c42c012e",
+  "records": {
+    "candidate": {
+      "evidence_digest": "bae8cdb1874002c386247202739b14010315ab227da3c06a08013cb211c6713a",
+      "evidence_gaps": [
+        "server-reported identity changed during the run",
+        "declared endpoint trial evidence is missing or inconsistent",
+        "declared task-check evidence is missing or inconsistent",
+        "staged distribution evidence is missing or incomplete"
+      ],
+      "observed": {
+        "claimed_model": null,
+        "claimed_runtime_version": null,
+        "context": null,
+        "declared": {},
+        "identity_authority": null,
+        "identity_status": null
+      },
+      "path": "candidate.run.json",
+      "record_digest": "e96fc27f72f3f0fdf6af7878c81899bc3b76e40827ead523e77c2f7fe7f8d143",
+      "run_id": "run-0001",
+      "status": "failed"
+    },
+    "reference": {
+      "evidence_digest": "3f2edbe445f779ab52cb3493795b125ff1a32787f0febfec7f6a68b1207fe116",
+      "evidence_gaps": [],
+      "observed": {
+        "claimed_model": "smollm2",
+        "claimed_runtime_version": "0.30.0",
+        "context": 256,
+        "declared": {
+          "engine_version": "0.30.0"
+        },
+        "identity_authority": "claimed",
+        "identity_status": "partial"
+      },
+      "path": "reference.run.json",
+      "record_digest": "4492908448de84badc07643d332baa816d468652f813000208f6955839e7d6a7",
+      "run_id": "run-0000",
+      "status": "completed"
+    }
+  },
+  "schema": "metria.verification.v1",
+  "scope": "remote_endpoint_change.v1",
+  "study": "remote-endpoint-change",
+  "systems": {
+    "candidate": {
+      "available": false
+    },
+    "reference": {
+      "available": false
+    }
+  },
+  "verdict": "EXECUTION_FAILED"
+}

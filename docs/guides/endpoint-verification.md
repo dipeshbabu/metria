@@ -84,5 +84,20 @@ reported as **client-side** request time, including the network, load balancer
 and any other traffic on the server; it is descriptive and does not feed
 `performance.*` targets.
 
+## Retained evidence
+
+[`artifacts/qualification/endpoint-cpu/`](../../artifacts/qualification/endpoint-cpu/README.md)
+runs this profile against real `vllm serve` processes (pinned `0.30.0+cpu`,
+SmolLM2-135M):
+
+- identical servers PASS with agreement 1.0 and trajectory KLD 0;
+- float32 → bfloat16 PASS a declared policy with agreement 0.953 and KLD
+  0.0559 nats, exactly matching the in-process vLLM result;
+- a declared engine version the server contradicts ends `EXECUTION_FAILED`;
+- an undeclared `max_model_len` difference ends `NOT_COMPARABLE`.
+
+Endpoint token IDs match the in-process engine for every prompt. The GPU case
+is pending.
+
 See the [endpoint adapter](endpoint-runtime.md) for request, retry and privacy
 details.

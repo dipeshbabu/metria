@@ -5,6 +5,12 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Retain native CPU evidence for `remote_endpoint_change.v1` against
+  `vllm serve` 0.30.0: identical servers PASS, a declared float32 → bfloat16
+  change PASS a policy with results identical to the in-process engine, a
+  contradicted declaration fails execution, and an undeclared server difference
+  is not comparable. Adds `tools/qualification/staged/qualify_endpoint_cpu.sh`
+  and `endpoint_crosscheck.py`.
 - STAGED: `remote_endpoint_change.v1` verifies a declared change between two
   running OpenAI-compatible servers. `metria recipe prepare-endpoint` pins the
   tokenizer, names URL/key environment variables, and derives

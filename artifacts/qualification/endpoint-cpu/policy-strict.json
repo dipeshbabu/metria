@@ -1,0 +1,25 @@
+{
+  "schema": "metria.verification_policy.v1",
+  "criteria": [
+    {
+      "target": "quality.candidate_pass_rate",
+      "version": "1",
+      "min": 1.0
+    },
+    {
+      "target": "behavior.reference_repeatability",
+      "version": "1",
+      "min": 1.0
+    },
+    {
+      "target": "behavior.trajectory_agreement",
+      "version": "0.3.4",
+      "min": 1.0
+    },
+    {
+      "target": "behavior.trajectory_kld_mean",
+      "version": "0.1.0",
+      "max": 1e-09
+    }
+  ]
+}

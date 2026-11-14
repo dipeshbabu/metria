@@ -1,0 +1,82 @@
+# Metria Verification
+
+**Verdict: EXECUTION_FAILED**
+
+Recipe: `5b2c0ff14a2e176dc92a26c4b06e3a8af31a401dd902e529df7ebb25c42c012e`
+Scope: STAGED remote endpoint comparison; server identity was reported by the server, not verified by Metria
+
+## Change:
+  Declared endpoint configuration: {'engine_version': '0.30.0'} -> {'engine_version': '0.29.0'}
+
+## Evidence:
+  reference: completed (reference.run.json)
+    Claimed runtime: 0.30.0; context: 256; identity: partial (claimed)
+  candidate: failed (candidate.run.json)
+    Claimed runtime: None; context: None; identity: None (None)
+    server-reported identity changed during the run
+    declared endpoint trial evidence is missing or inconsistent
+    declared task-check evidence is missing or inconsistent
+    staged distribution evidence is missing or incomplete
+  Lifecycle: failed
+  measurements: matched
+  model: matched
+  scenario: matched
+  trial_policy: matched
+
+## Comparison:
+  NOT_EVALUATED
+  status: both runs must be completed for direct comparison
+  observed.declared.engine_version: required vary dimension is missing
+  observed.endpoint: required vary dimension is missing
+  observed.identity.endpoint: required vary dimension is missing
+  observed.identity.runtime: required vary dimension is missing
+  observed.identity_snapshots.after.runtime: required vary dimension is missing
+  observed.identity_snapshots.before.runtime: required vary dimension is missing
+  observed.configured.decode.max_tokens: undeclared comparison-relevant difference
+  observed.configured.decode.seed: undeclared comparison-relevant difference
+  observed.configured.decode.temperature: undeclared comparison-relevant difference
+  observed.identity.applied: undeclared comparison-relevant difference
+  observed.identity.chat_template: required control evidence is missing
+  observed.identity.model.id: required control evidence is missing
+  observed.identity.model.max_model_len: required control evidence is missing
+  observed.identity.model.root_sha256: required control evidence is missing
+  observed.identity.model.status: required control evidence is missing
+  observed.identity.schema: undeclared comparison-relevant difference
+  observed.identity.status: undeclared comparison-relevant difference
+  observed.identity.tokenizer.checked_prompts: required control evidence is missing
+  observed.identity.tokenizer.mismatched_prompts: required control evidence is missing
+  observed.identity.tokenizer.status: required control evidence is missing
+  observed.identity_authority: undeclared comparison-relevant difference
+  observed.identity_snapshots.after.model.id: undeclared comparison-relevant difference
+  observed.identity_snapshots.after.model.max_model_len: undeclared comparison-relevant difference
+  observed.identity_snapshots.after.model.root_sha256: undeclared comparison-relevant difference
+  observed.identity_snapshots.before.model.id: undeclared comparison-relevant difference
+  observed.identity_snapshots.before.model.max_model_len: undeclared comparison-relevant difference
+  observed.identity_snapshots.before.model.root_sha256: undeclared comparison-relevant difference
+  observed.identity_snapshots.stable: undeclared comparison-relevant difference
+  observed.runtime.flavor: undeclared comparison-relevant difference
+  observed.runtime.name: undeclared comparison-relevant difference
+
+## Impact:
+  kv_fidelity.trajectory_match: skipped
+  metria.verification_impact: skipped
+    Decision evidence unavailable: methodology is missing or incompatible.
+  metria.trajectory_kld: skipped
+  Performance impact unavailable: reference/candidate comparison gate did not pass
+  TTFT, decode throughput, inter-token latency, and device/KV memory: unavailable.
+  No candidate benefit is inferred from an invalid or incomplete comparison.
+
+## Verdict:
+  EXECUTION_FAILED
+  Policy: NOT_EVALUATED
+
+Policy checks:
+  quality.candidate_pass_rate@1 >= 1.0: NOT_EVALUATED (observed unavailable fraction)
+    verification gate: EXECUTION_FAILED
+  behavior.reference_repeatability@1 >= 1.0: NOT_EVALUATED (observed unavailable fraction)
+    verification gate: EXECUTION_FAILED
+  behavior.trajectory_agreement@0.3.4 >= 1.0: NOT_EVALUATED (observed unavailable fraction)
+    verification gate: EXECUTION_FAILED
+  behavior.trajectory_kld_mean@0.1.0 [staged] <= 1e-09: NOT_EVALUATED (observed unavailable nats)
+    verification gate: EXECUTION_FAILED
+  PASS means the user-defined criteria were met; it is not a universal deployment-safety judgment.
