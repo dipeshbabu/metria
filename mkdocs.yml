@@ -112,6 +112,7 @@ nav:
           - Serving and memory: guides/serving-measurements.md
           - FP8 cache verification: guides/fp8-kv-cache-verification.md
       - Remote endpoints (staged): guides/endpoint-verification.md
+      - Import production traffic: guides/traffic-import.md
       - Decisions and automation:
           - Read checks and repeatability: guides/verification-decisions.md
           - Define a policy: guides/verification-policies.md

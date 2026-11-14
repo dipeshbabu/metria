@@ -19,7 +19,8 @@ dtype, a quantized checkpoint, or new server flags.
 - A local copy of the tokenizer the servers use. Its files are hashed into the
   recipe and used to tokenize every prompt.
 - A JSONL workload whose prompts declare task checks, and a policy JSON file.
-  The result is always `PASS` or `FAIL`.
+  The result is always `PASS` or `FAIL`. To use real traffic, build the
+  workload with [`import-traffic`](traffic-import.md).
 
 ## Prepare and verify
 
