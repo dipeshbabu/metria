@@ -242,6 +242,8 @@ def _scope_label(manifest: Mapping[str, Any]) -> str:
         return "Scope: local vLLM CPU runtime-stack upgrade"
     if manifest.get("scope") == "local_vllm_kv_cache_precision.v1":
         return "Scope: local vLLM KV-cache precision comparison"
+    if manifest.get("scope") == "local_vllm_parallelism.v1":
+        return "Scope: STAGED local vLLM tensor/pipeline parallelism comparison"
     if manifest.get("scope") == "remote_endpoint_change.v1":
         return "Scope: STAGED remote endpoint comparison; server identity was reported by the server, not verified by Metria"
     return "Scope: unrecognized verification contract"
@@ -255,6 +257,10 @@ def _change_label(manifest: Mapping[str, Any]) -> str:
     )
 
     change = manifest["change"]
+    if manifest.get("scope") == "local_vllm_parallelism.v1":
+        return (
+            f"  Parallelism: {dict(change['reference'])} -> {dict(change['candidate'])}"
+        )
     if manifest.get("scope") == "remote_endpoint_change.v1":
         return f"  Declared endpoint configuration: {dict(change['reference'])} -> {dict(change['candidate'])}"
     if manifest.get("scope") == "local_vllm_serving_concurrency.v1":
@@ -285,6 +291,8 @@ def _facts_label(facts: Mapping[str, Any], scope: Any) -> str:
         return f"    Observed prefix caching: {facts['prefix_caching']}; context: {facts['context']}"
     if scope == "local_vllm_kv_cache_precision.v1":
         return f"    Observed KV-cache dtype: {facts['kv_cache_dtype']}; context: {facts['context']}"
+    if scope == "local_vllm_parallelism.v1":
+        return f"    Observed tensor parallel: {facts['tensor_parallel_size']}; pipeline parallel: {facts['pipeline_parallel_size']}; visible devices: {facts['device_count']}"
     if scope == "remote_endpoint_change.v1":
         return f"    Claimed runtime: {facts['claimed_runtime_version']}; context: {facts['context']}; identity: {facts['identity_status']} ({facts['identity_authority']})"
     return f"    Observed threads: {facts['threads']}; context: {facts['context']}"

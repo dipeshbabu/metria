@@ -58,11 +58,13 @@ _SUPPORTED_RUNTIME_KEYS = frozenset(
         "max_num_seqs",
         "max_model_len",
         "tensor_parallel_size",
+        "pipeline_parallel_size",
         "enforce_eager",
         "enable_prefix_caching",
         "trust_remote_code",
     }
 )
+_PIPELINE = ("pipeline_parallel_size",)
 _SUPPORTED_KV_DTYPES = frozenset({"auto", "fp8", "fp8_e4m3", "fp8_e5m2"})
 _SUPPORTED_KV_KEYS = frozenset({"dtype"})
 
@@ -180,9 +182,11 @@ def _runtime_config(spec: RunSpec) -> dict[str, Any]:
 
     max_num_seqs = spec.runtime.get("max_num_seqs", 32)
     tensor_parallel_size = spec.runtime.get("tensor_parallel_size", 1)
+    pipeline = spec.runtime.get("pipeline_parallel_size", 1)
     for key, value in (
         ("max_num_seqs", max_num_seqs),
         ("tensor_parallel_size", tensor_parallel_size),
+        ("pipeline_parallel_size", pipeline),
     ):
         if isinstance(value, bool) or not isinstance(value, int):
             raise TypeError(f"runtime.{key} must be an integer")
@@ -222,6 +226,8 @@ def _runtime_config(spec: RunSpec) -> dict[str, Any]:
         "max_num_seqs": max_num_seqs,
         "max_model_len": max_model_len,
         "tensor_parallel_size": tensor_parallel_size,
+        # Recorded only when requested, so earlier records stay byte-identical.
+        **{k: pipeline for k in _PIPELINE if k in spec.runtime},
         "enforce_eager": enforce_eager,
         "enable_prefix_caching": enable_prefix_caching,
         "trust_remote_code": trust_remote_code,
@@ -358,10 +364,11 @@ def _introspect_applied_config(llm: Any) -> dict[str, Any]:
                 fields[f"cache.{attr}"] = _evidence_scalar(getattr(cache_config, attr))
 
     parallel_config = getattr(vllm_config, "parallel_config", None)
-    if parallel_config is not None and hasattr(parallel_config, "tensor_parallel_size"):
-        fields["parallel.tensor_parallel_size"] = _evidence_scalar(
-            parallel_config.tensor_parallel_size
-        )
+    for attr in ("tensor_parallel_size", "pipeline_parallel_size"):
+        if parallel_config is not None and hasattr(parallel_config, attr):
+            fields[f"parallel.{attr}"] = _evidence_scalar(
+                getattr(parallel_config, attr)
+            )
 
     return {
         "status": "introspected" if fields else "unverified",
@@ -831,6 +838,7 @@ class VLLMAdapter:
             "gpu_memory_utilization": settings["gpu_memory_utilization"],
             "max_num_seqs": settings["max_num_seqs"],
             "tensor_parallel_size": settings["tensor_parallel_size"],
+            **{k: settings[k] for k in _PIPELINE if k in settings},
             "enforce_eager": settings["enforce_eager"],
             "enable_prefix_caching": settings["enable_prefix_caching"],
             "trust_remote_code": settings["trust_remote_code"],

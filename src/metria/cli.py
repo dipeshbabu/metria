@@ -196,6 +196,13 @@ def _add_preparation_parser(subparsers: Any) -> None:
         help="prepare an automatic-vs-FP8 KV-cache recipe instead of prefix caching; "
         "requires --policy and workload task checks",
     )
+    for kind in ("tensor", "pipeline"):
+        prepare.add_argument(
+            f"--candidate-{kind}-parallel-size",
+            type=int,
+            help=f"STAGED: compare a single-device reference with a {kind}-parallel "
+            "candidate; requires --policy and workload task checks",
+        )
     prepare.add_argument(
         "--staged-kld",
         action="store_true",
