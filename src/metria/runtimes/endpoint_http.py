@@ -78,6 +78,16 @@ class EndpointConnection:
     timeout_s: float
     max_retries: int
     attempts: list[dict[str, Any]] = field(default_factory=list)
+    # Loading the system CA store costs ~100 ms on some platforms; build the
+    # verifying TLS context once and share it (SSLContext is thread-safe).
+    _tls: ssl.SSLContext | None = field(default=None, repr=False, compare=False)
+
+    def _context(self) -> ssl.SSLContext | None:
+        if self.base.scheme != "https":
+            return None
+        if self._tls is None:
+            self._tls = ssl.create_default_context()
+        return self._tls
 
     @classmethod
     def from_environment(
@@ -154,7 +164,7 @@ class EndpointConnection:
         request = urllib.request.Request(
             self._url(path), data=data, headers=headers, method=method
         )
-        context = ssl.create_default_context()
+        context = self._context()
         try:
             with urllib.request.urlopen(  # noqa: S310 - scheme validated above
                 request, timeout=self.timeout_s, context=context

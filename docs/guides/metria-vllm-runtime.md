@@ -159,6 +159,16 @@ normalized identity envelope. If a field cannot be recovered from the live
 engine, Metria does not copy the configured value into observed identity and
 pretend it was verified.
 
+`observed.numerics_environment` records environment variables that can change
+numerics, device placement or collectives: every `NCCL_*` and `VLLM_*`
+variable plus `CUDA_VISIBLE_DEVICES`, `CUDA_DEVICE_ORDER`,
+`CUDA_LAUNCH_BLOCKING`, `CUBLAS_WORKSPACE_CONFIG`, `PYTORCH_CUDA_ALLOC_CONF`,
+`OMP_NUM_THREADS` and `MKL_NUM_THREADS`. Names that look like credentials
+(containing `KEY`, `TOKEN`, `SECRET`, `PASSWORD`, `CREDENTIAL` or `AUTH`) are
+never recorded, and path-like or very long values are kept only as SHA-256.
+Because it is part of observed state, two runs that differ in one of these
+variables are not comparable unless the difference is declared.
+
 ## Cleanup
 
 The adapter releases its session-owned vLLM and tokenizer references at close.
