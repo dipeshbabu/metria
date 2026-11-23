@@ -140,3 +140,9 @@ def test_cli_writes_workload_and_manifest(tmp_path):
          "--manifest", str(tmp_path / "m2.json"), "--sample", "1", "--seed", "1"],
         stdout=io.StringIO(), stderr=io.StringIO(),
     ) != 0  # fmt: skip
+
+
+def test_secret_file_literals_match_any_case(tmp_path):
+    source = _log(tmp_path, [{"prompt": "about PROJECT NIGHTINGALE timelines"}])
+    rows, _ = import_traffic(source, sample=1, seed=1, secrets=["Project Nightingale"])
+    assert rows[0]["prompt"] == "about [REDACTED:SECRET] timelines"

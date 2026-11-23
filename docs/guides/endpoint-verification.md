@@ -6,9 +6,9 @@ changes you deploy as a server: a new engine version, a different KV-cache
 dtype, a quantized checkpoint, or new server flags.
 
 !!! warning "Staged"
-    This profile is staged until the native evidence in
-    [#214](https://github.com/dipeshbabu/metria/issues/214) is retained. Server
-    identity is **claimed**: Metria records what each server reports about
+    Native CPU and GPU runs are retained (see
+    [Retained evidence](#retained-evidence)), but the profile stays staged
+    because server identity is **claimed**: Metria records what each server reports about
     itself and checks it stays consistent, but cannot verify which weights or
     binary a remote server runs.
 
@@ -159,8 +159,12 @@ SmolLM2-135M):
 - a declared engine version the server contradicts ends `EXECUTION_FAILED`;
 - an undeclared `max_model_len` difference ends `NOT_COMPARABLE`.
 
-Endpoint token IDs match the in-process engine for every prompt. The GPU case
-is pending.
+Endpoint token IDs match the in-process engine for every prompt.
+
+On GPUs, [`endpoint-fp8-l4`](../../artifacts/qualification/endpoint-fp8-l4/README.md)
+compares two `vllm serve` processes on separate L4s, automatic versus FP8 KV
+cache, with a trajectory-KLD policy: PASS with mean KLD 0.105 nats and
+agreement 48.4, the candidate's own log confirming the FP8 cache.
 
 See the [endpoint adapter](endpoint-runtime.md) for request, retry and privacy
 details.

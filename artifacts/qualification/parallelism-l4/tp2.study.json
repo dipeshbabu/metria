@@ -1,0 +1,207 @@
+{
+  "environment": {
+    "verification_timeout_s": 900,
+    "vllm_distribution_sha256": "6e36aeddc878d2788585d6e6ab8573e8e5d97a7fc55c6a055b64b4f1c6bd8b2b"
+  },
+  "measurement_configs": {
+    "kv_fidelity.decode_time_trajectory": {
+      "measured_trials": 2,
+      "prompts": [
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "story",
+          "prompt": "Once upon a time"
+        },
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "dog",
+          "prompt": "The little dog"
+        },
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "capital",
+          "prompt": "The capital of France is"
+        },
+        {
+          "checks": [
+            {
+              "id": "answered",
+              "kind": "nonempty"
+            }
+          ],
+          "id": "arithmetic",
+          "prompt": "Two plus two equals"
+        }
+      ],
+      "staged_distributions": true,
+      "warmup_trials": 1
+    }
+  },
+  "policy": {
+    "criteria": [
+      {
+        "min": 0.0,
+        "target": "quality.pass_rate_delta",
+        "unit": "fraction_delta",
+        "version": "1"
+      },
+      {
+        "min": 0.9,
+        "target": "behavior.trajectory_agreement",
+        "unit": "fraction",
+        "version": "0.3.4"
+      },
+      {
+        "max": 0.05,
+        "target": "behavior.trajectory_kld_mean",
+        "unit": "nats",
+        "version": "0.1.0"
+      }
+    ],
+    "schema": "metria.verification_policy.v1"
+  },
+  "schema": "metria.study_recipe.v1",
+  "study": {
+    "comparison": {
+      "analyses": [
+        "kv_fidelity.trajectory_match",
+        "metria.verification_impact",
+        "metria.trajectory_kld"
+      ],
+      "block_by": [],
+      "control": [
+        "measurements",
+        "model",
+        "scenario",
+        "trial_policy"
+      ],
+      "vary": [
+        "observed.applied.fields.parallel.tensor_parallel_size",
+        "observed.configured.runtime.tensor_parallel_size",
+        "observed.identity.applied.fields.parallel.tensor_parallel_size",
+        "resolved.runtime.settings.tensor_parallel_size",
+        "runtime.tensor_parallel_size"
+      ]
+    },
+    "constants": {},
+    "metadata": {},
+    "name": "vllm-parallelism-change",
+    "runs": [
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "files": {
+            "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+            "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+            "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+            "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+            "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+            "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+            "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+          },
+          "id": "Qwen/Qwen2.5-0.5B-Instruct",
+          "path": "${WORK}/hf/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775",
+          "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+        },
+        "runtime": {
+          "dtype": "float16",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.35,
+          "max_model_len": 512,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 1,
+          "trust_remote_code": false,
+          "version": "0.30.0+cu129"
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 512,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0
+        },
+        "treatments": [],
+        "trial_policy": {
+          "capability_overrides": [
+            "metria.staged_captures"
+          ],
+          "isolation": "reset_prefix_cache_before_each_trial",
+          "measured_trials": 2,
+          "method": "metria.prefix_cache_trials.v1",
+          "schedule": "sequential",
+          "warmup_trials": 1
+        }
+      },
+      {
+        "environment_selector": {},
+        "measurements": [
+          "kv_fidelity.decode_time_trajectory"
+        ],
+        "model": {
+          "files": {
+            "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+            "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+            "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+            "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+            "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+            "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+            "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+          },
+          "id": "Qwen/Qwen2.5-0.5B-Instruct",
+          "path": "${WORK}/hf/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775",
+          "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+        },
+        "runtime": {
+          "dtype": "float16",
+          "enable_prefix_caching": false,
+          "enforce_eager": true,
+          "gpu_memory_utilization": 0.35,
+          "max_model_len": 512,
+          "max_num_seqs": 1,
+          "name": "vllm",
+          "tensor_parallel_size": 2,
+          "trust_remote_code": false,
+          "version": "0.30.0+cu129"
+        },
+        "scenario": {
+          "chat_template": false,
+          "context": 512,
+          "max_tokens": 16,
+          "seed": 42,
+          "temperature": 0.0
+        },
+        "treatments": [],
+        "trial_policy": {
+          "capability_overrides": [
+            "metria.staged_captures"
+          ],
+          "isolation": "reset_prefix_cache_before_each_trial",
+          "measured_trials": 2,
+          "method": "metria.prefix_cache_trials.v1",
+          "schedule": "sequential",
+          "warmup_trials": 1
+        }
+      }
+    ]
+  }
+}

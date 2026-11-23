@@ -1,0 +1,4 @@
+{"id": "story", "prompt": "Once upon a time", "checks": [{"id": "answered", "kind": "nonempty"}]}
+{"id": "dog", "prompt": "The little dog", "checks": [{"id": "answered", "kind": "nonempty"}]}
+{"id": "capital", "prompt": "The capital of France is", "checks": [{"id": "answered", "kind": "nonempty"}]}
+{"id": "arithmetic", "prompt": "Two plus two equals", "checks": [{"id": "answered", "kind": "nonempty"}]}

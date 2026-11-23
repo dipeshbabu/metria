@@ -241,3 +241,10 @@ def test_cuda_devices_lists_every_visible_device():
     assert [row["name"] for row in devices] == ["GPU0", "GPU1"]
     assert devices[1]["compute_capability"] == [8, 9]
     assert len(devices[0]["uuid_sha256"]) == 64
+
+
+def test_every_isolated_route_is_accepted_by_the_native_worker(parallel_case):
+    from metria.verification_worker import worker_scopes
+
+    route = build_route(parallel_case["recipe"])
+    assert route.isolated and route.scope in worker_scopes()

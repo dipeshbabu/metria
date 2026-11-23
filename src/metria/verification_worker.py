@@ -299,10 +299,20 @@ def verify_isolated(
     return VerificationResult(output, data, data["exit_code"])
 
 
-def main() -> int:
-    from .verification import _verification_route, _verify_with_profile
+def worker_scopes() -> frozenset[str]:
+    """Scopes whose routes run in this isolated native worker."""
+
+    from .verification_parallelism import PARALLELISM_SCOPE
     from .verification_schema import VLLM_KV_PRECISION_SCOPE, VLLM_SERVING_SCOPE
     from .verification_vllm import VLLM_SCOPE
+
+    return frozenset(
+        {VLLM_SCOPE, VLLM_SERVING_SCOPE, VLLM_KV_PRECISION_SCOPE, PARALLELISM_SCOPE}
+    )
+
+
+def main() -> int:
+    from .verification import _verification_route, _verify_with_profile
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--recipe", required=True, type=Path)
@@ -320,7 +330,7 @@ def main() -> int:
     if study_recipe_digest(recipe) != args.digest:
         raise ValueError("worker recipe digest mismatch")
     route = _verification_route(recipe)
-    if route.scope not in {VLLM_SCOPE, VLLM_SERVING_SCOPE, VLLM_KV_PRECISION_SCOPE}:
+    if route.scope not in worker_scopes():
         raise ValueError("native worker accepts only the qualified vLLM profile")
     result = _verify_with_profile(
         recipe, output, route, reserved_output=True, defer_result=True
