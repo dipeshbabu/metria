@@ -7,9 +7,9 @@ order of floating-point reductions, so outputs can drift even though the model
 is the same; this profile measures that drift against your criteria.
 
 !!! warning "Staged"
-    No native multi-GPU run has qualified this profile yet
-    ([#218](https://github.com/dipeshbabu/metria/issues/218)). It accepts only
-    the pinned CUDA wheel (`vllm==0.30.0+cu129`).
+    A native 2×L4 run is retained (see [Status](#status)); the profile stays
+    staged pending a second model or host. It accepts only the pinned CUDA
+    wheel (`vllm==0.30.0+cu129`).
 
 ## Prepare and verify
 
@@ -43,9 +43,31 @@ tensor option. The candidate may span 2–8 devices in total.
 - **A decision.** Task checks and an explicit policy are required, as for FP8
   KV caches. `--staged-kld` adds trajectory KL divergence.
 
+## NCCL on PCIe-only hosts
+
+If tensor-parallel startup hangs right after vLLM reports its NCCL version,
+the GPUs are probably connected only through a PCIe host bridge (`PHB` in
+`nvidia-smi topo -m`). Export `NCCL_P2P_DISABLE=1` before `metria verify`; the
+isolated worker inherits it. It is not recorded in run records, so note it with
+your evidence.
+
 ## Status
 
-The adapter side was exercised natively with the pinned `0.30.0+cpu` wheel,
+On two NVIDIA L4 GPUs with Qwen2.5-0.5B-Instruct (14 heads),
+[`parallelism-l4`](../../artifacts/qualification/parallelism-l4/README.md)
+retains both cases with engine readback of the requested sizes and both GPUs
+recorded:
+
+| Candidate | Verdict | Agreement | Trajectory KLD (nats) |
+| --- | --- | --- | --- |
+| tensor parallel 2 | FAIL (agreement bound 0.9) | 0.891 | 0.0077 |
+| pipeline parallel 2 | PASS | 1.0 | 0 |
+
+Tensor parallelism moved distributions very little but enough to change some
+greedy tokens; pipeline parallelism changed nothing. Both ran with
+`NCCL_P2P_DISABLE=1`.
+
+Earlier, the adapter side was exercised natively with the pinned `0.30.0+cpu` wheel,
 whose CPU backend runs tensor-parallel ranks on separate core groups, using
 SmolLM2-135M (9 attention heads, 3 KV heads) through Metria's real adapter:
 
@@ -57,6 +79,5 @@ SmolLM2-135M (9 attention heads, 3 KV heads) through Metria's real adapter:
   consistent with 9 heads not dividing by 2; the run failed before measurement
   rather than silently using another size.
 
-This is a functional check of the adapter, not qualification: the profile
-accepts only the CUDA wheel, and a two-GPU run is still required before
-promotion.
+That CPU run was a functional check of the adapter; the 2×L4 run above is
+the profile's native evidence.

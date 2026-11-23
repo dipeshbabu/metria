@@ -1,0 +1,64 @@
+# Metria Verification
+
+**Verdict: FAIL**
+
+Recipe: `f2f6aa7a0e86feef5ad091f994de205cf8177836b1d9c020df1794e84d08860d`
+Scope: STAGED local vLLM tensor/pipeline parallelism comparison
+
+## Change:
+  Parallelism: {'pipeline_parallel_size': 1, 'tensor_parallel_size': 1} -> {'pipeline_parallel_size': 1, 'tensor_parallel_size': 2}
+
+## Evidence:
+  reference: completed (reference.run.json)
+    Observed tensor parallel: 1; pipeline parallel: 1; visible devices: 2
+  candidate: completed (candidate.run.json)
+    Observed tensor parallel: 2; pipeline parallel: 1; visible devices: 2
+  Lifecycle: completed
+  measurements: matched
+  model: matched
+  scenario: matched
+  trial_policy: matched
+
+## Comparison:
+  VALID
+
+## Impact:
+  kv_fidelity.trajectory_match: completed
+    Token prefix agreement: 89.0625/100
+    Exact token-sequence matches: 75%
+    Divergent prompts: 2/8
+    Trajectory evidence: complete; unavailable prompts: 0
+    First divergence (zero-based): earliest 9, median 9.0
+    Length mismatches: 0
+      "0:story": first divergence at token 9
+      "1:story": first divergence at token 9
+  metria.verification_impact: completed
+    Task checks: reference 8/8, candidate 8/8 passed.
+    Checked workload: 4/4 unique prompts; results describe declared checks only.
+    Reference repeatability: 0/4 repeat pairs differed across 4 prompts.
+    Observed sample repeatability; not a statistical guarantee or a quality score.
+    Token differences are behavioral drift; task checks determine the declared quality outcomes.
+  metria.trajectory_kld: completed
+    Divergent prompts: 8
+      0:story: first divergence at token 9
+      0:dog: first divergence at token None
+      0:capital: first divergence at token None
+      0:arithmetic: first divergence at token None
+      1:story: first divergence at token 9
+      1:dog: first divergence at token None
+      1:capital: first divergence at token None
+      1:arithmetic: first divergence at token None
+  Loaded-engine request latency: +0.0451775s (regressed)
+    Relative change: +17.8281%
+    Sequential synchronous request calls after engine warmup; includes prompt evaluation and generation, excludes engine startup and cache reset. No streaming TTFT, serving-throughput, or statistical speedup claim.
+  TTFT, decode throughput, inter-token latency, and device/KV memory: unavailable.
+
+## Verdict:
+  FAIL
+  Policy: FAIL
+
+Policy checks:
+  quality.pass_rate_delta@1 >= 0.0: PASS (observed 0.0 fraction_delta)
+  behavior.trajectory_agreement@0.3.4 >= 0.9: FAIL (observed 0.890625 fraction)
+  behavior.trajectory_kld_mean@0.1.0 [staged] <= 0.05: PASS (observed 0.007707371581837366 nats)
+  PASS means the user-defined criteria were met; it is not a universal deployment-safety judgment.

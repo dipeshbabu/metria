@@ -5,6 +5,15 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Fix: the isolated vLLM verification worker now accepts the
+  `local_vllm_parallelism.v1` scope; every isolated route is covered by a test.
+- Retain native 2×L4 evidence: tensor parallel 2 vs one GPU on
+  Qwen2.5-0.5B-Instruct FAILs a 0.9 agreement bound (agreement 0.891, KLD
+  0.0077 nats) while pipeline parallel 2 is identical; remote endpoint
+  verification of automatic vs FP8 KV cache across two `vllm serve` processes
+  PASSes a KLD policy (0.105 nats). Adds a pinned Qwen2.5-0.5B-Instruct
+  descriptor, `pin_hf_model.py`, and GPU qualification scripts. Documents
+  `NCCL_P2P_DISABLE=1` for PCIe-only hosts.
 - STAGED: `local_vllm_parallelism.v1` compares a single-device vLLM reference
   with a tensor and/or pipeline parallel candidate on the pinned CUDA wheel
   (`prepare-vllm --candidate-tensor-parallel-size N` /

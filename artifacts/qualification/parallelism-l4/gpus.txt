@@ -1,0 +1,3 @@
+index, name, compute_cap, driver_version, memory.total [MiB]
+0, NVIDIA L4, 8.9, 595.91.07, 23034 MiB
+1, NVIDIA L4, 8.9, 595.91.07, 23034 MiB
