@@ -311,6 +311,7 @@ class EndpointSession:
         if kinds and self.tokenize is None:
             raise RuntimeError("this endpoint flavor cannot return token captures")
         distributions = TOP_LOGPROBS_CAPTURE in kinds
+        start = len(self.invocations)
         outputs: list[str] = []
         tokens: list[tuple[int, ...]] = []
         tops: list[Any] = []
@@ -350,7 +351,7 @@ class EndpointSession:
         return InferenceBatch(
             outputs=tuple(outputs),
             captures=captures,
-            metadata={"invocations": tuple(self.invocations[-len(requests) :])},
+            metadata={"invocations": tuple(self.invocations[start:])},
         )
 
     def _concurrent_one(
@@ -385,6 +386,8 @@ class EndpointSession:
             if prompt_ids is None:  # pragma: no cover - guarded above
                 raise RuntimeError("concurrent requests require token-ID prompts")
             prepared.append((body, prompt_ids))
+        # Build the opener (and TLS context) once; thread copies share it.
+        self.connection.opener()
         with ThreadPoolExecutor(max_workers=max_in_flight) as pool:
             results = list(pool.map(self._concurrent_one, prepared))
         origin = min((row["started_ns"] for _, row in results), default=0)

@@ -8,6 +8,7 @@ endpoint's safe identity fields and per-attempt status codes and timings.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import ipaddress
 import json
 import math
@@ -26,6 +27,13 @@ _RETRY_STATUS = frozenset({0, 429, 500, 502, 503, 504})
 _MAX_RESPONSE_BYTES = 64 * 1024 * 1024
 _backoff = time.sleep
 _ENV_NAME_CHARS = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+
+
+class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
+    """Never follow redirects: they could carry the API key to another host."""
+
+    def redirect_request(self, *args: Any, **kwargs: Any) -> None:
+        return None
 
 
 class EndpointError(RuntimeError):
@@ -81,6 +89,9 @@ class EndpointConnection:
     # Loading the system CA store costs ~100 ms on some platforms; build the
     # verifying TLS context once and share it (SSLContext is thread-safe).
     _tls: ssl.SSLContext | None = field(default=None, repr=False, compare=False)
+    _opener: urllib.request.OpenerDirector | None = field(
+        default=None, repr=False, compare=False
+    )
 
     def _context(self) -> ssl.SSLContext | None:
         if self.base.scheme != "https":
@@ -88,6 +99,21 @@ class EndpointConnection:
         if self._tls is None:
             self._tls = ssl.create_default_context()
         return self._tls
+
+    def opener(self) -> urllib.request.OpenerDirector:
+        """One opener per connection: no redirects, no environment proxies.
+
+        Build it before sharing the connection across threads so every copy
+        reuses the same TLS context.
+        """
+
+        if self._opener is None:
+            handlers: list[Any] = [urllib.request.ProxyHandler({}), _RefuseRedirects()]
+            context = self._context()
+            if context is not None:
+                handlers.append(urllib.request.HTTPSHandler(context=context))
+            self._opener = urllib.request.build_opener(*handlers)
+        return self._opener
 
     @classmethod
     def from_environment(
@@ -164,17 +190,21 @@ class EndpointConnection:
         request = urllib.request.Request(
             self._url(path), data=data, headers=headers, method=method
         )
-        context = self._context()
         try:
-            with urllib.request.urlopen(  # noqa: S310 - scheme validated above
-                request, timeout=self.timeout_s, context=context
-            ) as response:
+            with self.opener().open(request, timeout=self.timeout_s) as response:
                 raw = response.read(_MAX_RESPONSE_BYTES + 1)
                 status = response.status
         except urllib.error.HTTPError as exc:
+            exc.close()
             return exc.code, None
-        except (urllib.error.URLError, OSError, TimeoutError):
-            # Status 0 marks a transport failure; its text may name the host.
+        except (
+            urllib.error.URLError,
+            OSError,
+            TimeoutError,
+            http.client.HTTPException,
+        ):
+            # Status 0 marks a transport failure (including truncated or
+            # malformed responses); its text may name the host.
             return 0, None
         if len(raw) > _MAX_RESPONSE_BYTES:
             raise EndpointError(f"{method} {path} response exceeds the size bound")
