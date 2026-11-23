@@ -51,6 +51,10 @@ class Server:
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
+            # Headers and body are separate writes; without this, Nagle plus
+            # delayed ACKs add ~200 ms per response on some platforms.
+            disable_nagle_algorithm = True
+
             def log_message(self, *args):
                 pass
 
@@ -329,3 +333,12 @@ def test_tokenizer_pins_are_validated_and_hashed(tmp_path):
     except ImportError:
         with pytest.raises(RuntimeError, match="tokenizers"):
             endpoint.load_tokenizer(str(tmp_path), good)
+
+
+def test_tls_context_is_built_once_and_never_for_plain_http():
+    from metria.runtimes.endpoint_http import EndpointConnection
+
+    secure = EndpointConnection(parse_base_url("https://example.com"), None, 5, 0)
+    assert secure._context() is secure._context()
+    plain = EndpointConnection(parse_base_url("http://127.0.0.1:8000"), None, 5, 0)
+    assert plain._context() is None

@@ -48,8 +48,9 @@ tensor option. The candidate may span 2–8 devices in total.
 If tensor-parallel startup hangs right after vLLM reports its NCCL version,
 the GPUs are probably connected only through a PCIe host bridge (`PHB` in
 `nvidia-smi topo -m`). Export `NCCL_P2P_DISABLE=1` before `metria verify`; the
-isolated worker inherits it. It is not recorded in run records, so note it with
-your evidence.
+isolated worker inherits it, and the run records it under
+`observed.numerics_environment`. (The retained 2×L4 run predates that field,
+so its README states the setting instead.)
 
 ## Status
 

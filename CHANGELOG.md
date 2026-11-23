@@ -5,6 +5,16 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- vLLM runs record `observed.numerics_environment`: allow-listed `NCCL_*`,
+  `VLLM_*`, CUDA and thread-count variables (credential-like names excluded,
+  paths hashed), so settings such as `NCCL_P2P_DISABLE` are part of the
+  evidence and an undeclared difference is not comparable.
+- Endpoint requests reuse one verifying TLS context per connection instead of
+  loading the system CA store on every request (about 140 ms per request on
+  Windows); plain loopback HTTP builds none.
+- Split model-source, KV-treatment and applied-config helpers out of
+  `runtimes/vllm.py` (now well under its size ceiling); the full test suite
+  runs about twice as fast.
 - Fix: the isolated vLLM verification worker now accepts the
   `local_vllm_parallelism.v1` scope; every isolated route is covered by a test.
 - Retain native 2×L4 evidence: tensor parallel 2 vs one GPU on
