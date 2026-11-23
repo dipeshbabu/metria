@@ -1,0 +1,20 @@
+{
+  "schema": "metria.verification_policy.v1",
+  "criteria": [
+    {
+      "target": "quality.pass_rate_delta",
+      "version": "1",
+      "min": 0.0
+    },
+    {
+      "target": "behavior.trajectory_agreement",
+      "version": "0.3.4",
+      "min": 0.9
+    },
+    {
+      "target": "behavior.trajectory_kld_mean",
+      "version": "0.1.0",
+      "max": 0.05
+    }
+  ]
+}

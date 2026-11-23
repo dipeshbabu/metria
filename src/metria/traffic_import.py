@@ -78,6 +78,12 @@ class Redactor:
             (name, re.compile(pattern)) for name, pattern in (*BUILTIN_RULES, *extra)
         ]
         self.secrets = sorted({item for item in secrets if item}, key=len, reverse=True)
+        # Literal secrets match regardless of case in redaction and the check.
+        self._literal = (
+            re.compile("|".join(re.escape(s) for s in self.secrets), re.IGNORECASE)
+            if self.secrets
+            else None
+        )
         self.counts: dict[str, int] = {}
 
     def _replace(self, name: str, pattern: re.Pattern[str], text: str) -> str:
@@ -92,12 +98,10 @@ class Redactor:
         return pattern.sub(substitute, text)
 
     def redact(self, text: str) -> str:
-        for secret in self.secrets:
-            if secret in text:
-                self.counts["secret_file"] = self.counts.get(
-                    "secret_file", 0
-                ) + text.count(secret)
-                text = text.replace(secret, "[REDACTED:SECRET]")
+        if self._literal is not None:
+            text, found = self._literal.subn("[REDACTED:SECRET]", text)
+            if found:
+                self.counts["secret_file"] = self.counts.get("secret_file", 0) + found
         for name, pattern in self.rules:
             text = self._replace(name, pattern, text)
         return text
@@ -106,7 +110,7 @@ class Redactor:
         """Rules that still match after redaction (placeholders excluded)."""
 
         cleaned = re.sub(r"\[REDACTED:[A-Z_]+\]", " ", text)
-        found = [secret for secret in self.secrets if secret in cleaned]
+        found = self._literal is not None and self._literal.search(cleaned)
         hits = ["secret_file"] if found else []
         for name, pattern in self.rules:
             for match in pattern.finditer(cleaned):
