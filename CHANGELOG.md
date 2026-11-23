@@ -5,6 +5,8 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+## 0.1.7
+
 - vLLM runs record `observed.numerics_environment`: allow-listed `NCCL_*`,
   `VLLM_*`, CUDA and thread-count variables (credential-like names excluded,
   paths hashed), so settings such as `NCCL_P2P_DISABLE` are part of the
