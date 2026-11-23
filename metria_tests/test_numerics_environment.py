@@ -51,3 +51,10 @@ def test_vllm_runs_record_the_snapshot(monkeypatch):
     observed = adapter.observe(session)
     assert observed["numerics_environment"]["NCCL_P2P_DISABLE"] == "1"
     assert "VLLM_API_KEY" not in observed["numerics_environment"]
+
+
+def test_token_count_settings_are_not_mistaken_for_secrets():
+    recorded = numerics_environment(
+        {"VLLM_MAX_NUM_BATCHED_TOKENS": "2048", "VLLM_API_KEY": "x", "NCCL_AUTH": "y"}
+    )
+    assert recorded == {"VLLM_MAX_NUM_BATCHED_TOKENS": "2048"}

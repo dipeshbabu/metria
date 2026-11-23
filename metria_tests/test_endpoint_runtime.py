@@ -342,3 +342,26 @@ def test_tls_context_is_built_once_and_never_for_plain_http():
     assert secure._context() is secure._context()
     plain = EndpointConnection(parse_base_url("http://127.0.0.1:8000"), None, 5, 0)
     assert plain._context() is None
+
+
+def test_redirects_are_refused_not_followed(server, tmp_path, monkeypatch):
+    import http.server as hs
+
+    class Redirect(hs.BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_GET(self):
+            self.send_response(307)
+            self.send_header("Location", server.url + "/v1/models")
+            self.end_headers()
+
+    httpd = hs.ThreadingHTTPServer(("127.0.0.1", 0), Redirect)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    monkeypatch.setenv("METRIA_TEST_URL", f"http://127.0.0.1:{httpd.server_address[1]}")
+    try:
+        record = _run(_spec(tmp_path))
+    finally:
+        httpd.shutdown()
+    assert record.status.value == "failed"
+    assert server.headers == []  # the redirect target never saw the key

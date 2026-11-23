@@ -29,7 +29,11 @@ _EXACT = frozenset(
     }
 )
 _PREFIXES = ("NCCL_", "VLLM_")
-_SECRET = re.compile(r"KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|AUTH", re.IGNORECASE)
+# Whole name segments only, so e.g. VLLM_MAX_NUM_BATCHED_TOKENS is kept.
+_SECRET = re.compile(
+    r"(?:^|_)(?:API_?KEY|KEY|TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIALS?|AUTH)(?:_|$)",
+    re.IGNORECASE,
+)
 _MAX_VALUE = 256
 
 

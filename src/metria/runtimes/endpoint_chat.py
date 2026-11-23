@@ -62,10 +62,34 @@ class ChatTemplate:
         def raise_exception(message: str) -> None:
             raise RuntimeError(f"chat template error: {message}")
 
+        def tojson(
+            value: Any,
+            ensure_ascii: bool = False,
+            indent: Any = None,
+            separators: Any = None,
+            sort_keys: bool = False,
+        ) -> str:
+            return json.dumps(
+                value,
+                ensure_ascii=ensure_ascii,
+                indent=indent,
+                separators=separators,
+                sort_keys=sort_keys,
+            )
+
+        def strftime_now(fmt: str) -> str:
+            from datetime import datetime
+
+            return datetime.now().strftime(fmt)
+
+        # Mirror transformers' chat-template environment so real templates
+        # (loop controls, dates, tool JSON) render as the server would.
         environment = ImmutableSandboxedEnvironment(
-            trim_blocks=True, lstrip_blocks=True
+            trim_blocks=True, lstrip_blocks=True, extensions=["jinja2.ext.loopcontrols"]
         )
         environment.globals["raise_exception"] = raise_exception
+        environment.globals["strftime_now"] = strftime_now
+        environment.filters["tojson"] = tojson
         self._template = environment.from_string(source)
         self._tokens = {
             "bos_token": _token(config.get("bos_token")),
