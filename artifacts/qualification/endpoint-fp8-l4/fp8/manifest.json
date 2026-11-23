@@ -1,0 +1,1256 @@
+{
+  "acceptance_policy_evaluated": true,
+  "analyses": [
+    {
+      "diagnostics": {
+        "all_trajectories_match": false,
+        "comparison_steps": 128,
+        "divergence": {
+          "by_category": [],
+          "compared_prompts": 8,
+          "diverged_prompts": 6,
+          "divergence_rate": 0.75,
+          "earliest_first_divergence": 1,
+          "exact_match_rate": 0.25,
+          "exact_matches": 2,
+          "first_divergence_positions": [
+            {
+              "count": 4,
+              "position": 1
+            },
+            {
+              "count": 2,
+              "position": 13
+            }
+          ],
+          "length_mismatches": 0,
+          "mean_prefix_steps": 7.75,
+          "median_first_divergence": 1.0,
+          "most_divergent": [
+            {
+              "candidate_steps": 16,
+              "category": null,
+              "first_divergence": 1,
+              "id": "0:arithmetic",
+              "matched": false,
+              "prefix_agreement_steps": 1,
+              "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+              "reference_steps": 16
+            },
+            {
+              "candidate_steps": 16,
+              "category": null,
+              "first_divergence": 1,
+              "id": "0:capital",
+              "matched": false,
+              "prefix_agreement_steps": 1,
+              "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+              "reference_steps": 16
+            },
+            {
+              "candidate_steps": 16,
+              "category": null,
+              "first_divergence": 1,
+              "id": "1:arithmetic",
+              "matched": false,
+              "prefix_agreement_steps": 1,
+              "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+              "reference_steps": 16
+            },
+            {
+              "candidate_steps": 16,
+              "category": null,
+              "first_divergence": 1,
+              "id": "1:capital",
+              "matched": false,
+              "prefix_agreement_steps": 1,
+              "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+              "reference_steps": 16
+            },
+            {
+              "candidate_steps": 16,
+              "category": null,
+              "first_divergence": 13,
+              "id": "0:story",
+              "matched": false,
+              "prefix_agreement_steps": 13,
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+              "reference_steps": 16
+            },
+            {
+              "candidate_steps": 16,
+              "category": null,
+              "first_divergence": 13,
+              "id": "1:story",
+              "matched": false,
+              "prefix_agreement_steps": 13,
+              "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+              "reference_steps": 16
+            }
+          ],
+          "n_prompts": 8,
+          "position_origin": 0,
+          "ranking": "prefix_fraction_ascending,first_divergence_ascending,id_ascending",
+          "schema": "metria.trajectory_divergence.v1",
+          "status": "complete",
+          "top_limit": 10,
+          "unavailable_prompts": 0,
+          "uncategorized_prompts": 8
+        },
+        "mean_candidate_steps": 16.0,
+        "mean_reference_steps": 16.0,
+        "median_first_divergence": 1.0,
+        "method": "kv_fidelity.trajectory_match",
+        "method_version": "0.3.4",
+        "n_prompts": 8,
+        "notes": [],
+        "per_prompt": [
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": 13,
+            "id": "0:story",
+            "matched": false,
+            "prefix_agreement_steps": 13,
+            "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": null,
+            "id": "0:dog",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": 1,
+            "id": "0:capital",
+            "matched": false,
+            "prefix_agreement_steps": 1,
+            "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": 1,
+            "id": "0:arithmetic",
+            "matched": false,
+            "prefix_agreement_steps": 1,
+            "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": 13,
+            "id": "1:story",
+            "matched": false,
+            "prefix_agreement_steps": 13,
+            "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": null,
+            "id": "1:dog",
+            "matched": true,
+            "prefix_agreement_steps": 16,
+            "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": 1,
+            "id": "1:capital",
+            "matched": false,
+            "prefix_agreement_steps": 1,
+            "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+            "reference_steps": 16
+          },
+          {
+            "candidate_steps": 16,
+            "category": null,
+            "first_divergence": 1,
+            "id": "1:arithmetic",
+            "matched": false,
+            "prefix_agreement_steps": 1,
+            "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+            "reference_steps": 16
+          }
+        ],
+        "prefix_agreement_steps": 62,
+        "schema": "metria.trajectory_comparison.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "trajectory_agreement_score": {
+          "aggregation": "weighted_by_max_trajectory_length",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_agreement_score",
+            "unit": "score_0_100",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "0:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 81.25
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 6.25
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 6.25
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "1:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 81.25
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 100.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 6.25
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 6.25
+            }
+          ],
+          "uncertainty": {},
+          "value": 48.4375
+        },
+        "trajectory_divergence_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_divergence_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "0:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "1:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 1.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.75
+        },
+        "trajectory_full_match_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_full_match_rate",
+            "unit": "fraction",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "0:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "1:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 0.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 0.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.25
+        },
+        "trajectory_mean_prefix_steps": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "descriptive",
+            "method": "kv_fidelity.trajectory_match",
+            "name": "trajectory_mean_prefix_steps",
+            "unit": "tokens",
+            "version": "0.3.4"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "0:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 13.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "0:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "0:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 13,
+                "prompt_id": "1:story",
+                "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a"
+              },
+              "value": 13.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 16,
+                "prompt_id": "1:dog",
+                "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d"
+              },
+              "value": 16.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:capital",
+                "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762"
+              },
+              "value": 1.0
+            },
+            {
+              "metadata": {
+                "comparison_steps": 16,
+                "prefix_steps": 1,
+                "prompt_id": "1:arithmetic",
+                "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65"
+              },
+              "value": 1.0
+            }
+          ],
+          "uncertainty": {},
+          "value": 7.75
+        }
+      },
+      "name": "kv_fidelity.trajectory_match",
+      "reason": null,
+      "status": "completed",
+      "version": "0.3.4"
+    },
+    {
+      "diagnostics": {
+        "method": "metria.verification_impact",
+        "method_version": "1",
+        "performance": {
+          "available": false,
+          "reason": "authoritative request latency is unavailable",
+          "schema": "metria.performance_impact.v1",
+          "unsupported_metrics": [
+            "ttft",
+            "inter_token_latency",
+            "decode_throughput",
+            "peak_device_memory",
+            "kv_memory"
+          ]
+        },
+        "quality": {
+          "candidate_passed": 8,
+          "check_count_per_role": 8,
+          "configured_prompts": 4,
+          "failed_candidate_checks": [],
+          "interval": {
+            "assumption": "each retained check outcome is treated as an independent Bernoulli trial; checks sharing a prompt or seed are correlated, so intervals are approximate",
+            "candidate_pass_rate": [
+              0.6755924351161198,
+              1.0
+            ],
+            "confidence": 0.95,
+            "method": "metria.task_pass_rate_interval",
+            "method_version": "1",
+            "pass_rate_delta": [
+              -0.32440756488388023,
+              0.32440756488388023
+            ],
+            "reference_pass_rate": [
+              0.6755924351161198,
+              1.0
+            ]
+          },
+          "reference_passed": 8,
+          "status": "available",
+          "total_prompts": 4,
+          "workload_sha256": "771d0a306db0545c9b86c06a33c3dfe043ceebd071de396bfc01a0b9d96631f7"
+        },
+        "reference_variability": {
+          "compared_pairs": 4,
+          "different_pairs": 0,
+          "limitation": "Observed sample repeatability; not a statistical guarantee or a quality score.",
+          "reference_trials_per_prompt": 2,
+          "status": "available",
+          "unique_prompts": 4
+        },
+        "schema": "metria.verification_impact.v1"
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "candidate_task_pass_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "candidate_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "candidate_task_pass_rate_lower": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_pass_rate_interval",
+            "name": "candidate_task_pass_rate_lower",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.6755924351161198
+        },
+        "reference_repeatability": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.observed_reference_repeatability",
+            "name": "reference_repeatability",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "reference_task_pass_rate": {
+          "aggregation": "mean",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "reference_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 1.0
+        },
+        "task_pass_rate_delta": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "task_pass_rate_delta",
+            "unit": "fraction_delta",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.0
+        },
+        "task_pass_rate_delta_lower": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_pass_rate_interval",
+            "name": "task_pass_rate_delta_lower",
+            "unit": "fraction_delta",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": -0.32440756488388023
+        },
+        "task_pass_rate_delta_upper": {
+          "aggregation": "derived",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "higher_is_better",
+            "method": "metria.task_pass_rate_interval",
+            "name": "task_pass_rate_delta_upper",
+            "unit": "fraction_delta",
+            "version": "1"
+          },
+          "samples": [],
+          "uncertainty": {},
+          "value": 0.32440756488388023
+        }
+      },
+      "name": "metria.verification_impact",
+      "reason": null,
+      "status": "completed",
+      "version": "1"
+    },
+    {
+      "diagnostics": {
+        "estimator": {
+          "direction": "KL(reference || candidate)",
+          "log_floor": -30.0,
+          "name": "approximate_topk_kl",
+          "omitted_mass_bucket": true,
+          "top_k": 20
+        },
+        "method": "metria.trajectory_kld",
+        "method_version": "0.1.0",
+        "n_prompts": 8,
+        "notes": [],
+        "per_prompt": [
+          {
+            "first_divergence": 13,
+            "id": "0:story",
+            "max_kld": 0.5092599789690327,
+            "mean_kld": 0.0639774254931587,
+            "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+            "scored_steps": 14
+          },
+          {
+            "first_divergence": null,
+            "id": "0:dog",
+            "max_kld": 0.27660031387449363,
+            "mean_kld": 0.1272709158465232,
+            "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+            "scored_steps": 16
+          },
+          {
+            "first_divergence": 1,
+            "id": "0:capital",
+            "max_kld": 0.5049974825976281,
+            "mean_kld": 0.2529722762372505,
+            "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+            "scored_steps": 2
+          },
+          {
+            "first_divergence": 1,
+            "id": "0:arithmetic",
+            "max_kld": 0.12689003154931947,
+            "mean_kld": 0.06549345880834308,
+            "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+            "scored_steps": 2
+          },
+          {
+            "first_divergence": 13,
+            "id": "1:story",
+            "max_kld": 0.5092599789690327,
+            "mean_kld": 0.0639774254931587,
+            "prompt_sha256": "e286222c229ec73b1bc520d88583191572ae0cbbaa66ea68053994a5e50ac87a",
+            "scored_steps": 14
+          },
+          {
+            "first_divergence": null,
+            "id": "1:dog",
+            "max_kld": 0.27660031387449363,
+            "mean_kld": 0.1272709158465232,
+            "prompt_sha256": "805a9795a676f77bcd3b5f3eb31d3389dcdec2318d59be516bf59eb353426c1d",
+            "scored_steps": 16
+          },
+          {
+            "first_divergence": 1,
+            "id": "1:capital",
+            "max_kld": 0.5049974825976281,
+            "mean_kld": 0.2529722762372505,
+            "prompt_sha256": "bbaff4d2ecd5892d4a442b0f53131641bf6e6f284761dd20fc0664bc97145762",
+            "scored_steps": 2
+          },
+          {
+            "first_divergence": 1,
+            "id": "1:arithmetic",
+            "max_kld": 0.12689003154931947,
+            "mean_kld": 0.06549345880834308,
+            "prompt_sha256": "cdf1347c153639e3f67e4cdabf1c6e1acf41f33bb067ed6f4e82b4d518a91a65",
+            "scored_steps": 2
+          }
+        ],
+        "qualification": "staged",
+        "schema": "metria.trajectory_kld.v1",
+        "scope": "steps 0..first_divergence produced by both runs",
+        "scored_prompts": 8,
+        "scored_steps": 68
+      },
+      "error_type": null,
+      "message_sha256": null,
+      "metric_errors": {},
+      "metrics": {
+        "trajectory_kld_max": {
+          "aggregation": "max_over_shared_context_steps",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.trajectory_kld",
+            "name": "trajectory_kld_max",
+            "unit": "nats",
+            "version": "0.1.0"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "prompt_id": "0:story",
+                "scored_steps": 14
+              },
+              "value": 0.0639774254931587
+            },
+            {
+              "metadata": {
+                "prompt_id": "0:dog",
+                "scored_steps": 16
+              },
+              "value": 0.1272709158465232
+            },
+            {
+              "metadata": {
+                "prompt_id": "0:capital",
+                "scored_steps": 2
+              },
+              "value": 0.2529722762372505
+            },
+            {
+              "metadata": {
+                "prompt_id": "0:arithmetic",
+                "scored_steps": 2
+              },
+              "value": 0.06549345880834308
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:story",
+                "scored_steps": 14
+              },
+              "value": 0.0639774254931587
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:dog",
+                "scored_steps": 16
+              },
+              "value": 0.1272709158465232
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:capital",
+                "scored_steps": 2
+              },
+              "value": 0.2529722762372505
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:arithmetic",
+                "scored_steps": 2
+              },
+              "value": 0.06549345880834308
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.5092599789690327
+        },
+        "trajectory_kld_mean": {
+          "aggregation": "mean_over_shared_context_steps",
+          "coverage": 1.0,
+          "definition": {
+            "direction": "lower_is_better",
+            "method": "metria.trajectory_kld",
+            "name": "trajectory_kld_mean",
+            "unit": "nats",
+            "version": "0.1.0"
+          },
+          "samples": [
+            {
+              "metadata": {
+                "prompt_id": "0:story",
+                "scored_steps": 14
+              },
+              "value": 0.0639774254931587
+            },
+            {
+              "metadata": {
+                "prompt_id": "0:dog",
+                "scored_steps": 16
+              },
+              "value": 0.1272709158465232
+            },
+            {
+              "metadata": {
+                "prompt_id": "0:capital",
+                "scored_steps": 2
+              },
+              "value": 0.2529722762372505
+            },
+            {
+              "metadata": {
+                "prompt_id": "0:arithmetic",
+                "scored_steps": 2
+              },
+              "value": 0.06549345880834308
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:story",
+                "scored_steps": 14
+              },
+              "value": 0.0639774254931587
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:dog",
+                "scored_steps": 16
+              },
+              "value": 0.1272709158465232
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:capital",
+                "scored_steps": 2
+              },
+              "value": 0.2529722762372505
+            },
+            {
+              "metadata": {
+                "prompt_id": "1:arithmetic",
+                "scored_steps": 2
+              },
+              "value": 0.06549345880834308
+            }
+          ],
+          "uncertainty": {},
+          "value": 0.10496912001587588
+        }
+      },
+      "name": "metria.trajectory_kld",
+      "reason": null,
+      "status": "completed",
+      "version": "0.1.0"
+    }
+  ],
+  "change": {
+    "candidate": {
+      "engine_version": "0.30.0",
+      "kv_cache_dtype": "fp8"
+    },
+    "identity_authority": "claimed",
+    "parameter": "declared_endpoint_configuration",
+    "reference": {
+      "engine_version": "0.30.0",
+      "kv_cache_dtype": "auto"
+    }
+  },
+  "comparison": {
+    "comparable_metrics": [
+      "request_latency_seconds",
+      "task_check_pass_rate",
+      "trajectory_mean_steps",
+      "trajectory_nonempty_capture_rate"
+    ],
+    "compatible": true,
+    "incompatible_metrics": {},
+    "issues": [],
+    "waived_differences": []
+  },
+  "comparison_plan": {
+    "block_by": [],
+    "control": [
+      "measurements",
+      "model",
+      "scenario",
+      "trial_policy"
+    ],
+    "vary": [
+      "observed.declared.kv_cache_dtype",
+      "observed.endpoint",
+      "observed.identity.endpoint",
+      "resolved.declared.kv_cache_dtype",
+      "resolved.runtime.base_url_env",
+      "runtime.base_url_env",
+      "runtime.declared.kv_cache_dtype"
+    ]
+  },
+  "comparison_status": "VALID",
+  "controls": [
+    {
+      "dimension": "measurements",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "model",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "scenario",
+      "role": "control",
+      "status": "matched"
+    },
+    {
+      "dimension": "trial_policy",
+      "role": "control",
+      "status": "matched"
+    }
+  ],
+  "exit_code": 0,
+  "hardware": {
+    "accelerators": [],
+    "host": {
+      "cpu_count": 24,
+      "hostname_sha256": "d1b769e2866b556cff175081e940028335488516ee00d53affb1d7acce86cb7d"
+    },
+    "metadata": {
+      "accelerator_detection": "runtime_or_adapter_required"
+    },
+    "platform": {
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "release": "6.8.0-149-generic",
+      "system": "Linux",
+      "version": "#149-Ubuntu SMP PREEMPT_DYNAMIC Fri Oct 23 13:21:10 UTC 2026"
+    },
+    "software": {
+      "python_executable": "python",
+      "python_implementation": "CPython",
+      "python_version": "3.12.3"
+    }
+  },
+  "implementation": {
+    "name": "metria.verify",
+    "source_sha256": "51a1984a0063c3e045d4de2d7ca54bd064c03841278e9d86a7348817bc42168c",
+    "version": "0.1.6"
+  },
+  "lifecycle": {
+    "records": {
+      "candidate": "completed",
+      "reference": "completed"
+    },
+    "status": "completed"
+  },
+  "performance": {
+    "absolute_delta": -0.039451253249999985,
+    "available": true,
+    "candidate": 0.321063516875,
+    "direction": "improved",
+    "label": "Client-side request latency (includes network)",
+    "limitations": "Client-side wall time per sequential request, including the network, load balancer and any concurrent traffic on the server. Descriptive only; not a policy target.",
+    "methodology": {
+      "aggregation": "arithmetic mean across complete measured request calls",
+      "clock": "perf_counter_ns",
+      "excluded": [
+        "engine startup",
+        "warmup",
+        "cache reset"
+      ],
+      "isolation": "none: remote server state is not reset between trials",
+      "runtime_hardware": null,
+      "sample_count": 8,
+      "schedule": "sequential prompts in declared order",
+      "scope": "session.infer call after engine launch",
+      "source": "sequential session.infer calls",
+      "trials_per_prompt": 2,
+      "warmup_trials": 0,
+      "workload_sha256": "06df1ca435a00b6f13e7dd793e138e8e9534946b6632dfb9f9b0f8ff1fb631b0"
+    },
+    "metric": {
+      "direction": "lower_is_better",
+      "method": "metria.runtime_call_latency",
+      "name": "request_latency_seconds",
+      "unit": "seconds",
+      "version": "1"
+    },
+    "reference": 0.360514770125,
+    "relative_baseline_floor_seconds": 1e-09,
+    "relative_delta": -0.10943033828078998,
+    "relative_unavailable_reason": null,
+    "schema": "metria.performance_impact.v1",
+    "unsupported_metrics": [
+      "ttft",
+      "inter_token_latency",
+      "decode_throughput",
+      "peak_device_memory",
+      "kv_memory"
+    ]
+  },
+  "policy": {
+    "criteria": [
+      {
+        "criterion": {
+          "min": 1.0,
+          "target": "quality.candidate_pass_rate",
+          "unit": "fraction",
+          "version": "1"
+        },
+        "observed_source": {
+          "aggregation": "mean",
+          "analysis": {
+            "name": "metria.verification_impact",
+            "version": "1"
+          },
+          "coverage": 1.0,
+          "metric": {
+            "direction": "higher_is_better",
+            "method": "metria.task_check_comparison",
+            "name": "candidate_task_pass_rate",
+            "unit": "fraction",
+            "version": "1"
+          },
+          "raw_value": 1.0
+        },
+        "observed_value": 1.0,
+        "reason": null,
+        "result": "PASS",
+        "target_identity": {
+          "direction": "higher_is_better",
+          "kind": "number",
+          "name": "quality.candidate_pass_rate",
+          "source": {
+            "aggregation": "mean",
+            "analysis": {
+              "name": "metria.verification_impact",
+              "version": "1"
+            },
+            "metric": {
+              "direction": "higher_is_better",
+              "method": "metria.task_check_comparison",
+              "name": "candidate_task_pass_rate",
+              "unit": "fraction",
+              "version": "1"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "fraction",
+          "version": "1"
+        }
+      },
+      {
+        "criterion": {
+          "max": 0.5,
+          "target": "behavior.trajectory_kld_mean",
+          "unit": "nats",
+          "version": "0.1.0"
+        },
+        "observed_source": {
+          "aggregation": "mean_over_shared_context_steps",
+          "analysis": {
+            "name": "metria.trajectory_kld",
+            "version": "0.1.0"
+          },
+          "coverage": 1.0,
+          "metric": {
+            "direction": "lower_is_better",
+            "method": "metria.trajectory_kld",
+            "name": "trajectory_kld_mean",
+            "unit": "nats",
+            "version": "0.1.0"
+          },
+          "raw_value": 0.10496912001587588
+        },
+        "observed_value": 0.10496912001587588,
+        "reason": null,
+        "result": "PASS",
+        "target_identity": {
+          "direction": "lower_is_better",
+          "kind": "number",
+          "name": "behavior.trajectory_kld_mean",
+          "qualification": "staged",
+          "source": {
+            "aggregation": "mean_over_shared_context_steps",
+            "analysis": {
+              "name": "metria.trajectory_kld",
+              "version": "0.1.0"
+            },
+            "metric": {
+              "direction": "lower_is_better",
+              "method": "metria.trajectory_kld",
+              "name": "trajectory_kld_mean",
+              "unit": "nats",
+              "version": "0.1.0"
+            },
+            "normalization_divisor": 1.0
+          },
+          "unit": "nats",
+          "version": "0.1.0"
+        }
+      }
+    ],
+    "gate": "VERIFIED",
+    "policy_schema": "metria.verification_policy.v1",
+    "schema": "metria.policy_evaluation.v1",
+    "status": "PASS"
+  },
+  "policy_status": "PASS",
+  "recipe_digest": "100bbc25efaca6e21b24f680c326090f940a51a8f4f43a3bfaf5f628de5ade90",
+  "records": {
+    "candidate": {
+      "evidence_digest": "8a16d8363d92a0f620cf58f0207e74b08de7e0a61fb46e3eb84bc4847548035c",
+      "evidence_gaps": [],
+      "observed": {
+        "claimed_model": "smollm2",
+        "claimed_runtime_version": "0.30.0",
+        "context": 512,
+        "declared": {
+          "engine_version": "0.30.0",
+          "kv_cache_dtype": "fp8"
+        },
+        "identity_authority": "claimed",
+        "identity_status": "partial"
+      },
+      "path": "candidate.run.json",
+      "record_digest": "0238bee3dd16e5808806fe45fbd20be2117183b4c9290714a8d04e68a8aef331",
+      "run_id": "run-0001",
+      "status": "completed"
+    },
+    "reference": {
+      "evidence_digest": "216bba100965f7206834e496264f7e88d4fb4f6e1e8a05d383b0e88735fee8c0",
+      "evidence_gaps": [],
+      "observed": {
+        "claimed_model": "smollm2",
+        "claimed_runtime_version": "0.30.0",
+        "context": 512,
+        "declared": {
+          "engine_version": "0.30.0",
+          "kv_cache_dtype": "auto"
+        },
+        "identity_authority": "claimed",
+        "identity_status": "partial"
+      },
+      "path": "reference.run.json",
+      "record_digest": "7b678079e86b13b45f66a9249a32c8b5717e0c83e6c09c4cd85d42f87e7b5c4a",
+      "run_id": "run-0000",
+      "status": "completed"
+    }
+  },
+  "schema": "metria.verification.v1",
+  "scope": "remote_endpoint_change.v1",
+  "study": "remote-endpoint-change",
+  "systems": {
+    "candidate": {
+      "available": false
+    },
+    "reference": {
+      "available": false
+    }
+  },
+  "verdict": "PASS"
+}
