@@ -51,7 +51,7 @@ class ChatTemplate:
         config = json.loads(raw)
         source = _template_source(config)
         try:
-            from jinja2.sandbox import (  # type: ignore[import-not-found]
+            from jinja2.sandbox import (  # type: ignore[import-not-found,unused-ignore]
                 ImmutableSandboxedEnvironment,
             )
         except ImportError as exc:

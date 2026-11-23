@@ -248,3 +248,14 @@ def test_every_isolated_route_is_accepted_by_the_native_worker(parallel_case):
 
     route = build_route(parallel_case["recipe"])
     assert route.isolated and route.scope in worker_scopes()
+
+
+def test_candidate_parallel_options_map_to_sizes():
+    from metria.preparation_parallel import candidate_parallel
+
+    assert candidate_parallel(None, None) is None
+    assert candidate_parallel(2, None) == {"tensor_parallel_size": 2}
+    assert candidate_parallel(None, 2) == {
+        "tensor_parallel_size": 1,
+        "pipeline_parallel_size": 2,
+    }

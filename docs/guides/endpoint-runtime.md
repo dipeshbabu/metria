@@ -94,6 +94,11 @@ returns the gaps a verification profile applies.
 - `https` is required, except `http` on loopback (`localhost`, `127.0.0.1`,
   `::1`). URLs with credentials, a query or a fragment are rejected. TLS
   certificates are always verified.
+- Redirects are never followed: a 3xx response fails the attempt, so the key
+  cannot be forwarded to another host. `HTTP_PROXY`/`HTTPS_PROXY` are
+  ignored; requests go directly to the configured endpoint.
+- One verifying TLS context is built per connection and shared by concurrent
+  requests, instead of reloading the system CA store for every request.
 - Observed endpoint identity keeps only the scheme, port and a hash of the base
   path; the host is retained only for loopback addresses.
 

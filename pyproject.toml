@@ -91,6 +91,8 @@ metria = "metria.cli:main"
 dev = [
     "build>=1.0",
     "coverage>=7.15.3",
+    # Exercises local chat-template rendering in endpoint tests.
+    "jinja2>=3.1",
     "mypy==2.4.1",
     "pre-commit>=4.6.1",
     "pytest>=9.0.3",

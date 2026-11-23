@@ -5,6 +5,11 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Test local chat-template rendering for real: `jinja2` is now a dev
+  dependency, and new tests cover loop controls, `strftime_now`,
+  non-escaping `tojson`, `raise_exception`, named templates, tampered configs
+  and the sandbox (`endpoint_chat.py` coverage 20% → 93%).
+- Document the endpoint transport's redirect, proxy and TLS-context behavior.
 ## 0.1.7
 
 - vLLM runs record `observed.numerics_environment`: allow-listed `NCCL_*`,
