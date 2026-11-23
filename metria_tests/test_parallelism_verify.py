@@ -259,3 +259,88 @@ def test_candidate_parallel_options_map_to_sizes():
         "tensor_parallel_size": 1,
         "pipeline_parallel_size": 2,
     }
+
+
+@pytest.mark.parametrize(
+    ("change", "match"),
+    [
+        ("pipeline_one_side", "same parallel settings"),
+        ("zero_size", "positive integer"),
+        ("one_run", "exactly two runs"),
+        ("wrong_analyses", "trajectory and impact"),
+        ("no_checks", "task checks"),
+        ("prefix_on", "prefix caching off"),
+        ("dtype_differs", "may differ"),
+    ],
+)
+def test_more_invalid_parallel_recipes(parallel_case, change, match):
+    recipe, config = parallel_case["recipe"], parallel_case["config"]
+    left, right = recipe.study.runs
+
+    def runs(new_left, new_right):
+        return replace(recipe, study=replace(recipe.study, runs=(new_left, new_right)))
+
+    if change == "pipeline_one_side":
+        recipe = runs(
+            left, replace(right, runtime={**right.runtime, "pipeline_parallel_size": 1})
+        )
+    elif change == "zero_size":
+        recipe = runs(
+            left, replace(right, runtime={**right.runtime, "tensor_parallel_size": 0})
+        )
+    elif change == "one_run":
+        recipe = replace(recipe, study=replace(recipe.study, runs=(left,)))
+    elif change == "wrong_analyses":
+        plan = replace(
+            recipe.study.comparison, analyses=(TrajectoryAgreementAnalysis.name,)
+        )
+        recipe = replace(
+            recipe, policy=None, study=replace(recipe.study, comparison=plan)
+        )
+    elif change == "no_checks":
+        bare = {
+            **config,
+            "prompts": [
+                {k: v for k, v in row.items() if k != "checks"}
+                for row in config["prompts"]
+            ],
+        }
+        recipe = replace(
+            recipe, measurement_configs={TokenTrajectoryProtocol.name: bare}
+        )
+    elif change == "prefix_on":
+        recipe = runs(
+            replace(left, runtime={**left.runtime, "enable_prefix_caching": True}),
+            replace(right, runtime={**right.runtime, "enable_prefix_caching": True}),
+        )
+    else:
+        recipe = runs(
+            left, replace(right, runtime={**right.runtime, "dtype": "bfloat16"})
+        )
+    with pytest.raises(ValueError, match=match):
+        validate_parallelism_recipe(recipe)
+
+
+def test_staged_kld_registers_the_divergence_analysis(parallel_case):
+    from metria.measurements import TrajectoryDivergenceAnalysis
+    from metria.verification_vllm import trial_identity
+
+    recipe, config = parallel_case["recipe"], dict(parallel_case["config"])
+    config["staged_distributions"] = True
+    runs = tuple(
+        replace(run, trial_policy=trial_identity(config)) for run in recipe.study.runs
+    )
+    plan = replace(
+        recipe.study.comparison,
+        analyses=(
+            TrajectoryAgreementAnalysis.name,
+            VerificationImpactAnalysis.name,
+            TrajectoryDivergenceAnalysis.name,
+        ),
+    )
+    recipe = replace(
+        recipe,
+        study=replace(recipe.study, runs=runs, comparison=plan),
+        measurement_configs={TokenTrajectoryProtocol.name: config},
+    )
+    assert TrajectoryDivergenceAnalysis.name in build_route(recipe).analyses
