@@ -24,6 +24,47 @@ synthetic. A demo cannot establish runtime support, model quality or performance
 It runs in a separate bounded process so fake evidence never replaces the active
 verifier's runtime bindings. Choose a new output directory for each invocation.
 
+## Check your setup and start a workspace
+
+!!! note "Unreleased"
+    `metria doctor` and `metria init` are on `main` and ship in the next release
+    after 0.1.7.
+
+`metria doctor` checks only what you point it at and reports each item as ok,
+warn or fail with a fix. It exits 1 when anything blocks verification:
+
+```bash
+metria doctor --model /path/to/local/model --policy policy.json   --endpoint-env METRIA_REFERENCE_URL --endpoint-env METRIA_CANDIDATE_URL
+```
+
+It reports the Python and Metria versions, optional packages (vLLM, torch,
+tokenizers, Jinja2, cryptography), which verification profiles an installed
+vLLM version is qualified for, NVIDIA GPUs with FP8 KV-cache (compute capability
+8.9+) and multi-GPU support, whether a model directory has `config.json` and
+`tokenizer.json`, and whether a policy file is valid. Endpoint variables are
+checked for presence and URL shape only: doctor never prints their values,
+contacts a server, launches an engine or downloads anything. Add `--json` for a
+`metria.doctor.v1` report, or `--no-gpus` to skip `nvidia-smi`.
+
+`metria init` writes starter files into a new directory and never overwrites:
+
+```bash
+metria init --output-dir my-study --model /path/to/local/model
+```
+
+| File | Contents |
+|---|---|
+| `workload.jsonl` | Example prompts, each with a `nonempty` task check |
+| `policy.json` | A `metria.verification_policy.v1` template |
+| `descriptor.proposed.json` | SHA-256 pins for the model directory's files (with `--model`) |
+| `NEXT_STEPS.md` | Commands for endpoint and local vLLM verification |
+
+The prompts and thresholds are placeholders, not recommendations. Pins computed
+from files on disk prove only that those files have not changed since; check
+them against the publisher's revision, then rename the file to
+`descriptor.json` (or rerun with `--approve-pins`) before passing it to
+`--descriptor`.
+
 ## Prepare your real comparison
 
 With a qualified vLLM runtime and pinned local model already installed, run Metria

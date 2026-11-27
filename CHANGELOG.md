@@ -5,6 +5,15 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add `metria doctor` and `metria init` (#239). `doctor` reports Python,
+  optional packages, the profiles an installed vLLM is qualified for, GPU FP8
+  and multi-GPU capability, model directory, policy validity and endpoint
+  variable presence (values are never shown or contacted), as ok/warn/fail
+  with fixes, exiting 1 on blocking problems; `--json` emits
+  `metria.doctor.v1`. `init` writes an example workload with task checks, a
+  policy template, a proposed pinned model descriptor and next steps into a
+  new directory, never overwriting and never trusting pins without
+  `--approve-pins`.
 - Endpoint verification can require signed host collector evidence (#238):
   each run names a collector, challenged at launch and after the last request
   with fresh nonces bound to its session, role and deployment. Verified,
