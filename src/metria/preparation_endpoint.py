@@ -68,6 +68,18 @@ def _scenario(
     return scenario
 
 
+def _collector_block(collector: Mapping[str, Any], role: str) -> dict[str, Any]:
+    """One run's collector settings from the shared preparation options."""
+
+    return {
+        "url_env": collector[f"{role}_url_env"],
+        "keys_env": collector["keys_env"],
+        "deployment": collector[f"{role}_deployment"],
+        "role": role,
+        "trust": dict(collector.get("trust") or {}),
+    }
+
+
 def prepare_endpoint_recipe(
     *,
     model_id: str,
@@ -94,6 +106,7 @@ def prepare_endpoint_recipe(
     top_p: float | None = None,
     stop: Sequence[str] | None = None,
     chat_template: bool = False,
+    collector: Mapping[str, Any] | None = None,
 ) -> StudyRecipe:
     from .verification_endpoint import (
         analyses,
@@ -124,7 +137,9 @@ def prepare_endpoint_recipe(
         max_tokens, seed, temperature, seeds, top_p, stop, chat_template
     )
 
-    def run(url_env: str, key_env: str | None, declared: Mapping[str, Any]) -> RunSpec:
+    def run(
+        url_env: str, key_env: str | None, declared: Mapping[str, Any], role: str
+    ) -> RunSpec:
         runtime: dict[str, Any] = {
             "name": "openai_endpoint",
             "flavor": flavor,
@@ -135,6 +150,8 @@ def prepare_endpoint_recipe(
         }
         if key_env is not None:
             runtime["api_key_env"] = key_env
+        if collector is not None:
+            runtime["collector"] = _collector_block(collector, role)
         return RunSpec(
             model=model,
             runtime=runtime,
@@ -143,8 +160,8 @@ def prepare_endpoint_recipe(
             trial_policy=trial_identity(config),
         )
 
-    left = run(reference_url_env, reference_key_env, reference_declared)
-    right = run(candidate_url_env, candidate_key_env, candidate_declared)
+    left = run(reference_url_env, reference_key_env, reference_declared, "reference")
+    right = run(candidate_url_env, candidate_key_env, candidate_declared, "candidate")
     recipe = StudyRecipe(
         study=StudySpec(
             name="remote-endpoint-change",
@@ -219,6 +236,53 @@ def add_endpoint_parser(subparsers: Any) -> None:
         action="store_true",
         help="render the pinned tokenizer_config.json chat template locally",
     )
+    group = parser.add_argument_group(
+        "host evidence collectors",
+        "require signed collector evidence from each server host (all or none)",
+    )
+    for name in ("reference-collector-url-env", "candidate-collector-url-env"):
+        group.add_argument("--" + name)
+    group.add_argument(
+        "--collector-keys-env", help="variable holding the JSON key ring"
+    )
+    group.add_argument("--reference-deployment")
+    group.add_argument("--candidate-deployment")
+    group.add_argument(
+        "--required-fact",
+        action="append",
+        default=[],
+        help="fact that must be observed",
+    )
+    group.add_argument("--collector-max-age", type=float, default=300.0)
+
+
+def _collector_options(args: Any) -> dict[str, Any] | None:
+    names = (
+        "reference_collector_url_env",
+        "candidate_collector_url_env",
+        "collector_keys_env",
+        "reference_deployment",
+        "candidate_deployment",
+    )
+    given = [getattr(args, name) for name in names]
+    if not any(given):
+        return None
+    if not all(given):
+        raise ValueError(
+            "collector options need both collector URL variables, the key ring "
+            "variable and both deployment names"
+        )
+    trust: dict[str, Any] = {"max_age_s": args.collector_max_age}
+    if args.required_fact:
+        trust.update(require_collector=True, required_facts=list(args.required_fact))
+    return {
+        "reference_url_env": args.reference_collector_url_env,
+        "candidate_url_env": args.candidate_collector_url_env,
+        "keys_env": args.collector_keys_env,
+        "reference_deployment": args.reference_deployment,
+        "candidate_deployment": args.candidate_deployment,
+        "trust": trust,
+    }
 
 
 def prepare_endpoint_command(args: Any, stdout: TextIO) -> int:
@@ -255,6 +319,7 @@ def prepare_endpoint_command(args: Any, stdout: TextIO) -> int:
         top_p=args.top_p,
         stop=args.stop,
         chat_template=args.chat_template,
+        collector=_collector_options(args),
     )
     _write_atomic(args.output, study_recipe_to_json(recipe) + "\n")
     stdout.write(f"Prepared {args.output}\nRecipe: {study_recipe_digest(recipe)}\n")

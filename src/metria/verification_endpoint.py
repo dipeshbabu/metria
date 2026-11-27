@@ -31,6 +31,12 @@ from .models import RunRecord, RunSpec
 from .recipes import StudyRecipe
 from .runtimes.endpoint import RUNTIME_NAME, TOKEN_FLAVORS, EndpointAdapter
 from .runtimes.endpoint_identity import identity_gaps, validate_declared
+from .verification_endpoint_trust import (
+    authority,
+    collector_gaps,
+    collector_vary,
+    collectors,
+)
 from .verification_evidence import task_check_gaps, task_check_identity
 from .verification_route import VerificationRoute
 from .verification_schema import ENDPOINT_SCOPE
@@ -141,7 +147,7 @@ def derived_vary(left: RunSpec, right: RunSpec) -> frozenset[str]:
                 f"observed.identity_snapshots.before.{snapshot}",
                 f"observed.identity_snapshots.after.{snapshot}",
             }
-    return frozenset(paths)
+    return frozenset(paths | collector_vary(left, right))
 
 
 def _validate_runs(left: RunSpec, right: RunSpec, config: Mapping[str, Any]) -> None:
@@ -169,7 +175,8 @@ def _validate_runs(left: RunSpec, right: RunSpec, config: Mapping[str, Any]) -> 
         raise ValueError(
             "endpoint verification requires identical model and scenario inputs"
         )
-    plumbing = {"base_url_env", "api_key_env", "declared"}
+    collectors(left, right)
+    plumbing = {"base_url_env", "api_key_env", "declared", "collector"}
     if {k: v for k, v in left.runtime.items() if k not in plumbing} != {
         k: v for k, v in right.runtime.items() if k not in plumbing
     }:
@@ -304,6 +311,7 @@ def evidence_gaps(
         *identity_gaps(record.observed),
         *_workload_gaps(record, trials),
         *task_check_gaps(record, quality_identity),
+        *collector_gaps(record),
     ]
     if distributions:
         gaps += _distribution_gaps(record)
@@ -322,7 +330,7 @@ def observed_facts(record: RunRecord) -> dict[str, Any]:
     runtime = _section(identity, "runtime")
     model = _section(identity, "model")
     return {
-        "identity_authority": record.observed.get("identity_authority"),
+        "identity_authority": authority(record),
         "identity_status": identity.get("status"),
         "claimed_runtime_version": runtime.get("version"),
         "claimed_model": model.get("id"),
@@ -381,7 +389,11 @@ def build_route(recipe: StudyRecipe) -> VerificationRoute:
         change={
             "parameter": "declared_endpoint_configuration",
             **declarations,
-            "identity_authority": "claimed",
+            "identity_authority": (
+                "collector_observed"
+                if collectors(*recipe.study.runs)[0] is not None
+                else "claimed"
+            ),
         },
         performance=endpoint_performance,
     )

@@ -245,6 +245,8 @@ def _scope_label(manifest: Mapping[str, Any]) -> str:
     if manifest.get("scope") == "local_vllm_parallelism.v1":
         return "Scope: STAGED local vLLM tensor/pipeline parallelism comparison"
     if manifest.get("scope") == "remote_endpoint_change.v1":
+        if manifest.get("change", {}).get("identity_authority") == "collector_observed":
+            return "Scope: STAGED remote endpoint comparison; deployment facts were observed by signed host collectors, which prove origin and integrity, not truth on a compromised host"
         return "Scope: STAGED remote endpoint comparison; server identity was reported by the server, not verified by Metria"
     return "Scope: unrecognized verification contract"
 

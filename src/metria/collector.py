@@ -54,6 +54,11 @@ _BOOL_FLAGS = {
     "--no-enable-prefix-caching": ("engine.enable_prefix_caching", False),
     "--enforce-eager": ("engine.enforce_eager", True),
 }
+_VLLM_DEFAULTS = {
+    "engine.kv_cache_dtype": "auto",
+    "engine.tensor_parallel_size": 1,
+    "engine.pipeline_parallel_size": 1,
+}
 _MODEL_SUFFIXES = (
     ".json",
     ".safetensors",
@@ -206,6 +211,11 @@ def collect_facts(config: CollectorConfig) -> tuple[dict[str, Any], list[str]]:
         if argv:
             engine, model = parse_vllm_command(argv)
             facts.update(engine)
+            if any("vllm" in a for a in argv[:3]):
+                # vLLM's documented defaults for omitted flags, listed explicitly.
+                defaulted = [k for k in _VLLM_DEFAULTS if k not in engine]
+                facts.update({k: _VLLM_DEFAULTS[k] for k in defaulted})
+                facts["engine.defaulted"] = defaulted
             facts["engine.command"] = (
                 "vllm" if any("vllm" in a for a in argv[:3]) else "unknown"
             )
