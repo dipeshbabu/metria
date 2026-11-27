@@ -140,41 +140,43 @@ def _completion(case: str):
 def _run_fixture(case: str, output: Path) -> int:
     """Run only in the isolated synthetic-demo worker; never use as runtime evidence."""
     with tempfile.TemporaryDirectory(prefix="metria-example-") as temporary:
-        root = Path(temporary)
-        recipe_path = _fixture_recipe(root, case)
+        return _run_fixture_in(Path(temporary), case, output)
 
-        stdout, stderr = io.StringIO(), io.StringIO()
-        with (
-            patch.object(llamacpp.subprocess, "run", _completion(case)),
-            patch.object(llamacpp, "time", SimpleNamespace(monotonic=lambda: 1.0)),
-            patch.object(
-                verification,
-                "capture_hardware_fingerprint",
-                lambda: HardwareFingerprint(platform={"system": "synthetic-fixture"}),
-            ),
-            patch.object(verification, "VERIFICATION_SCOPE", "synthetic_fixture.v1"),
-        ):
-            code = verify_main(
-                ["verify", str(recipe_path), "--output", str(output), "--json"],
-                stdout=stdout,
-                stderr=stderr,
-            )
-        if not (output / "verification.json").is_file():
-            raise RuntimeError(
-                "fixture failed before producing a canonical result: "
-                + stderr.getvalue()
-            )
-        data = json.loads(stdout.getvalue())
-        data["scope"] = "synthetic_fixture.v1"
-        data["fixture_only"] = True
-        serialized = json.dumps(data, indent=2, sort_keys=True, allow_nan=False) + "\n"
-        for filename in ("verification.json", "manifest.json"):
-            (output / filename).write_text(serialized, encoding="utf-8")
-        (output / "report.md").write_text(
-            verification.render_verification(data), encoding="utf-8"
+
+def _run_fixture_in(root: Path, case: str, output: Path) -> int:
+    recipe_path = _fixture_recipe(root, case)
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    with (
+        patch.object(llamacpp.subprocess, "run", _completion(case)),
+        patch.object(llamacpp, "time", SimpleNamespace(monotonic=lambda: 1.0)),
+        patch.object(
+            verification,
+            "capture_hardware_fingerprint",
+            lambda: HardwareFingerprint(platform={"system": "synthetic-fixture"}),
+        ),
+        patch.object(verification, "VERIFICATION_SCOPE", "synthetic_fixture.v1"),
+    ):
+        code = verify_main(
+            ["verify", str(recipe_path), "--output", str(output), "--json"],
+            stdout=stdout,
+            stderr=stderr,
         )
-        print(verification.render_verification(data))
-        return code
+    if not (output / "verification.json").is_file():
+        raise RuntimeError(
+            "fixture failed before producing a canonical result: " + stderr.getvalue()
+        )
+    data = json.loads(stdout.getvalue())
+    data["scope"] = "synthetic_fixture.v1"
+    data["fixture_only"] = True
+    serialized = json.dumps(data, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    for filename in ("verification.json", "manifest.json"):
+        (output / filename).write_text(serialized, encoding="utf-8")
+    (output / "report.md").write_text(
+        verification.render_verification(data), encoding="utf-8"
+    )
+    print(verification.render_verification(data))
+    return code
 
 
 def main() -> int:

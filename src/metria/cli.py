@@ -48,11 +48,13 @@ def _parser() -> argparse.ArgumentParser:
     from .pilot import add_pilot_parser
 
     add_pilot_parser(subparsers)
+    from .baseline import add_baseline_parser
     from .collector import add_collector_parser
     from .doctor import add_onboarding_parsers
 
     add_collector_parser(subparsers)
     add_onboarding_parsers(subparsers)
+    add_baseline_parser(subparsers)
 
     _add_recipe_parser(subparsers)
     demo = subparsers.add_parser(
@@ -636,7 +638,7 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
     try:
         if args.command == "verify":
             return _verify_command(args, out, err)
-        if args.command in {"demo", "pilot", "collector", "doctor", "init"}:
+        if args.command in {"demo", "pilot", "collector", "doctor", "init", "baseline"}:
             return _guided_command(args, out, err)
         if args.command == "recipe" and args.recipe_command in {
             "prepare-vllm",
@@ -698,6 +700,10 @@ def _main(argv: Sequence[str], out: TextIO, err: TextIO) -> int:
 
 
 def _guided_command(args: Any, out: TextIO, err: TextIO) -> int:
+    if args.command == "baseline":
+        from .baseline import baseline_command
+
+        return baseline_command(args, out)
     if args.command in {"doctor", "init"}:
         from .doctor import doctor_command, init_command
 

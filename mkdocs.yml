@@ -121,6 +121,7 @@ nav:
           - Performance measurements: guides/verification-performance.md
           - Gate a change in CI: guides/verification-ci.md
           - Repeated verification trials: guides/verification-trials.md
+          - Reference baselines (staged): guides/baselines.md
       - Runtime qualification: guides/runtime-qualification.md
       - vLLM qualification: guides/vllm-qualification.md
       - Staged capabilities: guides/staged-capabilities.md
