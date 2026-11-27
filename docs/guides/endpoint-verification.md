@@ -12,6 +12,10 @@ dtype, a quantized checkpoint, or new server flags.
     itself and checks it stays consistent, but cannot verify which weights or
     binary a remote server runs.
 
+With [host evidence collectors](endpoint-collector.md) on each serving host,
+engine configuration, model file digests and GPUs become signed,
+`collector_observed` evidence instead of server claims.
+
 ## Requirements
 
 - Two running servers with a flavor that returns token IDs (`vllm`), reachable

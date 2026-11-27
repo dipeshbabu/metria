@@ -5,6 +5,15 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Endpoint verification can require signed host collector evidence (#238):
+  each run names a collector, challenged at launch and after the last request
+  with fresh nonces bound to its session, role and deployment. Verified,
+  stable facts upgrade identity to `collector_observed`; unverifiable,
+  unstable, required-but-unavailable or contradicting evidence is an evidence
+  gap, and undeclared observed differences are not comparable.
+  `prepare-endpoint` gains `--*-collector-url-env`, `--collector-keys-env`,
+  `--*-deployment`, `--required-fact` and `--collector-max-age`. New guide
+  documents setup, enforcement and the threat model.
 - Add `metria collector serve` / `metria collector keygen` (#238 step 2): an
   optional collector that runs beside an inference server and answers
   verifier challenges with signed envelopes of facts the server cannot be

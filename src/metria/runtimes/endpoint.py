@@ -28,6 +28,7 @@ from ..protocols import (
     RuntimeSession,
     SupportReport,
 )
+from .endpoint_collector import CollectorSession, validate_collector
 from .endpoint_http import (
     EndpointConnection,
     _env_name,
@@ -89,7 +90,7 @@ def _runtime(spec: RunSpec) -> dict[str, Any]:
     runtime = dict(spec.runtime)
     if runtime.get("name") != RUNTIME_NAME:
         raise ValueError(f"runtime.name must be {RUNTIME_NAME!r}")
-    if unknown := set(runtime) - _RUNTIME_KEYS - {"declared"}:
+    if unknown := set(runtime) - _RUNTIME_KEYS - {"declared", "collector"}:
         raise ValueError(
             "unsupported endpoint runtime fields: " + ", ".join(sorted(unknown))
         )
@@ -264,6 +265,7 @@ class EndpointSession:
     invocations: list[dict[str, Any]] = field(default_factory=list)
     concurrent_invocations: list[dict[str, Any]] = field(default_factory=list)
     chat: Any = None
+    collector: CollectorSession | None = None
 
     def _prompt_ids(self, prompt: str) -> tuple[str, list[int], bool]:
         """Return the text sent for tokenization, its IDs and the special flag."""
@@ -471,6 +473,7 @@ class EndpointAdapter:
             "decode": _decode(spec.scenario),
             "declared": validate_declared(spec.runtime.get("declared")),
             "chat_template": _chat_requested(spec, runtime["flavor"]),
+            "collector": validate_collector(spec.runtime.get("collector")),
         }
 
     def launch(
@@ -498,6 +501,11 @@ class EndpointAdapter:
             session.chat = ChatTemplate(
                 model["tokenizer_path"], model["tokenizer_files"]
             )
+        if resolved.get("collector"):
+            session.collector = CollectorSession(
+                resolved["collector"], runtime["timeout_s"]
+            )
+            session.collector.snapshot("before")
         return session
 
     def observe(self, session: RuntimeSession) -> dict[str, Any]:
@@ -511,6 +519,11 @@ class EndpointAdapter:
         except (RuntimeError, ValueError):
             after = None
         endpoint = session.connection.identity()
+        collector: dict[str, Any] = {}
+        if session.collector is not None:
+            session.collector.snapshot("after")
+            compared, receipts = session.collector.observed()
+            collector = {"collector": compared, "collector_receipts": receipts}
         tokenizer = (
             session.tokenizer_check.evidence() if session.tokenizer_check else None
         )
@@ -535,4 +548,5 @@ class EndpointAdapter:
             "concurrent_invocations": [
                 dict(row) for row in session.concurrent_invocations
             ],
+            **collector,
         }

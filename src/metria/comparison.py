@@ -41,6 +41,8 @@ _OBSERVED_NON_COMPARISON_ROOTS = frozenset(
         "invocations",
         # Concurrent request timings differ every run by design.
         "concurrent_invocations",
+        # Per-host collector receipts (nonces, timestamps, UUID hashes).
+        "collector_receipts",
         "reset_count",
         "closed",
         "cleanup",
