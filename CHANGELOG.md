@@ -5,6 +5,16 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add `metria baseline capture|validate|inspect|check` (#240 step 1).
+  Capture copies a completed verification bundle and its exact recipe into a
+  local store under a content-addressed ID, with a receipt binding file
+  hashes, reference identity, controls, verifier implementation, hardware and
+  expiry. Directories are published by atomic rename and never overwritten;
+  tampered, partial, renamed or duplicate baselines fail closed. `check`
+  reports per-family eligibility (behavior, quality, timing, memory) with
+  reasons and falls back to a fresh paired run; stale baselines and changed
+  workload, checks, model, runtime, methodology or hardware are never reused,
+  and timing/memory reuse requires an explicit window chosen at capture.
 - Add `metria doctor` and `metria init` (#239). `doctor` reports Python,
   optional packages, the profiles an installed vLLM is qualified for, GPU FP8
   and multi-GPU capability, model directory, policy validity and endpoint
