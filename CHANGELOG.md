@@ -5,6 +5,14 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add `metria.evidence_envelope` (foundation for #238): versioned
+  `metria.endpoint_evidence.v1` envelopes signed over canonical JSON
+  (HMAC-SHA256 in the standard library; Ed25519 when `cryptography` is
+  installed), bound to a verifier challenge (nonce, run ID, role, deployment)
+  and a freshness window, with a key ring for rotation, an opt-in trust policy
+  (required collector, required facts, allowed keys), replay detection and
+  redaction checks. Authority levels distinguish operator-declared,
+  server-claimed, collector-observed and (reserved) hardware-attested evidence.
 - Test local chat-template rendering for real: `jinja2` is now a dev
   dependency, and new tests cover loop controls, `strftime_now`,
   non-escaping `tojson`, `raise_exception`, named templates, tampered configs
