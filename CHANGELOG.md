@@ -5,6 +5,14 @@ canonical implementation. TurboQuant Reference retains its source-only history.
 
 ## Unreleased
 
+- Add `metria collector serve` / `metria collector keygen` (#238 step 2): an
+  optional collector that runs beside an inference server and answers
+  verifier challenges with signed envelopes of facts the server cannot be
+  trusted to self-report: vLLM engine flags from the server process's command
+  line, SHA-256 of model and tokenizer files, GPUs and driver from
+  `nvidia-smi`, the process's numerics environment (secrets excluded) and an
+  optional image digest. Unreadable facts are listed as unavailable; paths
+  appear only as hashes.
 - Add `metria.evidence_envelope` (foundation for #238): versioned
   `metria.endpoint_evidence.v1` envelopes signed over canonical JSON
   (HMAC-SHA256 in the standard library; Ed25519 when `cryptography` is
